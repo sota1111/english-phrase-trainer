@@ -1,66 +1,49 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import { StatsCard } from '@/components/StatsCard';
 
-export default function Home() {
+type Stats = {
+  totalPhrases: number;
+  answeredPhrases: number;
+  unansweredPhrases: number;
+  weakPhrases: number;
+  averageAccuracy: number;
+};
+
+export default async function HomePage() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
+  let stats: Stats = { totalPhrases: 0, answeredPhrases: 0, unansweredPhrases: 0, weakPhrases: 0, averageAccuracy: 0 };
+  try {
+    const res = await fetch(`${baseUrl}/api/stats`, { cache: 'no-store' });
+    if (res.ok) stats = await res.json();
+  } catch { /* Firestore unavailable at build time */ }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+      <h1>英語フレーズ学習アプリ</h1>
+      <p>フレーズを登録して、クイズで学習しましょう。</p>
+
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', margin: '2rem 0' }}>
+        <StatsCard label="登録フレーズ数" value={stats.totalPhrases} />
+        <StatsCard label="回答済み" value={stats.answeredPhrases} />
+        <StatsCard label="未回答" value={stats.unansweredPhrases} />
+        <StatsCard label="苦手フレーズ" value={stats.weakPhrases} description="正答率50%未満" />
+        <StatsCard
+          label="平均正答率"
+          value={stats.answeredPhrases > 0 ? `${Math.round(stats.averageAccuracy * 100)}%` : '-'}
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      <nav style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <Link href="/review" style={{ padding: '0.75rem 1.5rem', background: '#0070f3', color: '#fff', borderRadius: '6px', textDecoration: 'none' }}>
+          復習クイズを開始
+        </Link>
+        <Link href="/phrases" style={{ padding: '0.75rem 1.5rem', background: '#f0f0f0', color: '#333', borderRadius: '6px', textDecoration: 'none' }}>
+          フレーズ管理
+        </Link>
+        <Link href="/weak" style={{ padding: '0.75rem 1.5rem', background: '#f0f0f0', color: '#333', borderRadius: '6px', textDecoration: 'none' }}>
+          苦手フレーズ一覧
+        </Link>
+      </nav>
+    </main>
   );
 }

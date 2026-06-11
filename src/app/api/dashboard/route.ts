@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { countDueReviews } from '@/lib/firestore/reviewSchedules';
 import { getDailyStat, getStreakDays, getTotalReviewCount, getMonthlyStats } from '@/lib/firestore/dailyStats';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const today = new Date();
     today.setHours(23, 59, 59, 999);

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 type Phrase = {
@@ -30,7 +31,7 @@ export function SpacedReviewClient({ items }: Props) {
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <h2>今日の復習はありません</h2>
         <p>新しいフレーズを追加するか、明日また来てください。</p>
-        <a href="/" style={{ color: '#0070f3' }}>ホームへ戻る</a>
+        <Link href="/" style={{ color: '#0070f3' }}>ホームへ戻る</Link>
       </div>
     );
   }
@@ -41,9 +42,9 @@ export function SpacedReviewClient({ items }: Props) {
         <h2>復習完了！</h2>
         <p>覚えていた: {results.correct} 件</p>
         <p>覚えていなかった: {results.incorrect} 件</p>
-        <a href="/" style={{ padding: '0.75rem 1.5rem', background: '#0070f3', color: '#fff', borderRadius: '6px', textDecoration: 'none', display: 'inline-block', marginTop: '1rem' }}>
+        <Link href="/" style={{ padding: '0.75rem 1.5rem', background: '#0070f3', color: '#fff', borderRadius: '6px', textDecoration: 'none', display: 'inline-block', marginTop: '1rem' }}>
           ホームへ戻る
-        </a>
+        </Link>
       </div>
     );
   }

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { CalendarClient } from './CalendarClient';
 
 export default async function CalendarPage() {
@@ -17,7 +18,7 @@ export default async function CalendarPage() {
   return (
     <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-        <a href="/" style={{ color: '#0070f3', textDecoration: 'none' }}>← ホーム</a>
+        <Link href="/" style={{ color: '#0070f3', textDecoration: 'none' }}>← ホーム</Link>
         <h1 style={{ margin: 0 }}>学習カレンダー</h1>
       </div>
       <CalendarClient initialData={data} />

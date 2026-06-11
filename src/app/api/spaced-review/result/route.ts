@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPhraseById } from '@/lib/firestore/phrases';
 import { getReviewSchedule, upsertReviewSchedule } from '@/lib/firestore/reviewSchedules';
+import { incrementDailyStat } from '@/lib/firestore/dailyStats';
 import { calculateNextReview, DEFAULT_SM2_PARAMS } from '@/lib/sm2';
 
 export async function POST(request: NextRequest) {
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
 
     const next = calculateNextReview(params, isCorrect);
     await upsertReviewSchedule(phraseId, next);
+    await incrementDailyStat(new Date(), isCorrect, phraseId);
 
     return NextResponse.json({
       phraseId,

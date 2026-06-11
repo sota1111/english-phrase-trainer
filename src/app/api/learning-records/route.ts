@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLearningRecord } from '@/lib/firestore/learningRecords';
 import { updatePhraseStats } from '@/lib/firestore/phrases';
-import { isCorrectAnswer } from '@/lib/quiz';
 import { QuizType, LearningRecordInput } from '@/types/learningRecord';
 
 type RecordRequest = {
@@ -10,6 +9,10 @@ type RecordRequest = {
   answer: string;
   correctAnswer: string;
 };
+
+function isCorrectAnswer(answer: string, correctAnswer: string): boolean {
+  return answer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+}
 
 export async function POST(request: NextRequest) {
   try {

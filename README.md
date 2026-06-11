@@ -263,3 +263,91 @@ gcloud billing budgets create \
 - 学習進捗グラフ（Chart.js等）
 - PWA対応（オフライン学習）
 - 複数ユーザー対応（Firestore セキュリティルール）
+
+## ローカル開発（Firestore Emulator使用）
+
+本番Firestoreなしでローカル開発が可能です。Firebase Emulatorを使用します。
+
+### 前提条件
+
+- Node.js 18+
+- npm
+- Java 11+ （Firestoreエミュレーターの実行に必要）
+- Firebase CLI: `npm install -g firebase-tools`
+
+### 手順
+
+#### 方法1: Firebase Emulatorを手動で起動する
+
+```bash
+# 1. リポジトリのクローン
+git clone https://github.com/sota1111/english-phrase-trainer.git
+cd english-phrase-trainer
+
+# 2. 依存パッケージのインストール
+npm install
+
+# 3. 環境変数の設定
+cp .env.local.example .env.local
+# .env.local を開いて FIRESTORE_EMULATOR_HOST のコメントを外す
+
+# 4. Firestoreエミュレーターの起動（別ターミナル）
+firebase emulators:start --only firestore
+
+# 5. アプリの起動
+npm run dev
+```
+
+アクセス: http://localhost:3000
+エミュレーターUI: http://localhost:4000
+
+#### 方法2: Docker Composeで起動する
+
+```bash
+cp .env.local.example .env.local
+docker compose up
+```
+
+アクセス: http://localhost:3000
+
+### 動作確認
+
+エミュレーター起動後、以下を確認:
+
+```bash
+# フレーズ一覧API
+curl http://localhost:3000/api/phrases
+
+# 統計API
+curl http://localhost:3000/api/stats
+```
+
+## Docker単体での実行
+
+```bash
+docker build -t english-phrase-trainer .
+docker run -p 3000:3000 \
+  -e GOOGLE_CLOUD_PROJECT=your-gcp-project-id \
+  -e FIRESTORE_EMULATOR_HOST=host.docker.internal:8080 \
+  english-phrase-trainer
+```
+
+## Cloud Runへのデプロイ
+
+```bash
+# gcloud認証
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+
+# イメージをビルドしてArtifact Registryへプッシュ
+gcloud builds submit --tag asia-northeast1-docker.pkg.dev/YOUR_PROJECT_ID/english-phrase-trainer/app
+
+# Cloud Runへデプロイ
+gcloud run deploy english-phrase-trainer \
+  --image asia-northeast1-docker.pkg.dev/YOUR_PROJECT_ID/english-phrase-trainer/app \
+  --platform managed \
+  --region asia-northeast1 \
+  --allow-unauthenticated \
+  --set-env-vars GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID \
+  --memory 512Mi
+```

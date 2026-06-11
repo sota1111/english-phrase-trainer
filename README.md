@@ -5,9 +5,9 @@
 英語フレーズを登録・管理し、クイズ形式で学習するWebアプリ。
 
 - フレーズ一覧・追加・編集・削除
-- 復習クイズ（意味→フレーズ入力、穴埋め形式）
-- 正誤記録・正答率集計
-- 苦手フレーズ管理
+- 間隔反復（SM-2）に基づく復習スケジューリング
+- 正誤記録・学習カレンダー
+- 個人利用向けパスワード認証
 
 ## GCP最適化方針
 
@@ -22,7 +22,7 @@
 - **フレームワーク**: Next.js 16 (App Router, TypeScript)
 - **データベース**: Firestore (Firebase Admin SDK)
 - **ホスティング**: Cloud Run
-- **認証**: なし（個人用途）
+- **認証**: パスワード認証 + HTTP-only Cookie セッション（個人利用向け）
 
 ```
 [ブラウザ] → [Cloud Run (Next.js)] → [Firestore]
@@ -67,20 +67,26 @@
 ```
 src/
   app/
-    api/phrases/     GET/POST/PUT/DELETE
-    api/review/      GET（クイズ対象フレーズ取得）
+    api/auth/login/   POST（ログイン）
+    api/auth/logout/  POST（ログアウト）
+    api/phrases/      GET/POST/PUT/DELETE
+    api/spaced-review/ GET（復習フレーズ取得）, POST/result（結果記録）
     api/learning-records/  POST（正誤記録）
-    api/stats/       GET（統計情報）
-    phrases/         フレーズ管理画面
-    review/          復習クイズ設定・実行
-    weak/            苦手フレーズ一覧
-    page.tsx         トップページ
-  components/        再利用UIコンポーネント
+    api/dashboard/    GET（ダッシュボード統計）
+    api/calendar/     GET（学習カレンダー）
+    api/stats/        GET（統計情報）
+    login/            ログイン画面
+    phrases/          フレーズ管理画面
+    spaced-review/    間隔反復復習画面
+    calendar/         学習カレンダー画面
+    page.tsx          ダッシュボード（トップページ）
+  components/         再利用UIコンポーネント（LogoutButtonなど）
   lib/
     firebase-admin.ts
-    quiz.ts
+    sm2.ts
     firestore/
-  types/             型定義
+  types/              型定義
+  middleware.ts       認証ミドルウェア（全ルート保護）
 ```
 
 ## ローカル起動手順
@@ -104,6 +110,10 @@ cp .env.local.example .env.local
 ```
 GOOGLE_CLOUD_PROJECT=your-gcp-project-id
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
+# 認証設定
+AUTH_PASSWORD=your-secure-password-here
+AUTH_SECRET=your-random-secret-key-32chars-or-more
 ```
 
 ### 3. Firestoreへの接続
@@ -125,6 +135,32 @@ npm run dev
 ```
 
 http://localhost:3000 でアクセス可能。
+
+## 認証設定
+
+このアプリはアプリ所有者本人のみが利用できる個人利用向け認証を実装しています。
+
+### 認証方式
+
+- パスワード認証 + HTTP-only Cookie セッション
+- セッションは HMAC-SHA256 による stateless トークン（有効期限: 7日間）
+- 追加パッケージ不要（Node.js組み込み `crypto` モジュールを使用）
+
+### 環境変数
+
+| 変数名 | 説明 | 例 |
+|--------|------|-----|
+| `AUTH_PASSWORD` | ログイン時のパスワード | `mysecretpassword` |
+| `AUTH_SECRET` | セッション署名用のランダム文字列（32文字以上推奨） | `random-secret-key-32chars` |
+
+### 対象外機能
+
+以下の機能は実装していません（個人利用のため不要）：
+
+- ユーザー登録
+- 複数ユーザー管理
+- パスワード再発行
+- 管理者画面
 
 ## Firebase Emulator手順
 
@@ -197,6 +233,8 @@ gcloud run deploy english-phrase-trainer \
   --allow-unauthenticated \
   --set-env-vars GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
   --set-env-vars NEXT_PUBLIC_BASE_URL=https://your-cloudrun-url \
+  --set-env-vars AUTH_PASSWORD=your-secure-password \
+  --set-env-vars AUTH_SECRET=your-random-secret-key \
   --min-instances 0 \
   --max-instances 2 \
   --memory 512Mi \
@@ -257,12 +295,10 @@ gcloud billing budgets create \
 
 ## 将来拡張案
 
-- Firebase Authentication による認証追加
 - 音声読み上げ（Web Speech API）
 - CSVインポート/エクスポート
 - 学習進捗グラフ（Chart.js等）
 - PWA対応（オフライン学習）
-- 複数ユーザー対応（Firestore セキュリティルール）
 
 ## ローカル開発（Firestore Emulator使用）
 
@@ -349,5 +385,7 @@ gcloud run deploy english-phrase-trainer \
   --region asia-northeast1 \
   --allow-unauthenticated \
   --set-env-vars GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID \
+  --set-env-vars AUTH_PASSWORD=your-secure-password \
+  --set-env-vars AUTH_SECRET=your-random-secret-key \
   --memory 512Mi
 ```

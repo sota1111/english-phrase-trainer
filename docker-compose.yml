@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  firestore-emulator:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    command: >
+      gcloud beta emulators firestore start
+      --host-port=0.0.0.0:8080
+      --project=demo-project
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - GOOGLE_CLOUD_PROJECT=demo-project
+      - FIRESTORE_EMULATOR_HOST=firestore-emulator:8080
+      - NODE_ENV=development
+    depends_on:
+      firestore-emulator:
+        condition: service_healthy

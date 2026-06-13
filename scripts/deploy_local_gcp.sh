@@ -41,8 +41,17 @@ gcloud builds submit . \
   --tag="${IMAGE}:latest" \
   --timeout=600s
 
+
+# Secret Manager: 初回デプロイ前に以下を実行してください
+# echo -n "value" | gcloud secrets create english-trainer-auth-password --data-file=- --project=$PROJECT_ID
+# echo -n "value" | gcloud secrets create english-trainer-auth-secret --data-file=- --project=$PROJECT_ID
+# gcloud projects add-iam-policy-binding $PROJECT_ID \
+#   --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
+#   --role="roles/secretmanager.secretAccessor"
+
 gcloud run deploy "${SERVICE_NAME}" \
   --image="${IMAGE}:latest" \
+  --set-secrets="AUTH_PASSWORD=english-trainer-auth-password:latest,AUTH_SECRET=english-trainer-auth-secret:latest" \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \
   --platform=managed \
@@ -52,7 +61,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --cpu=1 \
   --min-instances=0 \
   --max-instances=1 \
-  --set-env-vars="AUTH_PASSWORD=${AUTH_PASSWORD},AUTH_SECRET=${AUTH_SECRET}" \
+  
   --quiet
 
 URL=$(gcloud run services describe "${SERVICE_NAME}" \

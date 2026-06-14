@@ -2,8 +2,11 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase-client';
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,10 +17,12 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ idToken }),
       });
       if (res.ok) {
         router.push('/');
@@ -26,8 +31,15 @@ export default function LoginPage() {
         const data = await res.json().catch(() => ({}));
         setError(data.error ?? '認証に失敗しました');
       }
-    } catch {
-      setError('ネットワークエラーが発生しました');
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code ?? '';
+      if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+        setError('メールアドレスまたはパスワードが正しくありません');
+      } else if (code === 'auth/too-many-requests') {
+        setError('ログイン試行が多すぎます。しばらく待ってから再試行してください');
+      } else {
+        setError('ログインに失敗しました');
+      }
     } finally {
       setLoading(false);
     }
@@ -40,6 +52,21 @@ export default function LoginPage() {
         <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem', textAlign: 'center' }}>ログインしてください</p>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>
+            <label htmlFor="email" style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem', color: '#333' }}>
+              メールアドレス
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #ccc', fontSize: '1rem', boxSizing: 'border-box' }}
+              placeholder="your-email@example.com"
+            />
+          </div>
+          <div style={{ marginBottom: '1rem' }}>
             <label htmlFor="password" style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem', color: '#333' }}>
               パスワード
             </label>
@@ -49,6 +76,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
               style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #ccc', fontSize: '1rem', boxSizing: 'border-box' }}
               placeholder="パスワードを入力"
             />

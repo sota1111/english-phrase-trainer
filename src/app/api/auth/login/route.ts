@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHmac, timingSafeEqual } from 'crypto';
+import { createHmac } from 'crypto';
+import { adminAuth } from '@/lib/firebase-admin';
 
 function computeToken(secret: string): string {
   return createHmac('sha256', secret)
@@ -9,28 +10,27 @@ function computeToken(secret: string): string {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { password } = body as { password?: string };
+  const { idToken } = body as { idToken?: string };
 
-  const authPassword = process.env.AUTH_PASSWORD;
   const authSecret = process.env.AUTH_SECRET;
+  const allowedEmails = process.env.ALLOWED_USER_EMAILS
+    ? process.env.ALLOWED_USER_EMAILS.split(',').map((e) => e.trim()).filter(Boolean)
+    : [];
 
-  if (!authPassword || !authSecret || !password) {
+  if (!authSecret || !idToken) {
     return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
   }
 
-  let isValid = false;
+  let email: string;
   try {
-    const inputBuf = Buffer.from(password);
-    const expectedBuf = Buffer.from(authPassword);
-    if (inputBuf.length === expectedBuf.length) {
-      isValid = timingSafeEqual(inputBuf, expectedBuf);
-    }
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    email = decoded.email ?? '';
   } catch {
-    isValid = false;
+    return NextResponse.json({ error: '認証トークンが無効です' }, { status: 401 });
   }
 
-  if (!isValid) {
-    return NextResponse.json({ error: 'パスワードが正しくありません' }, { status: 401 });
+  if (allowedEmails.length > 0 && !allowedEmails.includes(email)) {
+    return NextResponse.json({ error: 'このメールアドレスは許可されていません' }, { status: 403 });
   }
 
   const token = computeToken(authSecret);

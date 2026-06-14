@@ -7,7 +7,7 @@
 - フレーズ一覧・追加・編集・削除
 - 間隔反復（SM-2）に基づく復習スケジューリング
 - 正誤記録・学習カレンダー
-- 個人利用向けパスワード認証
+- Firebase Authentication による個人利用向け認証
 
 ## GCP最適化方針
 
@@ -22,7 +22,7 @@
 - **フレームワーク**: Next.js 16 (App Router, TypeScript)
 - **データベース**: Firestore (Firebase Admin SDK)
 - **ホスティング**: Cloud Run
-- **認証**: パスワード認証 + HTTP-only Cookie セッション（個人利用向け）
+- **認証**: Firebase Authentication（メール/パスワード）+ HTTP-only Cookie セッション（個人利用向け）
 
 ```
 [ブラウザ] → [Cloud Run (Next.js)] → [Firestore]
@@ -108,12 +108,20 @@ cp .env.local.example .env.local
 `.env.local` を編集：
 
 ```
+# Firebase クライアント設定（Firebase Console > プロジェクト設定 > アプリ から取得）
+NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id
+
+# 許可するメールアドレス（カンマ区切り）
+ALLOWED_USER_EMAILS=your-email@example.com
+
+# セッションcookie署名用シークレット（32文字以上推奨）
+AUTH_SECRET=your-random-secret-key-32chars-or-more
+
 GOOGLE_CLOUD_PROJECT=your-gcp-project-id
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
-
-# 認証設定
-AUTH_PASSWORD=your-secure-password-here
-AUTH_SECRET=your-random-secret-key-32chars-or-more
 ```
 
 ### 3. Firestoreへの接続
@@ -137,15 +145,52 @@ npm run dev
 http://localhost:3000 でアクセス可能。
 
 ## 認証設定
-### GCP Secret Manager セットアップ
+
+このアプリはアプリ所有者本人のみが利用できる個人利用向け認証を実装しています。
+
+### 認証方式
+
+- Firebase Authentication（メール/パスワードログイン）
+- ログイン後、Firebase ID トークンをサーバーサイドで検証し、HTTP-only Cookie にセッションを保存
+- 許可されたメールアドレスのみアプリを利用できる（ALLOWED_USER_EMAILS）
+
+### Firebase Authentication セットアップ
+
+1. [Firebase Console](https://console.firebase.google.com/) でプロジェクトを開く
+2. 「Authentication」→「始める」をクリック
+3. 「Sign-in method」タブで「メール/パスワード」を有効化
+4. 「Users」タブでログインに使用するメールアドレスとパスワードを追加
+5. 「プロジェクト設定」→「マイアプリ」でウェブアプリを追加し、設定値を取得
+
+### 許可メールアドレスの設定
+
+`ALLOWED_USER_EMAILS` 環境変数にカンマ区切りで許可するメールアドレスを設定します：
+
+```
+ALLOWED_USER_EMAILS=your-email@example.com,another@example.com
+```
+
+- 空の場合は Firebase Authentication で認証されたすべてのユーザーがアクセス可能
+- 許可されていないメールアドレスでログインするとアクセス不可メッセージを表示
+
+### 環境変数一覧
+
+| 変数名 | 説明 | 必須 |
+|--------|------|------|
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase API キー | Yes |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase Auth ドメイン | Yes |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase プロジェクト ID | Yes |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase App ID | Yes |
+| `ALLOWED_USER_EMAILS` | 許可メールアドレス（カンマ区切り） | 推奨 |
+| `AUTH_SECRET` | セッション Cookie 署名用シークレット（32文字以上） | Yes |
+| `GOOGLE_CLOUD_PROJECT` | GCP プロジェクト ID（Firestore 接続用） | Yes |
+
+### GCP Secret Manager セットアップ（本番環境）
 
 本番環境（Cloud Run）では機密情報を Secret Manager で管理します。初回デプロイ前に以下のコマンドでシークレットを作成してください。
 
 ```bash
-# パスワードの作成
-echo -n "your-password" | gcloud secrets create english-trainer-auth-password --data-file=- --project=YOUR_PROJECT_ID
-
-# 署名シークレットの作成
+# セッション署名シークレットの作成
 echo -n "your-auth-secret" | gcloud secrets create english-trainer-auth-secret --data-file=- --project=YOUR_PROJECT_ID
 
 # Cloud Run サービスアカウントへの権限付与
@@ -154,30 +199,15 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
   --role="roles/secretmanager.secretAccessor"
 ```
 
-
-このアプリはアプリ所有者本人のみが利用できる個人利用向け認証を実装しています。
-
-### 認証方式
-
-- パスワード認証 + HTTP-only Cookie セッション
-- セッションは HMAC-SHA256 による stateless トークン（有効期限: 7日間）
-- 追加パッケージ不要（Node.js組み込み `crypto` モジュールを使用）
-
-### 環境変数
-
-| 変数名 | 説明 | 例 |
-|--------|------|-----|
-| `AUTH_PASSWORD` | ログイン時のパスワード | `mysecretpassword` |
-| `AUTH_SECRET` | セッション署名用のランダム文字列（32文字以上推奨） | `random-secret-key-32chars` |
-
 ### 対象外機能
 
 以下の機能は実装していません（個人利用のため不要）：
 
-- ユーザー登録
+- ユーザー登録（Firebase Console で手動追加）
 - 複数ユーザー管理
 - パスワード再発行
 - 管理者画面
+
 
 ## Firebase Emulator手順
 
@@ -250,7 +280,11 @@ gcloud run deploy english-phrase-trainer \
   --allow-unauthenticated \
   --set-env-vars GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
   --set-env-vars NEXT_PUBLIC_BASE_URL=https://your-cloudrun-url \
-  --set-env-vars AUTH_PASSWORD=your-secure-password \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id \
+  --set-env-vars ALLOWED_USER_EMAILS=your-email@example.com \
   --set-env-vars AUTH_SECRET=your-random-secret-key \
   --min-instances 0 \
   --max-instances 2 \
@@ -402,7 +436,11 @@ gcloud run deploy english-phrase-trainer \
   --region asia-northeast1 \
   --allow-unauthenticated \
   --set-env-vars GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID \
-  --set-env-vars AUTH_PASSWORD=your-secure-password \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id \
+  --set-env-vars NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id \
+  --set-env-vars ALLOWED_USER_EMAILS=your-email@example.com \
   --set-env-vars AUTH_SECRET=your-random-secret-key \
   --memory 512Mi
 ```

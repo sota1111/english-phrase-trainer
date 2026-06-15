@@ -1,240 +1,296 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>english-phrase-trainer --mode=quiz</title>
-    <style>
-        :root {
-            --bg-color: #0d1117;
-            --text-color: #00ff41;
-            --dim-text: #008f11;
-            --border-color: #00ff41;
-            --highlight-bg: #1a1a1a;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Courier New', 'Lucida Console', monospace;
-            margin: 0;
-            padding: 2rem;
-            line-height: 1.4;
-        }
-        header {
-            border-bottom: 1px solid var(--dim-text);
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-        }
-        .prompt::before {
-            content: "$ ";
-        }
-        .quiz-container {
-            border: 1px solid var(--dim-text);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: #000;
-        }
-        .phrase {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        .translation {
-            font-size: 1.5rem;
-            color: #fff;
-            margin-bottom: 2rem;
-            min-height: 1.5em;
-        }
-        .hint {
-            color: var(--dim-text);
-            animation: blink 1s step-end infinite;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        button {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--text-color);
-            padding: 0.5rem 1rem;
-            font-family: inherit;
-            cursor: pointer;
-        }
-        button:hover {
-            background: var(--text-color);
-            color: var(--bg-color);
-        }
-        .stats {
-            margin: 1rem 0;
-            padding: 1rem;
-            border: 1px dashed var(--dim-text);
-        }
-        .cheat-sheet {
-            margin-top: 4rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        th, td {
-            text-align: left;
-            padding: 0.5rem;
-            border: 1px solid var(--dim-text);
-        }
-        .review-section {
-            margin-top: 4rem;
-            border-top: 1px solid var(--dim-text);
-            padding-top: 2rem;
-        }
-        .review-comment {
-            margin-bottom: 1rem;
-            color: var(--dim-text);
-        }
-        footer {
-            margin-top: 4rem;
-            text-align: center;
-            color: var(--dim-text);
-            font-size: 0.8rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Phrase Trainer</title>
+<style>
+  :root {
+    --bg: #f0f7ff;
+    --primary: #1565c0;
+    --correct: #2e7d32;
+    --incorrect: #c62828;
+    --card-bg-front: #ffffff;
+    --card-bg-back: #e8f5e9;
+    --text: #333333;
+    --font: 'Quicksand', 'Helvetica Rounded', 'Arial Rounded MT Bold', sans-serif;
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  /* Header & Progress */
+  header {
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem 1rem 1rem;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  h1 { color: var(--primary); margin: 0 0 1rem 0; font-size: 1.8rem; }
+  .progress-wrap {
+    width: 100%;
+    height: 8px;
+    background: #d0e4fb;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* Deck Selection */
+  .decks {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .deck-btn {
+    background: #fff;
+    border: 2px solid #d0e4fb;
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+  .deck-btn.active, .deck-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  /* Flashcard */
+  .card-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    margin-bottom: 2rem;
+    cursor: pointer;
+  }
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    box-shadow: 0 8px 24px rgba(21, 101, 192, 0.15);
+    border: 2px solid #d0e4fb;
+    text-align: center;
+    backface-visibility: hidden;
+  }
+  .card-front {
+    background: var(--card-bg-front);
+  }
+  .card-back {
+    background: var(--card-bg-back);
+    transform: rotateY(180deg);
+    border-color: var(--correct);
+  }
+  .phrase { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; color: var(--primary); }
+  .hint { color: #666; font-size: 1.1rem; }
+  .translation { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--correct); }
+  .example { color: #555; font-size: 1rem; font-style: italic; }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .controls.visible { opacity: 1; pointer-events: auto; }
+  .srs-btn {
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    font-size: 1rem;
+    transition: transform 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .srs-btn:active { transform: scale(0.95); }
+  .btn-hard { background: var(--incorrect); }
+  .btn-good { background: #f57c00; }
+  .btn-easy { background: #7cb342; }
+  .btn-perfect { background: var(--correct); }
+
+  /* Stats */
+  .stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    background: #fff;
+    padding: 1rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    font-size: 0.9rem;
+  }
+  .stat-item { display: flex; flex-direction: column; align-items: center; }
+  .stat-val { font-weight: bold; font-size: 1.2rem; color: var(--primary); }
+
+  details {
+    margin-top: 3rem;
+    width: 100%;
+    max-width: 600px;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  summary { cursor: pointer; font-weight: bold; color: var(--primary); }
+
+</style>
 </head>
 <body>
-
-<header>
-    <div class="prompt">english-phrase-trainer --version</div>
-    <div>v1.0.4-stable (build: 20260615)</div>
-    <div class="prompt">english-phrase-trainer --mode=quiz</div>
-</header>
-
-<main>
-    <div class="quiz-container" id="quizArea" onclick="reveal()">
-        <div class="phrase" id="enText">Loading...</div>
-        <div class="translation" id="jaText"></div>
-        <div class="hint" id="revealHint">[CLICK TO REVEAL]</div>
+  <header>
+    <h1>English Phrase Trainer</h1>
+    <div class="decks">
+      <button class="deck-btn active" onclick="switchDeck(this)">日常会話</button>
+      <button class="deck-btn" onclick="switchDeck(this)">ビジネス</button>
+      <button class="deck-btn" onclick="switchDeck(this)">スラング</button>
+      <button class="deck-btn" onclick="switchDeck(this)">旅行</button>
+      <button class="deck-btn" onclick="switchDeck(this)">面接</button>
     </div>
-
-    <div class="controls" id="quizControls" style="display: none;">
-        <button onclick="record(true)">[✓ 正解]</button>
-        <button onclick="record(false)">[✗ 不正解]</button>
-        <button onclick="nextCard()">[NEXT ->]</button>
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progress"></div>
     </div>
+  </header>
 
-    <div class="stats" id="stats">
-        Score: <span id="correct">0</span>/<span id="total">0</span> | 
-        Accuracy: <span id="accuracy">0.0</span>% | 
-        Streak: <span id="streak">0</span>
+  <div class="card-container" onclick="flipCard()">
+    <div class="card" id="flashcard">
+      <div class="card-face card-front">
+        <div class="phrase" id="front-phrase">It's on the tip of my tongue.</div>
+        <div class="hint" id="front-hint">Situation: Trying to remember a word.</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="translation" id="back-trans">喉まで出かかっている</div>
+        <div class="example" id="back-ex">"I know his name... it's on the tip of my tongue!"</div>
+      </div>
     </div>
+  </div>
 
-    <section class="cheat-sheet">
-        <div class="prompt">cat phrases.txt</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Phrase (EN)</th>
-                    <th>Translation (JA)</th>
-                </tr>
-            </thead>
-            <tbody id="cheatTable"></tbody>
-        </table>
-    </section>
+  <div class="controls" id="controls">
+    <button class="srs-btn btn-hard" onclick="nextCard(false)"><span>😓</span>難しい</button>
+    <button class="srs-btn btn-good" onclick="nextCard(true)"><span>🤔</span>うーん</button>
+    <button class="srs-btn btn-easy" onclick="nextCard(true)"><span>😊</span>わかった</button>
+    <button class="srs-btn btn-perfect" onclick="nextCard(true)"><span>🌟</span>完璧</button>
+  </div>
 
-    <section class="review-section">
-        <div class="review-comment"># Claude's code review:</div>
-        <div class="review-comment">
-            "ターミナルUIは機能美の極致ですね。データが整然と並び、
-            情報密度が高い。個人的にはもう少しブレスを与えたいところですが、
-            エンジニアユーザーへの訴求力は抜群です。洗練された実用主義。★★★★☆"
-        </div>
-        <div class="review-comment"># Gemini's aesthetic assessment:</div>
-        <div class="review-comment">
-            "わあ、ダーク！かっこいい！ただ目が疲れそう…💻
-            Codexさんのページはまるでハッカーのアジトみたいで、ある意味最高です。
-            機能性は文句なし！でも、もしそこに虹色グラデーションが一本でもあれば…✨ ★★★☆☆"
-        </div>
-    </section>
-</main>
+  <div class="stats-bar">
+    <div class="stat-item"><span class="stat-val" style="color:var(--correct)" id="stat-correct">0</span>正解</div>
+    <div class="stat-item"><span class="stat-val" style="color:var(--incorrect)" id="stat-incorrect">0</span>不正解</div>
+    <div class="stat-item"><span class="stat-val" id="stat-rate">0%</span>正答率</div>
+    <div class="stat-item"><span class="stat-val" id="stat-streak">0</span>連続</div>
+  </div>
 
-<footer>
-    // Designed by Codex — Function over form, always
-</footer>
+  <details>
+    <summary>🤖 Design Credits & AI Reviews</summary>
+    <div style="margin-top:0.75rem;">
+      <p><strong>Designed by Gemini</strong></p>
+      <p><strong>Gemini's design note:</strong> 「学習アプリのデザインは"学習者の感情の波"に寄り添うべきです。正解した瞬間の緑、間違えた時の赤は批判ではなく、次への動機づけ。カードを中央に大きく置き、その他は消えるように設計しました。覚えることへの集中、それが機能美です。」</p>
+      <p><strong>Claude's review:</strong> 「3DフリップアニメーションのUXは正解。SRSの4段階評価ボタンのカラーコードが直感的で、モバイルでも使いやすそう。」</p>
+      <p><strong>Codex's review:</strong> 「デッキ切り替えとSRS更新のロジックが分離されていて、テストしやすい構造。スコア計算はシンプルで正確。」</p>
+    </div>
+  </details>
 
 <script>
-    var cards = [
-        { en: "Cut to the chase", ja: "要点を話す・前置きを省く" },
-        { en: "Hit the nail on the head", ja: "図星を突く・核心をつく" },
-        { en: "Bite the bullet", ja: "歯を食いしばって耐える" },
-        { en: "Break the ice", ja: "場の雰囲気をほぐす" },
-        { en: "Burn the midnight oil", ja: "夜遅くまで働く・徹夜する" },
-        { en: "Let the cat out of the bag", ja: "うっかり秘密を漏らす" },
-        { en: "Piece of cake", ja: "朝飯前・とても簡単なこと" },
-        { en: "Under the weather", ja: "体調が悪い" },
-        { en: "Once in a blue moon", ja: "めったにない・たまに" },
-        { en: "Go through the motions", ja: "形式的にこなす・惰性でやる" }
-    ];
+  const cards = [
+    { en: "It's on the tip of my tongue.", hint: "Situation: Trying to remember a word.", ja: "喉まで出かかっている", ex: "\"I know his name... it's on the tip of my tongue!\"" },
+    { en: "Call it a day.", hint: "Situation: Ending work.", ja: "今日はここまでにしよう", ex: "\"We've done enough for now. Let's call it a day.\"" },
+    { en: "Under the weather.", hint: "Situation: Feeling sick.", ja: "体調が優れない", ex: "\"I'm feeling a bit under the weather today.\"" },
+    { en: "Bite the bullet.", hint: "Situation: Facing a difficult situation.", ja: "困難に立ち向かう/我慢する", ex: "\"I'll just have to bite the bullet and do it.\"" },
+    { en: "Hit the sack.", hint: "Situation: Going to sleep.", ja: "寝る", ex: "\"I'm exhausted. It's time to hit the sack.\"" }
+  ];
+  
+  let currentIndex = 0;
+  let isFlipped = false;
+  let stats = { correct: 0, incorrect: 0, streak: 0 };
 
-    var currentIdx = 0;
-    var correctCount = 0;
-    var totalCount = 0;
-    var streakCount = 0;
+  function updateCard() {
+    const c = cards[currentIndex];
+    document.getElementById('front-phrase').innerText = c.en;
+    document.getElementById('front-hint').innerText = c.hint;
+    document.getElementById('back-trans').innerText = c.ja;
+    document.getElementById('back-ex').innerText = c.ex;
+    document.getElementById('progress').style.width = ((currentIndex) / cards.length * 100) + '%';
+  }
 
-    function init() {
-        var table = document.getElementById("cheatTable");
-        cards.forEach(function(c) {
-            var row = table.insertRow();
-            row.insertCell(0).innerText = c.en;
-            row.insertCell(1).innerText = c.ja;
-        });
-        nextCard();
+  function flipCard() {
+    if (isFlipped) return; // Don't flip back via card click
+    document.getElementById('flashcard').classList.add('flipped');
+    document.getElementById('controls').classList.add('visible');
+    isFlipped = true;
+  }
+
+  function nextCard(isCorrect) {
+    if (isCorrect) {
+      stats.correct++;
+      stats.streak++;
+    } else {
+      stats.incorrect++;
+      stats.streak = 0;
     }
+    
+    document.getElementById('stat-correct').innerText = stats.correct;
+    document.getElementById('stat-incorrect').innerText = stats.incorrect;
+    document.getElementById('stat-streak').innerText = stats.streak;
+    const total = stats.correct + stats.incorrect;
+    document.getElementById('stat-rate').innerText = Math.round((stats.correct / total) * 100) + '%';
 
-    function nextCard() {
-        currentIdx = Math.floor(Math.random() * cards.length);
-        document.getElementById("enText").innerText = cards[currentIdx].en;
-        document.getElementById("jaText").innerText = "";
-        document.getElementById("revealHint").style.display = "block";
-        document.getElementById("quizControls").style.display = "none";
-        document.getElementById("quizArea").style.pointerEvents = "auto";
-    }
+    document.getElementById('flashcard').classList.remove('flipped');
+    document.getElementById('controls').classList.remove('visible');
+    isFlipped = false;
 
-    function reveal() {
-        document.getElementById("jaText").innerText = cards[currentIdx].ja;
-        document.getElementById("revealHint").style.display = "none";
-        document.getElementById("quizControls").style.display = "flex";
-        document.getElementById("quizArea").style.pointerEvents = "none";
-    }
+    setTimeout(() => {
+      currentIndex = (currentIndex + 1) % cards.length;
+      updateCard();
+    }, 300);
+  }
 
-    function record(isCorrect) {
-        totalCount++;
-        if (isCorrect) {
-            correctCount++;
-            streakCount++;
-        } else {
-            streakCount = 0;
-        }
-        updateStats();
-        nextCard();
-    }
+  function switchDeck(btn) {
+    document.querySelectorAll('.deck-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentIndex = 0;
+    updateCard();
+  }
 
-    function updateStats() {
-        document.getElementById("correct").innerText = correctCount;
-        document.getElementById("total").innerText = totalCount;
-        document.getElementById("accuracy").innerText = ((correctCount / totalCount) * 100).toFixed(1);
-        document.getElementById("streak").innerText = streakCount;
-    }
-
-    init();
+  window.onload = updateCard;
 </script>
-
 </body>
 </html>

@@ -21,11 +21,50 @@ export function PhraseForm({ initialData, onSubmit, onCancel, isLoading }: Phras
     memo: initialData?.memo ?? '',
   });
 
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [genMessage, setGenMessage] = useState<{ type: 'error' | 'info'; text: string } | null>(null);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleGenerate = async (mode: 'ja2en' | 'en2ja') => {
+    const text = mode === 'ja2en' ? formData.meaningJa : formData.phrase;
+    if (!text.trim()) return;
+
+    setIsGenerating(true);
+    setGenMessage(null);
+
+    try {
+      const response = await fetch('/api/phrases/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode, text }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setFormData((prev) => ({
+          ...prev,
+          ...data.result,
+        }));
+        setGenMessage({ type: 'info', text: '自動生成しました。内容を確認・編集して保存してください。' });
+      } else {
+        setGenMessage({
+          type: response.status === 503 ? 'info' : 'error',
+          text: data.message || '自動生成に失敗しました。手動で入力してください。'
+        });
+      }
+    } catch (error) {
+      console.error('Generate error:', error);
+      setGenMessage({ type: 'error', text: '通信エラーが発生しました。手動で入力してください。' });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -115,11 +154,38 @@ export function PhraseForm({ initialData, onSubmit, onCancel, isLoading }: Phras
         />
       </div>
 
+      <div className="auto-gen-section">
+        <div className="gen-buttons">
+          <button
+            type="button"
+            onClick={() => handleGenerate('ja2en')}
+            disabled={isGenerating || isLoading || !formData.meaningJa.trim()}
+          >
+            日本語から英文を生成
+          </button>
+          <button
+            type="button"
+            onClick={() => handleGenerate('en2ja')}
+            disabled={isGenerating || isLoading || !formData.phrase.trim()}
+          >
+            英文から日本語を生成
+          </button>
+        </div>
+        <p className="gen-note">
+          日本語または英語のどちらかを入力して生成できます。ANTHROPIC_API_KEY 未設定時は自動生成は使えませんが手動入力は可能です。
+        </p>
+        {genMessage && (
+          <p className={`gen-message ${genMessage.type}`}>
+            {genMessage.text}
+          </p>
+        )}
+      </div>
+
       <div className="form-actions">
-        <button type="button" onClick={onCancel} disabled={isLoading}>
+        <button type="button" onClick={onCancel} disabled={isLoading || isGenerating}>
           キャンセル
         </button>
-        <button type="submit" className="submit" disabled={isLoading}>
+        <button type="submit" className="submit" disabled={isLoading || isGenerating}>
           {isLoading ? '保存中...' : '保存'}
         </button>
       </div>
@@ -155,6 +221,41 @@ export function PhraseForm({ initialData, onSubmit, onCancel, isLoading }: Phras
           justify-content: flex-end;
           gap: 1rem;
           margin-top: 1rem;
+        }
+        .auto-gen-section {
+          background: #f9f9f9;
+          padding: 1rem;
+          border-radius: 4px;
+          border: 1px dashed #ccc;
+          margin-top: 0.5rem;
+        }
+        .gen-buttons {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+        .gen-buttons button {
+          flex: 1;
+          font-size: 0.8rem;
+          padding: 0.4rem;
+          background: #eef;
+          border-color: #ccd;
+        }
+        .gen-note {
+          font-size: 0.75rem;
+          color: #666;
+          margin: 0;
+        }
+        .gen-message {
+          font-size: 0.8rem;
+          margin-top: 0.5rem;
+          font-weight: bold;
+        }
+        .gen-message.info {
+          color: #0070f3;
+        }
+        .gen-message.error {
+          color: #e00;
         }
         button {
           padding: 0.5rem 1.5rem;

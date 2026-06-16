@@ -50,6 +50,9 @@ export default async function HomePage() {
         <Link href="/spaced-review" style={{ padding: '0.75rem 1.5rem', background: '#0070f3', color: '#fff', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' }}>
           復習を開始 ({data.dueCount}件)
         </Link>
+        <Link href="/spaced-review/one-handed" style={{ padding: '0.75rem 1.5rem', background: '#e0f2fe', color: '#0369a1', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', border: '1px solid #bae6fd' }}>
+          片手モードで復習
+        </Link>
         <Link href="/phrases" style={{ padding: '0.75rem 1.5rem', background: '#f0f0f0', color: '#333', borderRadius: '6px', textDecoration: 'none' }}>
           フレーズ管理
         </Link>

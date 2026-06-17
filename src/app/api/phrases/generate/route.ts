@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { parseJson } from '@/lib/validation/api-helper';
+import { phraseGenerateSchema } from '@/lib/validation/schemas';
 
 export async function POST(request: NextRequest) {
   try {
-    const { mode, text } = await request.json();
-
-    if (!text || typeof text !== 'string' || !text.trim() || (mode !== 'ja2en' && mode !== 'en2ja')) {
-      return NextResponse.json(
-        { error: 'INVALID_INPUT', message: '入力が不正です。' },
-        { status: 400 }
-      );
+    const result = await parseJson(request, phraseGenerateSchema);
+    if (!result.success) {
+      return result.response;
     }
+    const { mode, text } = result.data;
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {

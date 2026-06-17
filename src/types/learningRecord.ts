@@ -12,4 +12,4 @@ export interface LearningRecord {
   answeredAt: Timestamp;
 }
 
-export type LearningRecordInput = Omit<LearningRecord, 'id'>;
+export type LearningRecordInput = Omit<LearningRecord, 'id' | 'answeredAt'>;

@@ -46,6 +46,36 @@ function timingSafeHexEqual(a: string, b: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // CSRF Protection for state-changing API requests
+  if (
+    pathname.startsWith('/api/') &&
+    ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+  ) {
+    const origin = request.headers.get('origin');
+    let targetOrigin = origin;
+
+    if (!targetOrigin) {
+      const referer = request.headers.get('referer');
+      if (referer) {
+        try {
+          targetOrigin = new URL(referer).origin;
+        } catch {
+          // ignore invalid referer
+        }
+      }
+    }
+
+    if (!targetOrigin || targetOrigin !== request.nextUrl.origin) {
+      return new NextResponse(
+        JSON.stringify({ error: 'CSRF validation failed' }),
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+  }
+
   // Allow public routes
   if (
     pathname === '/login' ||

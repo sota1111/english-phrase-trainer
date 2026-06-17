@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { submitReviewResultAction } from '@/lib/actions/reviewActions';
 
 type Phrase = {
   id: string;
@@ -53,11 +54,7 @@ export function SpacedReviewClient({ items }: Props) {
   const remaining = items.length - currentIndex;
 
   const handleAnswer = async (isCorrect: boolean) => {
-    await fetch('/api/spaced-review/result', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phraseId: current.phrase.id, isCorrect }),
-    });
+    await submitReviewResultAction({ phraseId: current.phrase.id, isCorrect });
 
     setResults(prev => ({
       correct: prev.correct + (isCorrect ? 1 : 0),

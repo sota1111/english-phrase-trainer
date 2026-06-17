@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getMonthlyStatsAction } from '@/lib/actions/statsActions';
 
 type DayData = {
   date: string;
@@ -38,13 +39,10 @@ export function CalendarClient({ initialData }: Props) {
     if (newMonth > 12) { newMonth = 1; newYear++; }
     setLoading(true);
     try {
-      const res = await fetch(`/api/calendar?year=${newYear}&month=${newMonth}`);
-      if (res.ok) {
-        const d = await res.json();
-        setData(d);
-        setYear(newYear);
-        setMonth(newMonth);
-      }
+      const d = await getMonthlyStatsAction(newYear, newMonth);
+      setData(d);
+      setYear(newYear);
+      setMonth(newMonth);
     } finally {
       setLoading(false);
     }

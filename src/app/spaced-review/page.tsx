@@ -1,11 +1,10 @@
-import { SpacedReviewClient } from './SpacedReviewClient';
+import { SpacedReviewClient } from '@/components/reviews/SpacedReviewClient';
+import { getDuePhrasesAction } from '@/lib/actions/reviewActions';
 
 export default async function SpacedReviewPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
-  let items: unknown[] = [];
+  let items: Parameters<typeof SpacedReviewClient>[0]['items'] = [];
   try {
-    const res = await fetch(`${baseUrl}/api/spaced-review`, { cache: 'no-store' });
-    if (res.ok) items = await res.json();
+    items = await getDuePhrasesAction() as Parameters<typeof SpacedReviewClient>[0]['items'];
   } catch {
     /* Firestore unavailable at build time */
   }

@@ -2,8 +2,6 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase-client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -17,12 +15,10 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const idToken = await userCredential.user.getIdToken();
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ email, password }),
       });
       if (res.ok) {
         router.push('/');
@@ -31,15 +27,8 @@ export default function LoginPage() {
         const data = await res.json().catch(() => ({}));
         setError(data.error ?? '認証に失敗しました');
       }
-    } catch (err: unknown) {
-      const code = (err as { code?: string }).code ?? '';
-      if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
-        setError('メールアドレスまたはパスワードが正しくありません');
-      } else if (code === 'auth/too-many-requests') {
-        setError('ログイン試行が多すぎます。しばらく待ってから再試行してください');
-      } else {
-        setError('ログインに失敗しました');
-      }
+    } catch {
+      setError('ログインに失敗しました');
     } finally {
       setLoading(false);
     }

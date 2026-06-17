@@ -392,3 +392,19 @@ docker run -p 3000:3000 \
   -e FIRESTORE_EMULATOR_HOST=host.docker.internal:8080 \
   english-phrase-trainer
 ```
+
+### E2E テスト (Playwright)
+
+ブラウザによるエンドツーエンドテストを実行します。
+
+```bash
+# ブラウザのインストール (初回のみ)
+npx playwright install chromium
+
+# テストの実行
+npm run test:e2e
+```
+
+認証が必要なテストを実行する場合、以下の環境変数を設定してください。未設定の場合は自動的にスキップされます。
+- `E2E_TEST_EMAIL`: テスト用ユーザーのメールアドレス
+- `E2E_TEST_PASSWORD`: テスト用ユーザーのパスワード

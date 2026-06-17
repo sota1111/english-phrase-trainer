@@ -3,15 +3,16 @@ import { getPhraseById } from '@/lib/firestore/phrases';
 import { getReviewSchedule, upsertReviewSchedule } from '@/lib/firestore/reviewSchedules';
 import { incrementDailyStat } from '@/lib/firestore/dailyStats';
 import { calculateNextReview, DEFAULT_SM2_PARAMS } from '@/lib/sm2';
+import { parseJson } from '@/lib/validation/api-helper';
+import { spacedReviewResultSchema } from '@/lib/validation/schemas';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { phraseId, isCorrect } = body as { phraseId: string; isCorrect: boolean };
-
-    if (!phraseId || typeof isCorrect !== 'boolean') {
-      return NextResponse.json({ error: 'phraseId and isCorrect are required' }, { status: 400 });
+    const result = await parseJson(request, spacedReviewResultSchema);
+    if (!result.success) {
+      return result.response;
     }
+    const { phraseId, isCorrect } = result.data;
 
     const phrase = await getPhraseById(phraseId);
     if (!phrase) {

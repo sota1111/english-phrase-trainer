@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPhrases, createPhrase } from '@/lib/firestore/phrases';
-import { PhraseInput } from '@/types/phrase';
+import { parseJson } from '@/lib/validation/api-helper';
+import { phraseInputSchema } from '@/lib/validation/schemas';
 
 export async function GET() {
   try {
@@ -14,8 +15,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: PhraseInput = await request.json();
-    const phrase = await createPhrase(body);
+    const result = await parseJson(request, phraseInputSchema);
+    if (!result.success) {
+      return result.response;
+    }
+    const phrase = await createPhrase(result.data);
     return NextResponse.json(phrase, { status: 201 });
   } catch (error) {
     console.error('POST /api/phrases error:', error);

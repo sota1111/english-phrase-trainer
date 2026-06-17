@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLearningRecord } from '@/lib/firestore/learningRecords';
 import { updatePhraseStats } from '@/lib/firestore/phrases';
-import { QuizType, LearningRecordInput } from '@/types/learningRecord';
-
-type RecordRequest = {
-  phraseId: string;
-  quizType: QuizType;
-  answer: string;
-  correctAnswer: string;
-};
+import { LearningRecordInput } from '@/types/learningRecord';
+import { parseJson } from '@/lib/validation/api-helper';
+import { learningRecordSchema } from '@/lib/validation/schemas';
 
 function isCorrectAnswer(answer: string, correctAnswer: string): boolean {
   return answer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
@@ -16,8 +11,11 @@ function isCorrectAnswer(answer: string, correctAnswer: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: RecordRequest = await request.json();
-    const { phraseId, quizType, answer, correctAnswer } = body;
+    const result = await parseJson(request, learningRecordSchema);
+    if (!result.success) {
+      return result.response;
+    }
+    const { phraseId, quizType, answer, correctAnswer } = result.data;
     const isCorrect = isCorrectAnswer(answer, correctAnswer);
     const record = await createLearningRecord({
       phraseId,

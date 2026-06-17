@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac } from 'crypto';
 import { adminAuth } from '@/lib/firebase-admin';
+import { parseJson } from '@/lib/validation/api-helper';
+import { loginSchema } from '@/lib/validation/schemas';
 
 function computeToken(secret: string): string {
   return createHmac('sha256', secret)
@@ -9,8 +11,11 @@ function computeToken(secret: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => ({}));
-  const { idToken } = body as { idToken?: string };
+  const result = await parseJson(request, loginSchema);
+  if (!result.success) {
+    return result.response;
+  }
+  const { idToken } = result.data;
 
   const authSecret = process.env.AUTH_SECRET;
   const allowedEmails = process.env.ALLOWED_USER_EMAILS

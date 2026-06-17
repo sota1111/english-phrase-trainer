@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPhraseById, updatePhrase, deletePhrase } from '@/lib/firestore/phrases';
-import { PhraseInput } from '@/types/phrase';
+import { parseJson } from '@/lib/validation/api-helper';
+import { phraseUpdateSchema } from '@/lib/validation/schemas';
 
 export async function GET(
   _request: NextRequest,
@@ -25,8 +26,11 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const body: Partial<PhraseInput> = await request.json();
-    await updatePhrase(id, body);
+    const result = await parseJson(request, phraseUpdateSchema);
+    if (!result.success) {
+      return result.response;
+    }
+    await updatePhrase(id, result.data);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('PUT /api/phrases/[id] error:', error);

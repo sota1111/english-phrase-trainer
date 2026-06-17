@@ -16,6 +16,8 @@ export const phraseInputSchema = z.object({
 
 export const phraseUpdateSchema = phraseInputSchema.partial();
 
+export const idParamSchema = z.string().min(1);
+
 export const phraseGenerateSchema = z.object({
   mode: z.enum(['ja2en', 'en2ja']),
   text: z.string().min(1),

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { submitReviewResultAction } from '@/lib/actions/reviewActions';
 
 export type Phrase = {
   id: string;
@@ -65,11 +66,7 @@ export function OneHandedReviewClient({ items }: Props) {
     setSubmitting(true);
 
     try {
-      await fetch('/api/spaced-review/result', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phraseId: current.phrase.id, isCorrect }),
-      });
+      await submitReviewResultAction({ phraseId: current.phrase.id, isCorrect });
 
       setResults(prev => ({
         correct: prev.correct + (isCorrect ? 1 : 0),

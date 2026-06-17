@@ -1,11 +1,10 @@
 import { OneHandedReviewClient, ReviewItem } from '@/components/reviews/OneHandedReviewClient';
+import { getDuePhrasesAction } from '@/lib/actions/reviewActions';
 
 export default async function OneHandedReviewPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
   let items: ReviewItem[] = [];
   try {
-    const res = await fetch(`${baseUrl}/api/spaced-review`, { cache: 'no-store' });
-    if (res.ok) items = await res.json();
+    items = await getDuePhrasesAction() as ReviewItem[];
   } catch {
     /* Firestore unavailable at build time */
   }

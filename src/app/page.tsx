@@ -1,18 +1,9 @@
 import Link from 'next/link';
 import { StatCard } from '@/components/ui/StatCard';
-
-type DashboardData = {
-  dueCount: number;
-  todayReviewCount: number;
-  todayCorrectCount: number;
-  streakDays: number;
-  totalReviews: number;
-  monthlyStats: { date: string; reviewCount: number }[];
-};
+import { getDashboardDataAction } from '@/lib/actions/statsActions';
 
 export default async function HomePage() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
-  let data: DashboardData = {
+  let data: Awaited<ReturnType<typeof getDashboardDataAction>> = {
     dueCount: 0,
     todayReviewCount: 0,
     todayCorrectCount: 0,
@@ -21,8 +12,7 @@ export default async function HomePage() {
     monthlyStats: [],
   };
   try {
-    const res = await fetch(`${baseUrl}/api/dashboard`, { cache: 'no-store' });
-    if (res.ok) data = await res.json();
+    data = await getDashboardDataAction();
   } catch { /* Firestore unavailable at build time */ }
 
   return (

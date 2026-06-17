@@ -1,16 +1,15 @@
 import Link from 'next/link';
 import { CalendarClient } from '@/components/calendar/CalendarClient';
+import { getMonthlyStatsAction } from '@/lib/actions/statsActions';
 
 export default async function CalendarPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
 
   let data = { year, month, streakDays: 0, days: [] as { date: string; reviewCount: number; correctCount: number }[] };
   try {
-    const res = await fetch(`${baseUrl}/api/calendar?year=${year}&month=${month}`, { cache: 'no-store' });
-    if (res.ok) data = await res.json();
+    data = await getMonthlyStatsAction(year, month);
   } catch {
     /* Firestore unavailable at build time */
   }

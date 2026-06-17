@@ -5,6 +5,12 @@ import { Phrase, PhraseInput } from '@/types/phrase';
 import { PhraseFilter, FilterState } from '@/components/phrases/PhraseFilter';
 import { PhraseList } from '@/components/phrases/PhraseList';
 import { PhraseForm } from '@/components/phrases/PhraseForm';
+import { 
+  getPhrasesAction, 
+  createPhraseAction, 
+  updatePhraseAction, 
+  deletePhraseAction 
+} from '@/lib/actions/phraseActions';
 
 type PhrasesClientProps = {
   initialPhrases: Phrase[];
@@ -25,11 +31,8 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
 
   const refetch = useCallback(async () => {
     try {
-      const res = await fetch('/api/phrases');
-      if (res.ok) {
-        const data = await res.json();
-        setPhrases(data);
-      }
+      const data = await getPhrasesAction();
+      setPhrases(data);
     } catch (error) {
       console.error('Failed to refetch phrases:', error);
     }
@@ -67,15 +70,9 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
   const handleCreate = async (data: PhraseInput) => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/phrases', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        await refetch();
-        setModalMode(null);
-      }
+      await createPhraseAction(data);
+      await refetch();
+      setModalMode(null);
     } catch (error) {
       console.error('Failed to create phrase:', error);
     } finally {
@@ -87,16 +84,10 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
     if (!editingPhraseId) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/phrases/${editingPhraseId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        await refetch();
-        setModalMode(null);
-        setEditingPhraseId(null);
-      }
+      await updatePhraseAction(editingPhraseId, data);
+      await refetch();
+      setModalMode(null);
+      setEditingPhraseId(null);
     } catch (error) {
       console.error('Failed to update phrase:', error);
     } finally {
@@ -106,10 +97,8 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/phrases/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        await refetch();
-      }
+      await deletePhraseAction(id);
+      await refetch();
     } catch (error) {
       console.error('Failed to delete phrase:', error);
     }

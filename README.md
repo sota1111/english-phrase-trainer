@@ -243,6 +243,43 @@ docker run -p 8080:8080 \
 # http://localhost:8080 でアクセス
 ```
 
+## GitHub Actions による自動デプロイ（Cloud Run）
+
+`.github/workflows/deploy-cloudrun.yml` により、`main` への push（および手動の `workflow_dispatch`）で
+GitHub Actions から Cloud Run へ自動デプロイされます。認証は Workload Identity Federation（WIF）を使用し、
+JSON キーは使用しません（`permissions: contents: read` / `id-token: write`）。フローは
+Docker build → Artifact Registry push → `gcloud run deploy` です。
+
+### 必要な GitHub Secrets
+
+リポジトリの Settings → Secrets and variables → Actions に以下を登録してください。
+
+#### GCP / デプロイ設定
+
+| Secret 名 | 用途 |
+| --- | --- |
+| `GCP_PROJECT_ID` | デプロイ先 GCP プロジェクト ID |
+| `GCP_PROJECT_NUMBER` | GCP プロジェクト番号（WIF 設定で使用） |
+| `GCP_REGION` | Cloud Run / Artifact Registry のリージョン（例: `asia-northeast1`） |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Provider のリソース名 |
+| `GCP_SERVICE_ACCOUNT` | デプロイに使用するサービスアカウントのメール |
+| `ARTIFACT_REGISTRY_REPOSITORY` | Artifact Registry のリポジトリ名 |
+| `CLOUD_RUN_SERVICE` | Cloud Run サービス名（= `english-phrase-trainer`） |
+
+#### Firebase 公開設定（ビルド時に Docker イメージへ注入）
+
+| Secret 名 | 用途 |
+| --- | --- |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Web API キー |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase 認証ドメイン |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase プロジェクト ID |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase アプリ ID |
+| `NEXT_PUBLIC_BASE_URL` | アプリのベース URL |
+
+> Next.js のクライアント側 Firebase 設定はビルド時に埋め込まれるため、これらは `docker build --build-arg`
+> で渡しています。未設定の場合、デプロイは成功してもクライアントの Firebase 設定が空になります。
+> 実行時のサーバ機密（`AUTH_SECRET` など）は別途 Secret Manager で管理します（下記「Cloud Run デプロイ」参照）。
+
 ## Cloud Run デプロイ
 
 このアプリは Cloud Run へのデプロイを自動化するスクリプトを提供しています。Next.js のビルド時に Firebase のパブリック設定を注入し、実行時に Secret Manager から機密情報を取得する構成になっています。

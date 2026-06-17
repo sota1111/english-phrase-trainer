@@ -1,4 +1,4 @@
-import { SpacedReviewClient } from './SpacedReviewClient';
+import { SpacedReviewClient } from '@/components/reviews/SpacedReviewClient';
 
 export default async function SpacedReviewPage() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';

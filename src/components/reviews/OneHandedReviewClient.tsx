@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { ProgressBar } from '@/components/ui/ProgressBar';
 
 export type Phrase = {
   id: string;
@@ -58,7 +59,6 @@ export function OneHandedReviewClient({ items }: Props) {
 
   const current = items[currentIndex];
   const total = items.length;
-  const progress = ((currentIndex) / total) * 100;
 
   const handleAnswer = async (isCorrect: boolean) => {
     if (submitting) return;
@@ -102,13 +102,7 @@ export function OneHandedReviewClient({ items }: Props) {
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
       {/* Progress Header */}
       <div style={{ padding: '12px 16px 8px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#666', marginBottom: '4px' }}>
-          <span>残り {total - currentIndex} 件 / 全 {total} 件</span>
-          <span>{Math.round((currentIndex / total) * 100)}%</span>
-        </div>
-        <div style={{ height: '4px', background: '#eee', borderRadius: '2px', overflow: 'hidden' }}>
-          <div style={{ height: '100%', background: '#0070f3', width: `${progress}%`, transition: 'width 0.3s ease' }} />
-        </div>
+        <ProgressBar current={currentIndex} total={total} />
       </div>
 
       {/* Card Content */}

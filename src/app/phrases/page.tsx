@@ -1,4 +1,4 @@
-import { PhrasesClient } from './PhrasesClient';
+import { PhrasesClient } from '@/components/phrases/PhrasesClient';
 
 export default async function PhrasesPage() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';

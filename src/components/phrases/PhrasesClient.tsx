@@ -2,9 +2,9 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { Phrase, PhraseInput } from '@/types/phrase';
-import { PhraseFilter, FilterState } from '@/components/PhraseFilter';
-import { PhraseList } from '@/components/PhraseList';
-import { PhraseForm } from '@/components/PhraseForm';
+import { PhraseFilter, FilterState } from '@/components/phrases/PhraseFilter';
+import { PhraseList } from '@/components/phrases/PhraseList';
+import { PhraseForm } from '@/components/phrases/PhraseForm';
 
 type PhrasesClientProps = {
   initialPhrases: Phrase[];

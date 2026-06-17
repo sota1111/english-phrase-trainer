@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CalendarClient } from './CalendarClient';
+import { CalendarClient } from '@/components/calendar/CalendarClient';
 
 export default async function CalendarPage() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';

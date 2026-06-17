@@ -1,4 +1,4 @@
-import { OneHandedReviewClient, ReviewItem } from './OneHandedReviewClient';
+import { OneHandedReviewClient, ReviewItem } from '@/components/reviews/OneHandedReviewClient';
 
 export default async function OneHandedReviewPage() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';

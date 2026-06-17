@@ -243,73 +243,46 @@ docker run -p 8080:8080 \
 # http://localhost:8080 でアクセス
 ```
 
-## Cloud Runデプロイ手順
+## Cloud Run デプロイ
 
-### 前提条件
+このアプリは Cloud Run へのデプロイを自動化するスクリプトを提供しています。Next.js のビルド時に Firebase のパブリック設定を注入し、実行時に Secret Manager から機密情報を取得する構成になっています。
 
-- Google Cloud プロジェクト作成済み
-- `gcloud` CLI インストール済み・認証済み
-- Firestore が Native Mode で有効化済み
-- Cloud Run API、Artifact Registry API 有効化済み
+### 1. Secret Manager の設定
 
-### 1. Artifact Registry リポジトリ作成（初回のみ）
+初回デプロイ前に、GCP コンソールまたは CLI で以下のシークレットを作成してください。
 
 ```bash
-export PROJECT_ID=your-gcp-project-id
-export REGION=asia-northeast1
+# セッション署名シークレット
+echo -n "your-auth-secret" | gcloud secrets create english-trainer-auth-secret --data-file=-
 
-gcloud artifacts repositories create english-phrase-trainer \
-  --repository-format=docker \
-  --location=$REGION \
-  --description="English Phrase Trainer"
+# 許可するメールアドレス（カンマ区切り、空の場合は全ユーザー許可）
+echo -n "user1@example.com,user2@example.com" | gcloud secrets create english-trainer-allowed-emails --data-file=-
 ```
 
-### 2. Dockerイメージをビルド＆プッシュ
+### 2. 環境変数の準備
+
+`.env` ファイルを作成し、Firebase の設定値を入力します。これらは Docker イメージのビルド時に埋め込まれます。
 
 ```bash
-gcloud builds submit --tag \
-  $REGION-docker.pkg.dev/$PROJECT_ID/english-phrase-trainer/app:latest
+cp .env.example .env
+# .env を編集して Firebase 設定値を入力
 ```
 
-### 3. Cloud Runにデプロイ
+### 3. デプロイの実行
+
+提供されているスクリプトを実行します。
 
 ```bash
-gcloud run deploy english-phrase-trainer \
-  --image $REGION-docker.pkg.dev/$PROJECT_ID/english-phrase-trainer/app:latest \
-  --region $REGION \
-  --platform managed \
-  --allow-unauthenticated \
-  --set-env-vars GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
-  --set-env-vars NEXT_PUBLIC_BASE_URL=https://your-cloudrun-url \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id \
-  --set-env-vars ALLOWED_USER_EMAILS=your-email@example.com \
-  --set-env-vars AUTH_SECRET=your-random-secret-key \
-  --min-instances 0 \
-  --max-instances 2 \
-  --memory 512Mi \
-  --cpu 1
+# .env を読み込んで実行
+source .env && bash scripts/deploy_local_gcp.sh
 ```
 
-### 4. Firestore権限設定
+このスクリプトは以下のステップを自動で行います：
+1. Artifact Registry リポジトリの作成（未作成の場合）
+2. Cloud Build による Docker ビルド（Next.js ビルド時環境変数を注入）
+3. Cloud Run へのデプロイ（シークレットの紐付け、ポート 8080、未認証アクセス許可）
 
-Cloud Runのサービスアカウントに Firestore の権限を付与：
-
-```bash
-# Cloud Runのサービスアカウントを確認
-gcloud run services describe english-phrase-trainer \
-  --region $REGION \
-  --format='value(spec.template.spec.serviceAccountName)'
-
-# Cloud Datastore User ロールを付与
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:SERVICE_ACCOUNT_EMAIL" \
-  --role="roles/datastore.user"
-```
-
-## 無料枠運用の注意点
+### 無料枠運用の注意点
 
 ### Cloud Run 無料枠（月あたり）
 
@@ -418,30 +391,4 @@ docker run -p 3000:3000 \
   -e GOOGLE_CLOUD_PROJECT=your-gcp-project-id \
   -e FIRESTORE_EMULATOR_HOST=host.docker.internal:8080 \
   english-phrase-trainer
-```
-
-## Cloud Runへのデプロイ
-
-```bash
-# gcloud認証
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-
-# イメージをビルドしてArtifact Registryへプッシュ
-gcloud builds submit --tag asia-northeast1-docker.pkg.dev/YOUR_PROJECT_ID/english-phrase-trainer/app
-
-# Cloud Runへデプロイ
-gcloud run deploy english-phrase-trainer \
-  --image asia-northeast1-docker.pkg.dev/YOUR_PROJECT_ID/english-phrase-trainer/app \
-  --platform managed \
-  --region asia-northeast1 \
-  --allow-unauthenticated \
-  --set-env-vars GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id \
-  --set-env-vars NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id \
-  --set-env-vars ALLOWED_USER_EMAILS=your-email@example.com \
-  --set-env-vars AUTH_SECRET=your-random-secret-key \
-  --memory 512Mi
 ```

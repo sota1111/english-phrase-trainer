@@ -20,8 +20,12 @@ ARTIFACT_REPO="${ARTIFACT_REGISTRY_REPOSITORY:-english-phrase-registry}"
 IMAGE_VAR="${IMAGE_NAME:-english-phrase-trainer}"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REPO}/${IMAGE_VAR}"
 
-AUTH_PASSWORD="${AUTH_PASSWORD:?AUTH_PASSWORD is required}"
-AUTH_SECRET="${AUTH_SECRET:?AUTH_SECRET is required}"
+# Required for build-time injection (Next.js)
+NEXT_PUBLIC_FIREBASE_API_KEY="${NEXT_PUBLIC_FIREBASE_API_KEY:?NEXT_PUBLIC_FIREBASE_API_KEY is required}"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:?NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN is required}"
+NEXT_PUBLIC_FIREBASE_PROJECT_ID="${NEXT_PUBLIC_FIREBASE_PROJECT_ID:?NEXT_PUBLIC_FIREBASE_PROJECT_ID is required}"
+NEXT_PUBLIC_FIREBASE_APP_ID="${NEXT_PUBLIC_FIREBASE_APP_ID:?NEXT_PUBLIC_FIREBASE_APP_ID is required}"
+NEXT_PUBLIC_BASE_URL="${NEXT_PUBLIC_BASE_URL:-}"
 
 echo "== Cloud Run デプロイ: ${SERVICE_NAME} =="
 echo "Project: ${PROJECT_ID} | Region: ${REGION}"
@@ -36,22 +40,24 @@ gcloud artifacts repositories create "${ARTIFACT_REPO}" \
   --repository-format=docker \
   --description="English Phrase Trainer Docker images"
 
+echo "Submitting build to Google Cloud Build..."
 gcloud builds submit . \
   --project="${PROJECT_ID}" \
-  --tag="${IMAGE}:latest" \
-  --timeout=600s
+  --config=cloudbuild.yaml \
+  --substitutions="_IMAGE=${IMAGE},_NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY},_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN},_NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID},_NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID},_NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}"
 
 
 # Secret Manager: 初回デプロイ前に以下を実行してください
-# echo -n "value" | gcloud secrets create english-trainer-auth-password --data-file=- --project=$PROJECT_ID
 # echo -n "value" | gcloud secrets create english-trainer-auth-secret --data-file=- --project=$PROJECT_ID
+# echo -n "value" | gcloud secrets create english-trainer-allowed-emails --data-file=- --project=$PROJECT_ID
 # gcloud projects add-iam-policy-binding $PROJECT_ID \
 #   --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
 #   --role="roles/secretmanager.secretAccessor"
 
 gcloud run deploy "${SERVICE_NAME}" \
   --image="${IMAGE}:latest" \
-  --set-secrets="AUTH_PASSWORD=english-trainer-auth-password:latest,AUTH_SECRET=english-trainer-auth-secret:latest" \
+  --set-secrets="AUTH_SECRET=english-trainer-auth-secret:latest,ALLOWED_USER_EMAILS=english-trainer-allowed-emails:latest" \
+  --set-env-vars="GOOGLE_CLOUD_PROJECT=${PROJECT_ID}" \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \
   --platform=managed \
@@ -61,7 +67,6 @@ gcloud run deploy "${SERVICE_NAME}" \
   --cpu=1 \
   --min-instances=0 \
   --max-instances=1 \
-  
   --quiet
 
 URL=$(gcloud run services describe "${SERVICE_NAME}" \

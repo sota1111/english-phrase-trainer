@@ -31,3 +31,26 @@ export const DEFAULT_SM2_PARAMS: SM2Params = {
   interval: 0,
   repetitions: 0,
 };
+
+/**
+ * Orders review items by SRS urgency: items with an earlier (more overdue) due time
+ * come first. Items whose due time is `null` (never scheduled) are placed last,
+ * preserving their original relative order. The input array is not mutated.
+ *
+ * Decoupled from Firestore types via the `getDueMillis` accessor.
+ */
+export function orderByReviewUrgency<T>(
+  items: T[],
+  getDueMillis: (item: T) => number | null,
+): T[] {
+  return items
+    .map((item, index) => ({ item, index, due: getDueMillis(item) }))
+    .sort((a, b) => {
+      if (a.due === null && b.due === null) return a.index - b.index;
+      if (a.due === null) return 1;
+      if (b.due === null) return -1;
+      if (a.due !== b.due) return a.due - b.due;
+      return a.index - b.index;
+    })
+    .map(({ item }) => item);
+}

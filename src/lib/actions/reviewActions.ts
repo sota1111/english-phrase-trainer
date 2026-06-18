@@ -4,7 +4,7 @@ import { getPhrases, getPhraseById, updatePhraseStats } from '@/lib/firestore/ph
 import { getDueReviews, getReviewSchedule, upsertReviewSchedule } from '@/lib/firestore/reviewSchedules';
 import { incrementDailyStat } from '@/lib/firestore/dailyStats';
 import { createLearningRecord } from '@/lib/firestore/learningRecords';
-import { calculateNextReview, DEFAULT_SM2_PARAMS } from '@/lib/sm2';
+import { calculateNextReview, orderByReviewUrgency, DEFAULT_SM2_PARAMS } from '@/lib/sm2';
 import { spacedReviewResultSchema, learningRecordSchema } from '@/lib/validation/schemas';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -37,10 +37,15 @@ export async function getDuePhrasesAction() {
       phrase: p,
     }));
 
-  return [...duePhrases, ...unscheduledPhrases].map(item => ({
+  const combined = [...duePhrases, ...unscheduledPhrases].map(item => ({
     phrase: item.phrase!,
     schedule: item.schedule,
   }));
+
+  // SRS ordering: most overdue (earliest dueDate) first; never-scheduled phrases last.
+  return orderByReviewUrgency(combined, item =>
+    item.schedule?.dueDate ? item.schedule.dueDate.toMillis() : null,
+  );
 }
 
 export async function submitReviewResultAction(input: SpacedReviewResultInput) {

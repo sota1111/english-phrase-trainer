@@ -261,7 +261,6 @@ Docker build → Artifact Registry push → `gcloud run deploy` です。
 | Secret 名 | 用途 |
 | --- | --- |
 | `GCP_PROJECT_ID` | デプロイ先 GCP プロジェクト ID |
-| `GCP_PROJECT_NUMBER` | GCP プロジェクト番号（WIF 設定で使用） |
 | `GCP_REGION` | Cloud Run / Artifact Registry のリージョン（例: `asia-northeast1`） |
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Provider のリソース名 |
 | `GCP_SERVICE_ACCOUNT` | デプロイに使用するサービスアカウントのメール |

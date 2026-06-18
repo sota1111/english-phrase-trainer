@@ -181,6 +181,8 @@ ALLOWED_USER_EMAILS=your-email@example.com,another@example.com
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase Auth ドメイン | Yes |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase プロジェクト ID | Yes |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase App ID | Yes |
+| `FIREBASE_WEB_API_KEY` | サーバサイドREST認証用 Web API キー（優先）。未設定時は `FIREBASE_API_KEY` にフォールバック | Yes |
+| `FIREBASE_API_KEY` | `FIREBASE_WEB_API_KEY` 未設定時のフォールバック | 任意 |
 | `ALLOWED_USER_EMAILS` | 許可メールアドレス（カンマ区切り） | 推奨 |
 | `AUTH_SECRET` | セッション Cookie 署名用シークレット（32文字以上） | Yes |
 | `GOOGLE_CLOUD_PROJECT` | GCP プロジェクト ID（Firestore 接続用） | Yes |

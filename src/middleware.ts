@@ -26,6 +26,24 @@ async function computeToken(secret: string): Promise<string> {
   return toHex(signature);
 }
 
+// Behind a TLS-terminating proxy (e.g. Cloud Run), the container is reached over
+// HTTP, so `request.nextUrl.origin` reports `http://...` while the browser's
+// Origin/Referer header is `https://...`. Reconstruct the externally-visible
+// origin from forwarded headers so the CSRF same-origin check does not falsely
+// reject legitimate requests.
+function getEffectiveOrigin(request: NextRequest): string {
+  const host =
+    request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  if (!host) {
+    return request.nextUrl.origin;
+  }
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  const proto =
+    forwardedProto?.split(',')[0]?.trim() ||
+    request.nextUrl.protocol.replace(/:$/, '');
+  return `${proto}://${host}`;
+}
+
 function timingSafeHexEqual(a: string, b: string): boolean {
   if (!/^[0-9a-f]+$/i.test(a) || !/^[0-9a-f]+$/i.test(b)) {
     return false;
@@ -65,7 +83,14 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    if (!targetOrigin || targetOrigin !== request.nextUrl.origin) {
+    const expectedOrigin = getEffectiveOrigin(request);
+
+    if (!targetOrigin || targetOrigin !== expectedOrigin) {
+      console.warn(
+        `CSRF validation failed: method=${request.method} path=${pathname} ` +
+          `origin=${origin ?? 'null'} referer=${request.headers.get('referer') ?? 'null'} ` +
+          `expected=${expectedOrigin}`,
+      );
       return new NextResponse(
         JSON.stringify({ error: 'CSRF validation failed' }),
         {

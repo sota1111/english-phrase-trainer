@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const { email, password } = result.data;
 
   const authSecret = process.env.AUTH_SECRET;
-  const apiKey = process.env.FIREBASE_API_KEY;
+  const apiKey = process.env.FIREBASE_WEB_API_KEY || process.env.FIREBASE_API_KEY;
   const allowedEmails = process.env.ALLOWED_USER_EMAILS
     ? process.env.ALLOWED_USER_EMAILS.split(',').map((e) => e.trim()).filter(Boolean)
     : [];

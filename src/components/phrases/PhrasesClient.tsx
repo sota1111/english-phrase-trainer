@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import { Phrase, PhraseInput } from '@/types/phrase';
 import { PhraseFilter, FilterState } from '@/components/phrases/PhraseFilter';
 import { PhraseList } from '@/components/phrases/PhraseList';
@@ -28,6 +29,13 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
   const [editingPhraseId, setEditingPhraseId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [justCreated, setJustCreated] = useState(false);
+
+  const closeModal = useCallback(() => {
+    setModalMode(null);
+    setEditingPhraseId(null);
+    setJustCreated(false);
+  }, []);
 
   const refetch = useCallback(async () => {
     try {
@@ -72,7 +80,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
     try {
       await createPhraseAction(data);
       await refetch();
-      setModalMode(null);
+      setJustCreated(true);
     } catch (error) {
       console.error('Failed to create phrase:', error);
     } finally {
@@ -86,8 +94,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
     try {
       await updatePhraseAction(editingPhraseId, data);
       await refetch();
-      setModalMode(null);
-      setEditingPhraseId(null);
+      closeModal();
     } catch (error) {
       console.error('Failed to update phrase:', error);
     } finally {
@@ -138,18 +145,35 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
       {modalMode && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>{modalMode === 'create' ? '新規フレーズ登録' : 'フレーズ編集'}</h2>
-            <PhraseForm
-              key={editingPhraseId || 'create'}
-              initialData={editingPhrase}
-              categories={categories}
-              onSubmit={modalMode === 'create' ? handleCreate : handleEdit}
-              onCancel={() => {
-                setModalMode(null);
-                setEditingPhraseId(null);
-              }}
-              isLoading={isLoading}
-            />
+            {justCreated ? (
+              <div className="created-view">
+                <h2>フレーズを追加しました</h2>
+                <p className="created-message">続けて追加するか、ホーム画面に戻れます。</p>
+                <div className="created-actions">
+                  <button
+                    type="button"
+                    onClick={() => setJustCreated(false)}
+                  >
+                    続けて追加
+                  </button>
+                  <Link href="/" className="home-link">
+                    ホームに戻る
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h2>{modalMode === 'create' ? '新規フレーズ登録' : 'フレーズ編集'}</h2>
+                <PhraseForm
+                  key={editingPhraseId || 'create'}
+                  initialData={editingPhrase}
+                  categories={categories}
+                  onSubmit={modalMode === 'create' ? handleCreate : handleEdit}
+                  onCancel={closeModal}
+                  isLoading={isLoading}
+                />
+              </>
+            )}
           </div>
         </div>
       )}

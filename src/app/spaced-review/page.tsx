@@ -1,6 +1,9 @@
 import { SpacedReviewClient } from '@/components/reviews/SpacedReviewClient';
 import { getDuePhrasesAction } from '@/lib/actions/reviewActions';
 
+// Read live Firestore data on every request (avoid build-time static prerender).
+export const dynamic = 'force-dynamic';
+
 export default async function SpacedReviewPage() {
   let items: Parameters<typeof SpacedReviewClient>[0]['items'] = [];
   try {

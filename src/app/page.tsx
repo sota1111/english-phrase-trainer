@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { StatCard } from '@/components/ui/StatCard';
 import { getDashboardDataAction } from '@/lib/actions/statsActions';
 
+// Read live Firestore data on every request (avoid build-time static prerender).
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   let data: Awaited<ReturnType<typeof getDashboardDataAction>> = {
     dueCount: 0,

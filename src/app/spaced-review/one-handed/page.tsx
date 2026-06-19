@@ -1,6 +1,9 @@
 import { OneHandedReviewClient, ReviewItem } from '@/components/reviews/OneHandedReviewClient';
 import { getDuePhrasesAction } from '@/lib/actions/reviewActions';
 
+// Read live Firestore data on every request (avoid build-time static prerender).
+export const dynamic = 'force-dynamic';
+
 export default async function OneHandedReviewPage() {
   let items: ReviewItem[] = [];
   try {

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { sot826Phrases } from './sot826Phrases';
 import { phraseInputSchema } from '@/lib/validation/schemas';
+import { hasPhraseAnnotation } from '@/lib/phraseText';
 
 // SOT-866: categories reorganized into three broad topical buckets.
 const KNOWN_CATEGORIES = new Set(['ビジネス', '技術', '日常']);
@@ -30,6 +31,12 @@ describe('sot826Phrases dataset', () => {
     const texts = sot826Phrases.map((p) => p.phrase);
     const unique = new Set(texts);
     expect(unique.size).toBe(texts.length);
+  });
+
+  it('keeps phrases English-only (no Japanese annotation in phrase)', () => {
+    for (const entry of sot826Phrases) {
+      expect(hasPhraseAnnotation(entry.phrase)).toBe(false);
+    }
   });
 
   it('only uses the broad topical categories (ビジネス / 技術 / 日常)', () => {

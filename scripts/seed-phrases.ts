@@ -15,6 +15,15 @@
  * seeding leaves old categories on existing docs untouched. The reconcile pass is
  * also idempotent: a second run finds no mismatches and updates nothing.
  *
+ * It then runs a CLEANUP pass (SOT-865): every already-registered document whose
+ * `phrase` field still carries a Japanese annotation — `(優先暗記)` / `(セット表現)`
+ * / `(重要動詞)` — is fixed so phrases are English-only. If a clean document with
+ * the de-annotated text already exists, the annotated duplicate is deleted;
+ * otherwise the document's `phrase` is rewritten in place to the stripped text.
+ * Source-data removal alone never reaches these docs (the insert pass skips
+ * existing text and the reconcile pass only touches `category`). This pass is also
+ * idempotent: once clean, a second run finds nothing to fix.
+ *
  * Run (requires Application Default Credentials for the target project):
  *
  *   GOOGLE_CLOUD_PROJECT=<your-gcp-project-id> npx tsx scripts/seed-phrases.ts
@@ -24,7 +33,13 @@
  */
 import { initialPhrases } from '../src/data/initialPhrases';
 import { sot826Phrases } from '../src/data/sot826Phrases';
-import { getPhrases, createPhrase, updatePhrase } from '../src/lib/firestore/phrases';
+import {
+  getPhrases,
+  createPhrase,
+  updatePhrase,
+  deletePhrase,
+} from '../src/lib/firestore/phrases';
+import { hasPhraseAnnotation, stripPhraseAnnotation } from '../src/lib/phraseText';
 
 const allPhrases = [...initialPhrases, ...sot826Phrases];
 
@@ -72,9 +87,31 @@ async function main(): Promise<void> {
     }
   }
 
+  // Cleanup pass: make already-registered phrases English-only by removing the
+  // Japanese annotation. Delete the annotated doc when a clean equivalent already
+  // exists; otherwise rewrite the phrase in place to the stripped text.
+  let annotationDeleted = 0;
+  let annotationStripped = 0;
+  for (const doc of existing) {
+    if (!hasPhraseAnnotation(doc.phrase)) continue;
+    const cleaned = stripPhraseAnnotation(doc.phrase);
+    if (existingTexts.has(cleaned)) {
+      await deletePhrase(doc.id);
+      existingTexts.delete(doc.phrase);
+      annotationDeleted += 1;
+    } else {
+      await updatePhrase(doc.id, { phrase: cleaned });
+      existingTexts.delete(doc.phrase);
+      existingTexts.add(cleaned);
+      annotationStripped += 1;
+    }
+  }
+
   console.log(
     `Done. inserted=${inserted}, skipped(existing)=${skipped}, ` +
-      `recategorized=${recategorized}, total=${allPhrases.length}`,
+      `recategorized=${recategorized}, ` +
+      `annotationDeleted=${annotationDeleted}, annotationStripped=${annotationStripped}, ` +
+      `total=${allPhrases.length}`,
   );
 }
 

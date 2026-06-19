@@ -19,16 +19,11 @@ describe('initialPhrases dataset', () => {
     expect(unique.size).toBe(texts.length);
   });
 
-  it('only uses known categories', () => {
-    const allowed = new Set(['word', 'expression', 'pattern']);
+  it('only uses the broad topical categories (ビジネス / 技術 / 日常)', () => {
+    const allowed = new Set(['ビジネス', '技術', '日常']);
     for (const entry of initialPhrases) {
       expect(allowed.has(entry.category)).toBe(true);
     }
-  });
-
-  it('every word entry is categorized as word', () => {
-    const words = initialPhrases.filter((p) => p.category === 'word');
-    expect(words.length).toBe(23);
   });
 
   it('marks the 10 priority items as hard', () => {

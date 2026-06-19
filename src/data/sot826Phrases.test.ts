@@ -2,23 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { sot826Phrases } from './sot826Phrases';
 import { phraseInputSchema } from '@/lib/validation/schemas';
 
-const KNOWN_CATEGORIES = new Set([
-  '最優先',
-  '技術報告',
-  '確認依頼',
-  'ビルド・環境',
-  '手順説明',
-  'RMF・ロボット',
-  'ビジネス・導入',
-  'PM・顧客対応',
-  '課金・契約',
-  'Excel・管理表',
-  '重要動詞',
-  '自然な言い換え',
-  'セット表現',
-  'テンプレート',
-  '優先暗記',
-]);
+// SOT-866: categories reorganized into three broad topical buckets.
+const KNOWN_CATEGORIES = new Set(['ビジネス', '技術', '日常']);
 
 describe('sot826Phrases dataset', () => {
   it('has at least 240 entries', () => {
@@ -44,19 +29,17 @@ describe('sot826Phrases dataset', () => {
     expect(unique.size).toBe(texts.length);
   });
 
-  it('only uses the 15 known SOT-826 categories', () => {
+  it('only uses the broad topical categories (ビジネス / 技術 / 日常)', () => {
     for (const entry of sot826Phrases) {
       expect(KNOWN_CATEGORIES.has(entry.category)).toBe(true);
     }
   });
 
-  it('marks only the priority categories (最優先 / 優先暗記) as hard', () => {
-    for (const entry of sot826Phrases) {
-      if (entry.difficulty === 'hard') {
-        expect(['最優先', '優先暗記']).toContain(entry.category);
-      }
-    }
+  it('still marks priority items as hard', () => {
     const hard = sot826Phrases.filter((p) => p.difficulty === 'hard');
     expect(hard.length).toBeGreaterThan(0);
+    for (const entry of hard) {
+      expect(KNOWN_CATEGORIES.has(entry.category)).toBe(true);
+    }
   });
 });

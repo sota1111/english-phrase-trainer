@@ -6,10 +6,10 @@ type StatCardProps = {
 
 export function StatCard({ label, value, sub }: StatCardProps) {
   return (
-    <div style={{ background: '#f8f9fa', borderRadius: '12px', padding: '1.25rem', textAlign: 'center' }}>
-      <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#111' }}>{value}</div>
-      <div style={{ fontSize: '0.9rem', color: '#555', marginTop: '0.25rem' }}>{label}</div>
-      {sub && <div style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.15rem' }}>{sub}</div>}
+    <div className="card card-pad" style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: '1.9rem', fontWeight: 700, color: 'var(--foreground)', letterSpacing: '-0.02em' }}>{value}</div>
+      <div style={{ fontSize: '0.88rem', color: 'var(--muted)', marginTop: '0.3rem' }}>{label}</div>
+      {sub && <div style={{ fontSize: '0.78rem', color: 'var(--muted-2)', marginTop: '0.15rem' }}>{sub}</div>}
     </div>
   );
 }

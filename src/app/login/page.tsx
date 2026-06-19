@@ -35,15 +35,16 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f5f5f5' }}>
-      <div style={{ background: '#fff', borderRadius: '12px', padding: '2rem', width: '100%', maxWidth: '360px', boxShadow: '0 2px 16px rgba(0,0,0,0.08)' }}>
-        <h1 style={{ fontSize: '1.4rem', marginBottom: '0.5rem', textAlign: 'center' }}>英語フレーズ学習</h1>
-        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem', textAlign: 'center' }}>ログインしてください</p>
+    <main style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 'calc(100vh - var(--header-h))', padding: '1.5rem' }}>
+      <div className="card" style={{ padding: '2rem', width: '100%', maxWidth: '380px', boxShadow: 'var(--shadow-lg)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <span className="brand-mark" style={{ width: 44, height: 44, fontSize: '1.2rem', margin: '0 auto 0.85rem', display: 'inline-flex' }}>英</span>
+          <h1 style={{ fontSize: '1.4rem', marginBottom: '0.35rem' }}>英語フレーズ学習</h1>
+          <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>ログインして学習を続けましょう</p>
+        </div>
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label htmlFor="email" style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem', color: '#333' }}>
-              メールアドレス
-            </label>
+          <div className="field">
+            <label htmlFor="email" className="field-label">メールアドレス</label>
             <input
               id="email"
               type="email"
@@ -51,14 +52,12 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #ccc', fontSize: '1rem', boxSizing: 'border-box' }}
+              className="input"
               placeholder="your-email@example.com"
             />
           </div>
-          <div style={{ marginBottom: '1rem' }}>
-            <label htmlFor="password" style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem', color: '#333' }}>
-              パスワード
-            </label>
+          <div className="field">
+            <label htmlFor="password" className="field-label">パスワード</label>
             <input
               id="password"
               type="password"
@@ -66,21 +65,22 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #ccc', fontSize: '1rem', boxSizing: 'border-box' }}
+              className="input"
               placeholder="パスワードを入力"
             />
           </div>
           {error && (
-            <p role="alert" style={{ color: '#d32f2f', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+            <p role="alert" className="alert">
               {error}
             </p>
           )}
           <button
             type="submit"
             disabled={loading}
-            style={{ width: '100%', padding: '0.75rem', background: loading ? '#aaa' : '#0070f3', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+            className="btn btn-primary btn-block"
+            style={{ marginTop: '0.25rem' }}
           >
-            {loading ? 'ログイン中...' : 'ログイン'}
+            {loading ? 'ログイン中…' : 'ログイン'}
           </button>
         </form>
       </div>

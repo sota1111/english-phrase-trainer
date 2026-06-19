@@ -205,27 +205,32 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         .back-home {
           display: inline-block;
           padding: 0.35rem 0.75rem;
-          background: #f0f0f0;
-          color: #333;
-          border-radius: 4px;
+          background: var(--surface-muted);
+          color: var(--muted);
+          border: 1px solid var(--border);
+          border-radius: 8px;
           text-decoration: none;
           font-size: 0.875rem;
         }
         .back-home:hover {
-          background: #e4e4e4;
+          border-color: var(--border-strong);
+          color: var(--foreground);
         }
         h1 {
           margin: 0;
           font-size: 1.5rem;
         }
         .add-button {
-          background-color: #0070f3;
+          background-color: var(--primary);
           color: white;
           border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 4px;
+          padding: 0.6rem 1.1rem;
+          border-radius: 8px;
           cursor: pointer;
-          font-weight: bold;
+          font-weight: 600;
+        }
+        .add-button:hover {
+          background-color: var(--primary-hover);
         }
         .modal-overlay {
           position: fixed;
@@ -240,13 +245,15 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           z-index: 1000;
         }
         .modal-content {
-          background: white;
+          background: var(--surface);
+          color: var(--foreground);
           padding: 2rem;
-          border-radius: 8px;
+          border-radius: 14px;
           width: 90%;
           max-width: 600px;
           max-height: 90vh;
           overflow-y: auto;
+          box-shadow: var(--shadow-lg);
         }
         .modal-content h2 {
           margin-top: 0;

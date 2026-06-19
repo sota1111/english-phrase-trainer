@@ -48,6 +48,7 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
           <tr>
             <th>フレーズ</th>
             <th>意味</th>
+            <th>例文</th>
             <th>カテゴリ</th>
             <th>難易度</th>
             <th>正答率</th>
@@ -61,6 +62,7 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
             <tr key={phrase.id}>
               <td>{phrase.phrase}</td>
               <td>{phrase.meaningJa}</td>
+              <td className="example">{phrase.example ? phrase.example : '-'}</td>
               <td>{phrase.category}</td>
               <td>{DIFFICULTY_MAP[phrase.difficulty]}</td>
               <td>
@@ -103,6 +105,11 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
         }
         tr:hover {
           background-color: #fafafa;
+        }
+        .example {
+          color: #555;
+          font-size: 0.9rem;
+          max-width: 24rem;
         }
         .no-phrases {
           text-align: center;

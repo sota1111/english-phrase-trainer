@@ -1,9 +1,11 @@
 /**
- * Idempotent Firestore seed for the SOT-823 initial phrase dataset.
+ * Idempotent Firestore seed for the initial phrase datasets.
  *
- * Inserts every entry from `src/data/initialPhrases.ts` into the `phrases`
- * collection, skipping any whose `phrase` text already exists. Safe to re-run:
- * a second run inserts nothing.
+ * Inserts every entry from `src/data/initialPhrases.ts` (SOT-823) and
+ * `src/data/sot826Phrases.ts` (SOT-826) into the `phrases` collection, skipping
+ * any whose `phrase` text already exists. Safe to re-run: a second run inserts
+ * nothing. Dedupe is by `phrase` text, so any phrase shared across the two
+ * datasets is only inserted once.
  *
  * Run (requires Application Default Credentials for the target project):
  *
@@ -13,7 +15,10 @@
  * it never blind-writes to the wrong (or a default) project.
  */
 import { initialPhrases } from '../src/data/initialPhrases';
+import { sot826Phrases } from '../src/data/sot826Phrases';
 import { getPhrases, createPhrase } from '../src/lib/firestore/phrases';
+
+const allPhrases = [...initialPhrases, ...sot826Phrases];
 
 async function main(): Promise<void> {
   const projectId = process.env.GOOGLE_CLOUD_PROJECT;
@@ -25,14 +30,14 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  console.log(`Seeding ${initialPhrases.length} phrases into project "${projectId}"...`);
+  console.log(`Seeding ${allPhrases.length} phrases into project "${projectId}"...`);
 
   const existing = await getPhrases();
   const existingTexts = new Set(existing.map((p) => p.phrase));
 
   let inserted = 0;
   let skipped = 0;
-  for (const entry of initialPhrases) {
+  for (const entry of allPhrases) {
     if (existingTexts.has(entry.phrase)) {
       skipped += 1;
       continue;
@@ -42,7 +47,7 @@ async function main(): Promise<void> {
     inserted += 1;
   }
 
-  console.log(`Done. inserted=${inserted}, skipped(existing)=${skipped}, total=${initialPhrases.length}`);
+  console.log(`Done. inserted=${inserted}, skipped(existing)=${skipped}, total=${allPhrases.length}`);
 }
 
 main().catch((err) => {

@@ -49,6 +49,22 @@
 | createdAt | Timestamp | 作成日時 |
 | updatedAt | Timestamp | 更新日時 |
 
+#### 初期フレーズの投入 (seed)
+
+業務でよく使う語彙・定型表現・優先暗記フレーズを初期データとして `src/data/initialPhrases.ts`
+に定義しています（`category`: `word` / `expression` / `pattern`、優先10件は `difficulty: 'hard'`）。
+
+冪等な seed スクリプトで `phrases` コレクションへ投入できます。`phrase` テキストが既に存在する
+エントリはスキップされるため、再実行しても重複は作られません。
+
+```bash
+# Application Default Credentials（対象プロジェクトへの書き込み権限）が必要
+GOOGLE_CLOUD_PROJECT=<your-gcp-project-id> npx tsx scripts/seed-phrases.ts
+```
+
+`GOOGLE_CLOUD_PROJECT` が未設定の場合、誤ったプロジェクトへの書き込みを避けるためスクリプトは
+書き込みを行わず exit 1 で終了します。
+
 ### コレクション: `learningRecords`
 
 | フィールド | 型 | 説明 |

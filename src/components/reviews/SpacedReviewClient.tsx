@@ -71,7 +71,12 @@ export function SpacedReviewClient({ items }: Props) {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '1rem', color: '#666', fontSize: '0.9rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
+        <Link href="/" style={{ color: '#0070f3', textDecoration: 'none', fontSize: '0.95rem' }}>
+          ← ホームに戻る
+        </Link>
+      </div>
+      <div style={{ marginBottom: '1rem', color: '#374151', fontSize: '0.9rem' }}>
         残り {remaining} 件 / 全 {items.length} 件
       </div>
 
@@ -80,7 +85,7 @@ export function SpacedReviewClient({ items }: Props) {
           {current.phrase.phrase}
         </p>
         {current.phrase.example && (
-          <p style={{ color: '#666', fontSize: '0.95rem', marginBottom: '1rem' }}>
+          <p style={{ color: '#374151', fontSize: '0.95rem', marginBottom: '1rem' }}>
             例: {current.phrase.example}
           </p>
         )}

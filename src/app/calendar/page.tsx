@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { CalendarClient } from '@/components/calendar/CalendarClient';
 import { getMonthlyStatsAction } from '@/lib/actions/statsActions';
 
+// Read live Firestore data on every request (avoid build-time static prerender).
+export const dynamic = 'force-dynamic';
+
 export default async function CalendarPage() {
   const now = new Date();
   const year = now.getFullYear();

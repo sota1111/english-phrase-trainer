@@ -121,7 +121,12 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
   return (
     <div className="container">
       <header>
-        <h1>フレーズ一覧</h1>
+        <div className="header-left">
+          <Link href="/" className="back-home">
+            ← ホームに戻る
+          </Link>
+          <h1>フレーズ一覧</h1>
+        </div>
         <button className="add-button" onClick={() => setModalMode('create')}>
           フレーズを追加
         </button>
@@ -189,6 +194,25 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           justify-content: space-between;
           align-items: center;
           margin-bottom: 2rem;
+          gap: 1rem;
+        }
+        .header-left {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+        .back-home {
+          display: inline-block;
+          padding: 0.35rem 0.75rem;
+          background: #f0f0f0;
+          color: #333;
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 0.875rem;
+        }
+        .back-home:hover {
+          background: #e4e4e4;
         }
         h1 {
           margin: 0;

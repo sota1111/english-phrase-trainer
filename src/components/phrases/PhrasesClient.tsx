@@ -142,6 +142,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
             <PhraseForm
               key={editingPhraseId || 'create'}
               initialData={editingPhrase}
+              categories={categories}
               onSubmit={modalMode === 'create' ? handleCreate : handleEdit}
               onCancel={() => {
                 setModalMode(null);

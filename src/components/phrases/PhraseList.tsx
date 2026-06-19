@@ -19,18 +19,16 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
     return <p className="no-phrases">フレーズがありません</p>;
   }
 
-  const formatDate = (timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined) => {
+  const formatDate = (
+    timestamp: { seconds?: number; _seconds?: number } | null | undefined
+  ) => {
     if (!timestamp) return '未回答';
-    // Handle both Firestore Timestamp and serialized version
-    let date: Date;
-    if (typeof timestamp.toDate === 'function') {
-      date = timestamp.toDate();
-    } else if (timestamp._seconds !== undefined) {
-      date = new Date(timestamp._seconds * 1000);
-    } else {
-      date = new Date(timestamp as unknown as string | number);
-    }
-    
+    // Canonical shape is the serialized `{ seconds, nanoseconds }`; keep
+    // backward-compatible handling of the legacy `_seconds` field just in case.
+    const seconds = timestamp.seconds ?? timestamp._seconds;
+    if (seconds === undefined) return '未回答';
+    const date = new Date(seconds * 1000);
+
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');

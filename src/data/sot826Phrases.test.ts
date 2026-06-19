@@ -6,8 +6,11 @@ import { phraseInputSchema } from '@/lib/validation/schemas';
 const KNOWN_CATEGORIES = new Set(['ビジネス', '技術', '日常']);
 
 describe('sot826Phrases dataset', () => {
-  it('has at least 240 entries', () => {
-    expect(sot826Phrases.length).toBeGreaterThanOrEqual(240);
+  // SOT-865: 22 phrase-field entries carrying Japanese annotations
+  // ((優先暗記)/(セット表現)/(重要動詞)) were removed as duplicates, dropping the
+  // count from 245 to 223.
+  it('has at least 220 entries', () => {
+    expect(sot826Phrases.length).toBeGreaterThanOrEqual(220);
   });
 
   it('every entry satisfies phraseInputSchema', () => {

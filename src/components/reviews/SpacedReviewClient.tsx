@@ -81,7 +81,7 @@ export function SpacedReviewClient({ items }: Props) {
       </div>
 
       <div style={{ border: '1px solid #e0e0e0', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', background: '#fff' }}>
-        <p style={{ fontSize: '1.4rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+        <p style={{ fontSize: '1.4rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#111' }}>
           {current.phrase.phrase}
         </p>
         {current.phrase.example && (

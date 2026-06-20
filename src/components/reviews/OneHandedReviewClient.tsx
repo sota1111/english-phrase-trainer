@@ -108,7 +108,7 @@ export function OneHandedReviewClient({ items }: Props) {
         onClick={() => !showAnswer && setShowAnswer(true)}
       >
         <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', wordBreak: 'break-word' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', wordBreak: 'break-word', color: '#111' }}>
             {current.phrase.phrase}
           </h2>
           {current.phrase.example && (

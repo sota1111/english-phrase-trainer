@@ -23,6 +23,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
     keyword: '',
     category: '',
     difficulty: '',
+    importance: '',
     onlyUnanswered: false,
     onlyWeak: false,
   });
@@ -58,6 +59,9 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         return false;
       }
       if (filter.difficulty && p.difficulty !== filter.difficulty) {
+        return false;
+      }
+      if (filter.importance && p.importance !== filter.importance) {
         return false;
       }
       if (filter.onlyUnanswered && p.answeredCount > 0) {

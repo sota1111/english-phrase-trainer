@@ -32,7 +32,7 @@ export default async function HomePage() {
         <StatCard label="総復習回数" value={data.totalReviews} sub="回" />
       </section>
 
-      <nav style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+      <nav className="home-nav" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'nowrap', overflowX: 'auto' }}>
         <Link href="/spaced-review" className="btn btn-primary">
           復習を開始（{data.dueCount}件）
         </Link>

@@ -159,6 +159,13 @@ a {
   font-weight: 700;
   font-size: 0.98rem;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* Home menu: single horizontal line, scrolls horizontally on overflow */
+.home-nav > .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .brand-mark {

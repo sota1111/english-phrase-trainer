@@ -21,7 +21,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
     example: initialData?.example ?? '',
     exampleJa: initialData?.exampleJa ?? '',
     category: initialData?.category ?? '',
-    difficulty: initialData?.difficulty ?? 'normal',
     importance: initialData?.importance ?? 'normal',
     memo: initialData?.memo ?? '',
   });
@@ -190,20 +189,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
               <option value={NEW_CATEGORY_OPTION}>＋ 新規カテゴリを追加</option>
             </select>
           )}
-        </div>
-        <div className="form-field">
-          <label htmlFor="difficulty">難易度</label>
-          <select
-            id="difficulty"
-            name="difficulty"
-            value={formData.difficulty}
-            onChange={handleChange}
-            required
-          >
-            <option value="easy">易しい</option>
-            <option value="normal">普通</option>
-            <option value="hard">難しい</option>
-          </select>
         </div>
         <div className="form-field">
           <label htmlFor="importance">重要度</label>

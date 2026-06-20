@@ -22,7 +22,6 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
   const [filter, setFilter] = useState<FilterState>({
     keyword: '',
     category: '',
-    difficulty: '',
     importance: '',
     onlyUnanswered: false,
     onlyWeak: false,
@@ -56,9 +55,6 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         if (!matchesKeyword) return false;
       }
       if (filter.category && p.category !== filter.category) {
-        return false;
-      }
-      if (filter.difficulty && p.difficulty !== filter.difficulty) {
         return false;
       }
       if (filter.importance && p.importance !== filter.importance) {

@@ -45,14 +45,6 @@ describe('sot826Phrases dataset', () => {
     }
   });
 
-  it('still marks priority items as hard', () => {
-    const hard = sot826Phrases.filter((p) => p.difficulty === 'hard');
-    expect(hard.length).toBeGreaterThan(0);
-    for (const entry of hard) {
-      expect(KNOWN_CATEGORIES.has(entry.category)).toBe(true);
-    }
-  });
-
   it('classifies every entry with an explicit importance (SOT-890)', () => {
     for (const entry of sot826Phrases) {
       expect(['high', 'normal', 'low']).toContain(entry.importance);

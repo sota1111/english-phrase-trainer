@@ -12,7 +12,6 @@ export const phraseInputSchema = z.object({
   exampleJa: z.string().optional().default(''),
   category: z.string().optional().default(''),
   memo: z.string().optional().default(''),
-  difficulty: z.enum(['easy', 'normal', 'hard']).optional().default('normal'),
   importance: z.enum(['high', 'normal', 'low']).optional().default('normal'),
 });
 

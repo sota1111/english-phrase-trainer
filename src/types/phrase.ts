@@ -1,9 +1,6 @@
-export type Difficulty = 'easy' | 'normal' | 'hard';
-
 /**
- * Importance (重要度) is a SEPARATE axis from `Difficulty`: how worth studying a
- * phrase is, independent of how hard it is. Used to classify existing phrases and
- * to narrow the spaced-review (出題) target to a chosen importance level.
+ * Importance (重要度): how worth studying a phrase is. Used to classify existing
+ * phrases and to narrow the spaced-review (出題) target to a chosen importance level.
  */
 export type Importance = 'high' | 'normal' | 'low';
 
@@ -27,7 +24,6 @@ export interface Phrase {
   exampleJa: string;
   category: string;
   memo: string;
-  difficulty: Difficulty;
   importance: Importance;
   correctCount: number;
   wrongCount: number;

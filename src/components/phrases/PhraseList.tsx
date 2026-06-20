@@ -9,12 +9,6 @@ type PhraseListProps = {
   onDelete: (id: string) => void;
 };
 
-const DIFFICULTY_MAP = {
-  easy: '易',
-  normal: '普',
-  hard: '難',
-};
-
 export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
   if (phrases.length === 0) {
     return <p className="no-phrases">フレーズがありません</p>;
@@ -51,7 +45,6 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
             <th>意味</th>
             <th>例文</th>
             <th>カテゴリ</th>
-            <th>難易度</th>
             <th>重要度</th>
             <th>正答率</th>
             <th>回答回数</th>
@@ -66,7 +59,6 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
               <td data-label="意味">{phrase.meaningJa}</td>
               <td className="example" data-label="例文">{phrase.example ? phrase.example : '-'}</td>
               <td data-label="カテゴリ">{phrase.category}</td>
-              <td data-label="難易度">{DIFFICULTY_MAP[phrase.difficulty]}</td>
               <td data-label="重要度">{IMPORTANCE_SHORT[phrase.importance]}</td>
               <td data-label="正答率">
                 {phrase.answeredCount > 0

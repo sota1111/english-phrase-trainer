@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { submitReviewResultAction } from '@/lib/actions/reviewActions';
+import { useI18n } from '@/i18n/I18nContext';
 
 export type Phrase = {
   id: string;
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export function OneHandedReviewClient({ items }: Props) {
+  const { t } = useI18n();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [completed, setCompleted] = useState(false);
@@ -32,9 +34,9 @@ export function OneHandedReviewClient({ items }: Props) {
   if (items.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>今日の復習はありません</h2>
-        <p style={{ color: '#666', marginBottom: '2rem' }}>新しいフレーズを追加するか、明日また来てください。</p>
-        <Link href="/" style={{ color: '#0070f3', fontWeight: 'bold' }}>ホームへ戻る</Link>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{t('review.none.title')}</h2>
+        <p style={{ color: '#666', marginBottom: '2rem' }}>{t('review.none.body')}</p>
+        <Link href="/" style={{ color: '#0070f3', fontWeight: 'bold' }}>{t('common.home')}</Link>
       </div>
     );
   }
@@ -42,17 +44,17 @@ export function OneHandedReviewClient({ items }: Props) {
   if (completed) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-        <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem' }}>復習完了！</h2>
+        <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem' }}>{t('review.done.title')}</h2>
         <div style={{ background: '#f8f9fa', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
           <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-            覚えていた: <span style={{ fontWeight: 'bold', color: '#22c55e' }}>{results.correct}</span> 件
+            {t('review.remembered')}: <span style={{ fontWeight: 'bold', color: '#22c55e' }}>{results.correct}</span> {t('unit.count')}
           </p>
           <p style={{ fontSize: '1.1rem' }}>
-            覚えていなかった: <span style={{ fontWeight: 'bold', color: '#ef4444' }}>{results.incorrect}</span> 件
+            {t('review.forgot')}: <span style={{ fontWeight: 'bold', color: '#ef4444' }}>{results.incorrect}</span> {t('unit.count')}
           </p>
         </div>
         <Link href="/" style={{ padding: '1rem 2rem', background: '#0070f3', color: '#fff', borderRadius: '8px', textDecoration: 'none', display: 'inline-block', fontSize: '1.1rem', fontWeight: 'bold' }}>
-          ホームへ戻る
+          {t('common.home')}
         </Link>
       </div>
     );
@@ -158,7 +160,7 @@ export function OneHandedReviewClient({ items }: Props) {
               boxShadow: '0 4px 6px rgba(0, 112, 243, 0.2)'
             }}
           >
-            意味を表示
+            {t('review.showMeaningShort')}
           </button>
         ) : (
           <div style={{ display: 'flex', gap: '12px' }}>
@@ -181,7 +183,7 @@ export function OneHandedReviewClient({ items }: Props) {
                 justifyContent: 'center'
               }}
             >
-              ✗ 覚えていない
+              {t('review.answer.forgotShort')}
             </button>
             <button
               disabled={submitting}
@@ -202,7 +204,7 @@ export function OneHandedReviewClient({ items }: Props) {
                 justifyContent: 'center'
               }}
             >
-              ✓ 覚えている
+              {t('review.answer.rememberedShort')}
             </button>
           </div>
         )}

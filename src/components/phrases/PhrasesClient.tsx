@@ -6,8 +6,9 @@ import { Phrase, PhraseInput } from '@/types/phrase';
 import { PhraseFilter, FilterState } from '@/components/phrases/PhraseFilter';
 import { PhraseList } from '@/components/phrases/PhraseList';
 import { PhraseForm } from '@/components/phrases/PhraseForm';
-import { 
-  getPhrasesAction, 
+import { useI18n } from '@/i18n/I18nContext';
+import {
+  getPhrasesAction,
   createPhraseAction, 
   updatePhraseAction, 
   deletePhraseAction 
@@ -18,6 +19,7 @@ type PhrasesClientProps = {
 };
 
 export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
+  const { t } = useI18n();
   const [phrases, setPhrases] = useState<Phrase[]>(initialPhrases);
   const [filter, setFilter] = useState<FilterState>({
     keyword: '',
@@ -123,12 +125,12 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
       <header>
         <div className="header-left">
           <Link href="/" className="back-home">
-            ← ホームに戻る
+            {t('common.backHome')}
           </Link>
-          <h1>フレーズ一覧</h1>
+          <h1>{t('phrases.list.title')}</h1>
         </div>
         <button className="add-button" onClick={() => setModalMode('create')}>
-          フレーズを追加
+          {t('phrases.add')}
         </button>
       </header>
 
@@ -152,23 +154,23 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           <div className="modal-content">
             {justCreated ? (
               <div className="created-view">
-                <h2>フレーズを追加しました</h2>
-                <p className="created-message">続けて追加するか、ホーム画面に戻れます。</p>
+                <h2>{t('phrases.created.title')}</h2>
+                <p className="created-message">{t('phrases.created.body')}</p>
                 <div className="created-actions">
                   <button
                     type="button"
                     onClick={() => setJustCreated(false)}
                   >
-                    続けて追加
+                    {t('phrases.created.again')}
                   </button>
                   <Link href="/" className="home-link">
-                    ホームに戻る
+                    {t('common.home')}
                   </Link>
                 </div>
               </div>
             ) : (
               <>
-                <h2>{modalMode === 'create' ? '新規フレーズ登録' : 'フレーズ編集'}</h2>
+                <h2>{modalMode === 'create' ? t('phrases.modal.create') : t('phrases.modal.edit')}</h2>
                 <PhraseForm
                   key={editingPhraseId || 'create'}
                   initialData={editingPhrase}

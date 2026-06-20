@@ -1,7 +1,8 @@
 'use client';
 
 import { Importance } from '@/types/phrase';
-import { IMPORTANCE_VALUES, IMPORTANCE_LABEL } from '@/lib/importance';
+import { IMPORTANCE_VALUES } from '@/lib/importance';
+import { useI18n } from '@/i18n/I18nContext';
 
 export type FilterState = {
   keyword: string;
@@ -18,6 +19,7 @@ type PhraseFilterProps = {
 };
 
 export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps) {
+  const { t } = useI18n();
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -38,10 +40,10 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
           name="keyword"
           value={filter.keyword}
           onChange={handleChange}
-          placeholder="キーワード検索"
+          placeholder={t('filter.keyword')}
         />
         <select name="category" value={filter.category} onChange={handleChange}>
-          <option value="">すべてのカテゴリ</option>
+          <option value="">{t('filter.allCategories')}</option>
           {categories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -49,10 +51,10 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
           ))}
         </select>
         <select name="importance" value={filter.importance} onChange={handleChange}>
-          <option value="">すべての重要度</option>
+          <option value="">{t('filter.allImportance')}</option>
           {IMPORTANCE_VALUES.map((value) => (
             <option key={value} value={value}>
-              {IMPORTANCE_LABEL[value]}
+              {t(`importance.${value}`)}
             </option>
           ))}
         </select>
@@ -65,7 +67,7 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
             checked={filter.onlyUnanswered}
             onChange={handleChange}
           />
-          未回答のみ
+          {t('filter.onlyUnanswered')}
         </label>
         <label>
           <input
@@ -74,7 +76,7 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
             checked={filter.onlyWeak}
             onChange={handleChange}
           />
-          苦手フレーズのみ（正答率50%未満）
+          {t('filter.onlyWeak')}
         </label>
       </div>
 

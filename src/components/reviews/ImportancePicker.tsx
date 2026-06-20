@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Importance } from '@/types/phrase';
-import { IMPORTANCE_VALUES, IMPORTANCE_LABEL } from '@/lib/importance';
+import { IMPORTANCE_VALUES } from '@/lib/importance';
+import { T } from '@/i18n/T';
 
 type Props = {
   /** Route the links point at (e.g. '/spaced-review'). */
@@ -11,24 +12,27 @@ type Props = {
 
 /**
  * Importance selector for the review (出題) screens. Each option is a link that
- * sets `?importance=<level>`; selecting 「すべて」 clears the filter. Rendered as a
- * server component so the chosen level is read back from the URL on the server.
+ * sets `?importance=<level>`; selecting 「すべて」/「All」 clears the filter. Rendered
+ * as a server component so the chosen level is read back from the URL on the server.
+ * Labels are localized via <T> (a client boundary) so they react to the JP/EN toggle.
  */
 export function ImportancePicker({ basePath, current }: Props) {
-  const options: { label: string; value: Importance | null }[] = [
-    { label: 'すべて', value: null },
-    ...IMPORTANCE_VALUES.map((value) => ({ label: IMPORTANCE_LABEL[value], value })),
+  const options: { key: string; value: Importance | null }[] = [
+    { key: 'importance.all', value: null },
+    ...IMPORTANCE_VALUES.map((value) => ({ key: `importance.${value}`, value })),
   ];
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.25rem' }}>
-      <span style={{ alignSelf: 'center', color: '#374151', fontSize: '0.9rem' }}>重要度:</span>
+      <span style={{ alignSelf: 'center', color: '#374151', fontSize: '0.9rem' }}>
+        <T k="importance.label" />
+      </span>
       {options.map((opt) => {
         const active = opt.value === current;
         const href = opt.value ? `${basePath}?importance=${opt.value}` : basePath;
         return (
           <Link
-            key={opt.label}
+            key={opt.key}
             href={href}
             style={{
               padding: '0.35rem 0.8rem',
@@ -40,7 +44,7 @@ export function ImportancePicker({ basePath, current }: Props) {
               color: active ? '#fff' : '#374151',
             }}
           >
-            {opt.label}
+            <T k={opt.key} />
           </Link>
         );
       })}

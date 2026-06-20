@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { PhraseInput } from '@/types/phrase';
-import { IMPORTANCE_VALUES, IMPORTANCE_LABEL } from '@/lib/importance';
+import { IMPORTANCE_VALUES } from '@/lib/importance';
+import { useI18n } from '@/i18n/I18nContext';
 
 const NEW_CATEGORY_OPTION = '__new__';
 
@@ -15,6 +16,7 @@ type PhraseFormProps = {
 };
 
 export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, isLoading }: PhraseFormProps) {
+  const { t } = useI18n();
   const [formData, setFormData] = useState<PhraseInput>({
     phrase: initialData?.phrase ?? '',
     meaningJa: initialData?.meaningJa ?? '',
@@ -77,16 +79,16 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           ...prev,
           ...data.result,
         }));
-        setGenMessage({ type: 'info', text: '自動生成しました。内容を確認・編集して保存してください。' });
+        setGenMessage({ type: 'info', text: t('form.genSuccess') });
       } else {
         setGenMessage({
           type: response.status === 503 ? 'info' : 'error',
-          text: data.message || '自動生成に失敗しました。手動で入力してください。'
+          text: data.message || t('form.genFail')
         });
       }
     } catch (error) {
       console.error('Generate error:', error);
-      setGenMessage({ type: 'error', text: '通信エラーが発生しました。手動で入力してください。' });
+      setGenMessage({ type: 'error', text: t('form.genCommError') });
     } finally {
       setIsGenerating(false);
     }
@@ -101,7 +103,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
     <form onSubmit={handleSubmit} className="phrase-form">
       <div className="form-grid">
         <div className="form-field">
-          <label htmlFor="phrase">英語フレーズ</label>
+          <label htmlFor="phrase">{t('form.phrase')}</label>
           <input
             id="phrase"
             name="phrase"
@@ -112,7 +114,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           />
         </div>
         <div className="form-field">
-          <label htmlFor="meaningJa">日本語の意味</label>
+          <label htmlFor="meaningJa">{t('form.meaning')}</label>
           <input
             id="meaningJa"
             name="meaningJa"
@@ -123,7 +125,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           />
         </div>
         <div className="form-field">
-          <label htmlFor="example">例文（英語）</label>
+          <label htmlFor="example">{t('form.exampleEn')}</label>
           <input
             id="example"
             name="example"
@@ -134,7 +136,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           />
         </div>
         <div className="form-field">
-          <label htmlFor="exampleJa">例文（日本語）</label>
+          <label htmlFor="exampleJa">{t('form.exampleJa')}</label>
           <input
             id="exampleJa"
             name="exampleJa"
@@ -145,7 +147,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           />
         </div>
         <div className="form-field">
-          <label htmlFor="category">カテゴリ</label>
+          <label htmlFor="category">{t('form.category')}</label>
           {isNewCategory ? (
             <div className="category-new">
               <input
@@ -154,7 +156,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
                 type="text"
                 value={formData.category}
                 onChange={handleChange}
-                placeholder="新しいカテゴリ名"
+                placeholder={t('form.newCategoryPlaceholder')}
                 required
               />
               {categoryOptions.length > 0 && (
@@ -166,7 +168,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
                     setFormData((prev) => ({ ...prev, category: categoryOptions[0] }));
                   }}
                 >
-                  一覧から選択
+                  {t('form.selectFromList')}
                 </button>
               )}
             </div>
@@ -179,19 +181,19 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
               required
             >
               <option value="" disabled>
-                選択してください
+                {t('form.selectPlaceholder')}
               </option>
               {categoryOptions.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
               ))}
-              <option value={NEW_CATEGORY_OPTION}>＋ 新規カテゴリを追加</option>
+              <option value={NEW_CATEGORY_OPTION}>{t('form.addNewCategory')}</option>
             </select>
           )}
         </div>
         <div className="form-field">
-          <label htmlFor="importance">重要度</label>
+          <label htmlFor="importance">{t('form.importance')}</label>
           <select
             id="importance"
             name="importance"
@@ -201,13 +203,13 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           >
             {IMPORTANCE_VALUES.map((value) => (
               <option key={value} value={value}>
-                {IMPORTANCE_LABEL[value]}
+                {t(`importance.${value}`)}
               </option>
             ))}
           </select>
         </div>
         <div className="form-field form-field-full">
-          <label htmlFor="memo">メモ（任意）</label>
+          <label htmlFor="memo">{t('form.memo')}</label>
           <textarea
             id="memo"
             name="memo"
@@ -225,18 +227,18 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             onClick={() => handleGenerate('ja2en')}
             disabled={isGenerating || isLoading || !formData.meaningJa.trim()}
           >
-            日本語から英文を生成
+            {t('form.genJa2En')}
           </button>
           <button
             type="button"
             onClick={() => handleGenerate('en2ja')}
             disabled={isGenerating || isLoading || !formData.phrase.trim()}
           >
-            英文から日本語を生成
+            {t('form.genEn2Ja')}
           </button>
         </div>
         <p className="gen-note">
-          日本語または英語のどちらかを入力して生成できます。ANTHROPIC_API_KEY 未設定時は自動生成は使えませんが手動入力は可能です。
+          {t('form.genNote')}
         </p>
         {genMessage && (
           <p className={`gen-message ${genMessage.type}`}>
@@ -247,10 +249,10 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
 
       <div className="form-actions">
         <button type="button" onClick={onCancel} disabled={isLoading || isGenerating}>
-          キャンセル
+          {t('form.cancel')}
         </button>
         <button type="submit" className="submit" disabled={isLoading || isGenerating}>
-          {isLoading ? '保存中...' : '保存'}
+          {isLoading ? t('form.saving') : t('form.save')}
         </button>
       </div>
 

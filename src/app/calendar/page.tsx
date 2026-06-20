@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CalendarClient } from '@/components/calendar/CalendarClient';
+import { T } from '@/i18n/T';
 import { getMonthlyStatsAction } from '@/lib/actions/statsActions';
 
 // Read live Firestore data on every request (avoid build-time static prerender).
@@ -20,8 +21,8 @@ export default async function CalendarPage() {
   return (
     <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-        <Link href="/" style={{ color: '#0070f3', textDecoration: 'none' }}>← ホーム</Link>
-        <h1 style={{ margin: 0 }}>学習カレンダー</h1>
+        <Link href="/" style={{ color: '#0070f3', textDecoration: 'none' }}><T k="common.backHome" /></Link>
+        <h1 style={{ margin: 0 }}><T k="calendar.title" /></h1>
       </div>
       <CalendarClient initialData={data} />
     </div>

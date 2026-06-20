@@ -26,11 +26,6 @@ describe('initialPhrases dataset', () => {
     }
   });
 
-  it('marks the 10 priority items as hard', () => {
-    const hard = initialPhrases.filter((p) => p.difficulty === 'hard');
-    expect(hard.length).toBe(10);
-  });
-
   it('every phrase and meaningJa is non-empty', () => {
     for (const entry of initialPhrases) {
       expect(entry.phrase.trim().length).toBeGreaterThan(0);

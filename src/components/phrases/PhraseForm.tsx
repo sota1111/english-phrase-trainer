@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { PhraseInput } from '@/types/phrase';
+import { IMPORTANCE_VALUES, IMPORTANCE_LABEL } from '@/lib/importance';
 
 const NEW_CATEGORY_OPTION = '__new__';
 
@@ -21,6 +22,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
     exampleJa: initialData?.exampleJa ?? '',
     category: initialData?.category ?? '',
     difficulty: initialData?.difficulty ?? 'normal',
+    importance: initialData?.importance ?? 'normal',
     memo: initialData?.memo ?? '',
   });
 
@@ -201,6 +203,22 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             <option value="easy">易しい</option>
             <option value="normal">普通</option>
             <option value="hard">難しい</option>
+          </select>
+        </div>
+        <div className="form-field">
+          <label htmlFor="importance">重要度</label>
+          <select
+            id="importance"
+            name="importance"
+            value={formData.importance ?? 'normal'}
+            onChange={handleChange}
+            required
+          >
+            {IMPORTANCE_VALUES.map((value) => (
+              <option key={value} value={value}>
+                {IMPORTANCE_LABEL[value]}
+              </option>
+            ))}
           </select>
         </div>
         <div className="form-field form-field-full">

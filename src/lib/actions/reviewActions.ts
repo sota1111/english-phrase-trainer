@@ -5,6 +5,8 @@ import { getDueReviews, getReviewSchedule, upsertReviewSchedule } from '@/lib/fi
 import { incrementDailyStat } from '@/lib/firestore/dailyStats';
 import { createLearningRecord } from '@/lib/firestore/learningRecords';
 import { calculateNextReview, orderByReviewUrgency, DEFAULT_SM2_PARAMS } from '@/lib/sm2';
+import { filterByImportance } from '@/lib/importance';
+import { Importance } from '@/types/phrase';
 import { spacedReviewResultSchema, learningRecordSchema } from '@/lib/validation/schemas';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -12,7 +14,7 @@ import { z } from 'zod';
 type SpacedReviewResultInput = z.infer<typeof spacedReviewResultSchema>;
 type LearningRecordInput = z.infer<typeof learningRecordSchema>;
 
-export async function getDuePhrasesAction() {
+export async function getDuePhrasesAction(importance?: Importance) {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
@@ -42,8 +44,11 @@ export async function getDuePhrasesAction() {
     schedule: item.schedule,
   }));
 
+  // Narrow to the chosen importance BEFORE ordering so SRS urgency order survives.
+  const scoped = filterByImportance(combined, importance);
+
   // SRS ordering: most overdue (earliest dueDate) first; never-scheduled phrases last.
-  return orderByReviewUrgency(combined, item =>
+  return orderByReviewUrgency(scoped, item =>
     item.schedule?.dueDate ? item.schedule.dueDate.toMillis() : null,
   );
 }

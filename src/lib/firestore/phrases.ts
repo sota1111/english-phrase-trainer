@@ -36,6 +36,9 @@ function serializePhrase(id: string, data: FirebaseFirestore.DocumentData): Phra
     category: data.category ?? '',
     memo: data.memo ?? '',
     difficulty: data.difficulty ?? 'normal',
+    // Legacy phrases predate the importance field; default them to 'normal' so
+    // they stay classified with no data migration.
+    importance: data.importance ?? 'normal',
     correctCount: data.correctCount ?? 0,
     wrongCount: data.wrongCount ?? 0,
     answeredCount: data.answeredCount ?? 0,

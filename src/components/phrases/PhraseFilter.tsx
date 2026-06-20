@@ -1,11 +1,13 @@
 'use client';
 
-import { Difficulty } from '@/types/phrase';
+import { Difficulty, Importance } from '@/types/phrase';
+import { IMPORTANCE_VALUES, IMPORTANCE_LABEL } from '@/lib/importance';
 
 export type FilterState = {
   keyword: string;
   category: string;
   difficulty: '' | Difficulty;
+  importance: '' | Importance;
   onlyUnanswered: boolean;
   onlyWeak: boolean;
 };
@@ -52,6 +54,14 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
           <option value="easy">易しい</option>
           <option value="normal">普通</option>
           <option value="hard">難しい</option>
+        </select>
+        <select name="importance" value={filter.importance} onChange={handleChange}>
+          <option value="">すべての重要度</option>
+          {IMPORTANCE_VALUES.map((value) => (
+            <option key={value} value={value}>
+              {IMPORTANCE_LABEL[value]}
+            </option>
+          ))}
         </select>
       </div>
       <div className="filter-group">

@@ -37,4 +37,10 @@ describe('initialPhrases dataset', () => {
       expect(entry.meaningJa.trim().length).toBeGreaterThan(0);
     }
   });
+
+  it('classifies every entry with an explicit importance (SOT-890)', () => {
+    for (const entry of initialPhrases) {
+      expect(['high', 'normal', 'low']).toContain(entry.importance);
+    }
+  });
 });

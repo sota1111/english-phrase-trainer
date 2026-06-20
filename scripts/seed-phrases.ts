@@ -7,12 +7,13 @@
  * nothing. Dedupe is by `phrase` text, so any phrase shared across the two
  * datasets is only inserted once.
  *
- * It then runs a RECONCILE pass (SOT-866): for every already-registered document
- * whose `phrase` text matches the source data but whose stored `category` differs
- * from the source `category`, it updates the document's `category` in place. This
- * is what keeps previously-seeded documents in sync after the source categories
- * are reorganized (e.g. the collapse to ビジネス / 技術 / 日常) — insert-only
- * seeding leaves old categories on existing docs untouched. The reconcile pass is
+ * It then runs a RECONCILE pass (SOT-866 / SOT-890): for every already-registered
+ * document whose `phrase` text matches the source data but whose stored `category`
+ * or `importance` differs from the source value, it updates the document in place.
+ * This is what keeps previously-seeded documents in sync after the source data is
+ * reorganized (e.g. the category collapse to ビジネス / 技術 / 日常, or the SOT-890
+ * importance classification at a high:normal:low = 1:2:7 ratio) — insert-only
+ * seeding leaves old field values on existing docs untouched. The reconcile pass is
  * also idempotent: a second run finds no mismatches and updates nothing.
  *
  * It then runs a CLEANUP pass (SOT-865): every already-registered document whose
@@ -33,6 +34,8 @@
  */
 import { initialPhrases } from '../src/data/initialPhrases';
 import { sot826Phrases } from '../src/data/sot826Phrases';
+import { DEFAULT_IMPORTANCE } from '../src/lib/importance';
+import { Importance } from '../src/types/phrase';
 import {
   getPhrases,
   createPhrase,
@@ -47,6 +50,13 @@ const allPhrases = [...initialPhrases, ...sot826Phrases];
 // datasets win on a text collision, matching the insert-pass dedupe order.
 const desiredCategoryByPhrase = new Map<string, string>(
   allPhrases.map((entry) => [entry.phrase, entry.category]),
+);
+
+// Desired importance for each phrase text, taken from the source datasets. Entries
+// without an explicit `importance` fall back to the default ('normal'), matching how
+// the read layer treats legacy docs. Later datasets win on a text collision.
+const desiredImportanceByPhrase = new Map<string, Importance>(
+  allPhrases.map((entry) => [entry.phrase, entry.importance ?? DEFAULT_IMPORTANCE]),
 );
 
 async function main(): Promise<void> {
@@ -87,6 +97,18 @@ async function main(): Promise<void> {
     }
   }
 
+  // Reconcile pass (SOT-890): fix the `importance` of already-registered documents
+  // so registered data follows the source importance classification (1:2:7). The
+  // insert pass skips existing phrase text, so without this the docs stay 'normal'.
+  let reimportanced = 0;
+  for (const doc of existing) {
+    const desired = desiredImportanceByPhrase.get(doc.phrase);
+    if (desired !== undefined && desired !== doc.importance) {
+      await updatePhrase(doc.id, { importance: desired });
+      reimportanced += 1;
+    }
+  }
+
   // Cleanup pass: make already-registered phrases English-only by removing the
   // Japanese annotation. Delete the annotated doc when a clean equivalent already
   // exists; otherwise rewrite the phrase in place to the stripped text.
@@ -109,7 +131,7 @@ async function main(): Promise<void> {
 
   console.log(
     `Done. inserted=${inserted}, skipped(existing)=${skipped}, ` +
-      `recategorized=${recategorized}, ` +
+      `recategorized=${recategorized}, reimportanced=${reimportanced}, ` +
       `annotationDeleted=${annotationDeleted}, annotationStripped=${annotationStripped}, ` +
       `total=${allPhrases.length}`,
   );

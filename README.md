@@ -40,6 +40,7 @@
 | exampleJa | string | 例文（日本語） |
 | category | string | カテゴリ |
 | difficulty | 'easy'｜'normal'｜'hard' | 難易度 |
+| importance | 'high'｜'normal'｜'low' | 重要度（間隔反復の出題対象を絞り込む。未設定で書き込まれたデータは `'normal'` として読み出す） |
 | memo | string | メモ |
 | correctCount | number | 正解数 |
 | wrongCount | number | 不正解数 |
@@ -83,27 +84,28 @@ GOOGLE_CLOUD_PROJECT=<your-gcp-project-id> npx tsx scripts/seed-phrases.ts
 ```
 src/
   app/
-    api/auth/login/   POST（ログイン）
-    api/auth/logout/  POST（ログアウト）
-    api/phrases/      GET/POST/PUT/DELETE
-    api/spaced-review/ GET（復習フレーズ取得）, POST/result（結果記録）
-    api/learning-records/  POST（正誤記録）
-    api/dashboard/    GET（ダッシュボード統計）
-    api/calendar/     GET（学習カレンダー）
-    api/stats/        GET（統計情報）
-    login/            ログイン画面
-    phrases/          フレーズ管理画面
-    spaced-review/    間隔反復復習画面
-    calendar/         学習カレンダー画面
-    page.tsx          ダッシュボード（トップページ）
-  components/         再利用UIコンポーネント（LogoutButtonなど）
+    api/
+      auth/login/        POST（ログイン）
+      auth/logout/       POST（ログアウト）
+      phrases/generate/  POST（Anthropic API で日本語⇄英文・例文を自動生成）
+    login/               ログイン画面
+    phrases/             フレーズ管理画面
+    spaced-review/       間隔反復（SM-2）復習画面
+      one-handed/        片手モード復習画面
+    calendar/            学習カレンダー画面
+    page.tsx             ダッシュボード（トップページ）
+  components/            UIコンポーネント（calendar / phrases / reviews / ui）
   lib/
+    actions/             Server Actions（phraseActions / reviewActions / statsActions）
+    firestore/           Firestore アクセス（phrases / learningRecords / dailyStats / reviewSchedules）
     firebase-admin.ts
-    sm2.ts
-    firestore/
-  types/              型定義
-  middleware.ts       認証ミドルウェア（全ルート保護）
+    sm2.ts               SM-2 間隔反復アルゴリズム
+    importance.ts        重要度の分類・既定値
+  types/                 型定義（phrase / reviewSchedule など）
+  middleware.ts          認証ミドルウェア（全ルート保護）
 ```
+
+> フレーズ CRUD・ダッシュボード・カレンダー・統計のデータ取得/更新は **Server Actions（`src/lib/actions/*`）とサーバーコンポーネント** 経由で行います。汎用の REST API エンドポイント（`/api/phrases` 等）は提供していません。認証（`/api/auth/*`）と AI 生成（`/api/phrases/generate`）のみ Route Handler として実装しています。
 
 ## ローカル起動手順
 
@@ -427,15 +429,13 @@ docker compose up
 
 ### 動作確認
 
-エミュレーター起動後、以下を確認:
+エミュレーター起動後、ブラウザで http://localhost:3000 を開き、以下を確認:
 
-```bash
-# フレーズ一覧API
-curl http://localhost:3000/api/phrases
+- ダッシュボード（`/`）に統計が表示される
+- フレーズ管理（`/phrases`）で一覧・追加・編集・削除ができる
+- 間隔反復復習（`/spaced-review`）で出題される
 
-# 統計API
-curl http://localhost:3000/api/stats
-```
+> データ取得/更新は Server Actions・サーバーコンポーネント経由のため、汎用 REST API（`/api/phrases` 等）への `curl` 確認は行えません。
 
 ## Docker単体での実行
 

@@ -10,10 +10,14 @@ export const IMPORTANCE_LABEL: Record<Importance, string> = {
   low: '低い',
 };
 
-/** Compact single-character labels for dense table cells. */
+/**
+ * Compact single-character labels for dense table cells. These mirror the full
+ * labels (高い / 普通 / 低い) so the same three-level scale is shown everywhere —
+ * `normal` is 普 (普通), never 中, to avoid mixing a "medium" level into the UI.
+ */
 export const IMPORTANCE_SHORT: Record<Importance, string> = {
   high: '高',
-  normal: '中',
+  normal: '普',
   low: '低',
 };
 

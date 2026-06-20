@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { filterByImportance, isImportance } from './importance';
+import { filterByImportance, isImportance, IMPORTANCE_LABEL, IMPORTANCE_SHORT } from './importance';
 import { phraseInputSchema } from './validation/schemas';
 import { Importance } from '@/types/phrase';
 
@@ -17,6 +17,19 @@ describe('isImportance', () => {
     expect(isImportance('urgent')).toBe(false);
     expect(isImportance('')).toBe(false);
     expect(isImportance(undefined)).toBe(false);
+  });
+});
+
+describe('importance labels use the 高い/普通/低い scale only', () => {
+  it('uses 普通/普 for normal — never 中 (no medium level leaks into the UI)', () => {
+    expect(IMPORTANCE_LABEL.normal).toBe('普通');
+    expect(IMPORTANCE_SHORT.normal).toBe('普');
+    expect(Object.values(IMPORTANCE_SHORT)).not.toContain('中');
+    expect(Object.values(IMPORTANCE_LABEL)).not.toContain('中');
+  });
+
+  it('maps all three levels to consistent short labels', () => {
+    expect(IMPORTANCE_SHORT).toEqual({ high: '高', normal: '普', low: '低' });
   });
 });
 

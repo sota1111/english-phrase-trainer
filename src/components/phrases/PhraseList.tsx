@@ -60,19 +60,19 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
         <tbody>
           {phrases.map((phrase) => (
             <tr key={phrase.id}>
-              <td>{phrase.phrase}</td>
-              <td>{phrase.meaningJa}</td>
-              <td className="example">{phrase.example ? phrase.example : '-'}</td>
-              <td>{phrase.category}</td>
-              <td>{DIFFICULTY_MAP[phrase.difficulty]}</td>
-              <td>
+              <td data-label="フレーズ">{phrase.phrase}</td>
+              <td data-label="意味">{phrase.meaningJa}</td>
+              <td className="example" data-label="例文">{phrase.example ? phrase.example : '-'}</td>
+              <td data-label="カテゴリ">{phrase.category}</td>
+              <td data-label="難易度">{DIFFICULTY_MAP[phrase.difficulty]}</td>
+              <td data-label="正答率">
                 {phrase.answeredCount > 0
                   ? `${Math.round(phrase.accuracy * 100)}%`
                   : '-'}
               </td>
-              <td>{phrase.answeredCount}</td>
-              <td>{formatDate(phrase.lastReviewedAt)}</td>
-              <td>
+              <td data-label="回答回数">{phrase.answeredCount}</td>
+              <td data-label="最終復習日">{formatDate(phrase.lastReviewedAt)}</td>
+              <td data-label="操作">
                 <div className="actions">
                   <button onClick={() => onEdit(phrase.id)}>編集</button>
                   <button onClick={() => handleDelete(phrase.id)} className="delete">
@@ -132,6 +132,54 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
         }
         .delete:hover {
           background-color: #ff7875;
+        }
+        /* Mobile: collapse each row into a stacked "label: value" card so the
+           table never requires horizontal scrolling. Desktop is unaffected. */
+        @media (max-width: 640px) {
+          .phrase-list {
+            overflow-x: visible;
+          }
+          table,
+          tbody {
+            display: block;
+            width: 100%;
+          }
+          thead {
+            display: none;
+          }
+          tr {
+            display: block;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            padding: 0.25rem 0.5rem;
+          }
+          td {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.75rem;
+            border: 0;
+            border-bottom: 1px solid #f4f4f4;
+            padding: 0.5rem 0.25rem;
+            text-align: right;
+            max-width: none;
+            overflow-wrap: anywhere;
+          }
+          tr td:last-child {
+            border-bottom: 0;
+          }
+          td::before {
+            content: attr(data-label);
+            flex: 0 0 auto;
+            font-weight: bold;
+            color: #666;
+            text-align: left;
+            white-space: nowrap;
+          }
+          .actions {
+            justify-content: flex-end;
+          }
         }
       `}</style>
     </div>

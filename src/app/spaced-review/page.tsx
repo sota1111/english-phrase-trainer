@@ -1,5 +1,6 @@
 import { SpacedReviewClient } from '@/components/reviews/SpacedReviewClient';
 import { ImportancePicker } from '@/components/reviews/ImportancePicker';
+import { T } from '@/i18n/T';
 import { getDuePhrasesAction } from '@/lib/actions/reviewActions';
 import { isImportance } from '@/lib/importance';
 
@@ -23,7 +24,7 @@ export default async function SpacedReviewPage({
 
   return (
     <div style={{ padding: '2rem', maxWidth: '700px', margin: '0 auto' }}>
-      <h1 style={{ marginBottom: '1.5rem' }}>今日の復習</h1>
+      <h1 style={{ marginBottom: '1.5rem' }}><T k="review.title" /></h1>
       <ImportancePicker basePath="/spaced-review" current={importance} />
       <SpacedReviewClient items={items as Parameters<typeof SpacedReviewClient>[0]['items']} />
     </div>

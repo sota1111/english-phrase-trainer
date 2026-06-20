@@ -1,7 +1,7 @@
 'use client';
 
 import { Phrase } from '@/types/phrase';
-import { IMPORTANCE_SHORT } from '@/lib/importance';
+import { useI18n } from '@/i18n/I18nContext';
 
 type PhraseListProps = {
   phrases: Phrase[];
@@ -10,18 +10,16 @@ type PhraseListProps = {
 };
 
 export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
-  if (phrases.length === 0) {
-    return <p className="no-phrases">フレーズがありません</p>;
-  }
+  const { t } = useI18n();
 
   const formatDate = (
     timestamp: { seconds?: number; _seconds?: number } | null | undefined
   ) => {
-    if (!timestamp) return '未回答';
+    if (!timestamp) return t('list.unanswered');
     // Canonical shape is the serialized `{ seconds, nanoseconds }`; keep
     // backward-compatible handling of the legacy `_seconds` field just in case.
     const seconds = timestamp.seconds ?? timestamp._seconds;
-    if (seconds === undefined) return '未回答';
+    if (seconds === undefined) return t('list.unanswered');
     const date = new Date(seconds * 1000);
 
     const y = date.getFullYear();
@@ -31,47 +29,51 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('このフレーズを削除しますか？')) {
+    if (window.confirm(t('list.confirmDelete'))) {
       onDelete(id);
     }
   };
+
+  if (phrases.length === 0) {
+    return <p className="no-phrases">{t('list.empty')}</p>;
+  }
 
   return (
     <div className="phrase-list">
       <table>
         <thead>
           <tr>
-            <th>フレーズ</th>
-            <th>意味</th>
-            <th>例文</th>
-            <th>カテゴリ</th>
-            <th>重要度</th>
-            <th>正答率</th>
-            <th>回答回数</th>
-            <th>最終復習日</th>
-            <th>操作</th>
+            <th>{t('col.phrase')}</th>
+            <th>{t('col.meaning')}</th>
+            <th>{t('col.example')}</th>
+            <th>{t('col.category')}</th>
+            <th>{t('col.importance')}</th>
+            <th>{t('col.accuracy')}</th>
+            <th>{t('col.answeredCount')}</th>
+            <th>{t('col.lastReviewed')}</th>
+            <th>{t('col.actions')}</th>
           </tr>
         </thead>
         <tbody>
           {phrases.map((phrase) => (
             <tr key={phrase.id}>
-              <td data-label="フレーズ">{phrase.phrase}</td>
-              <td data-label="意味">{phrase.meaningJa}</td>
-              <td className="example" data-label="例文">{phrase.example ? phrase.example : '-'}</td>
-              <td data-label="カテゴリ">{phrase.category}</td>
-              <td data-label="重要度">{IMPORTANCE_SHORT[phrase.importance]}</td>
-              <td data-label="正答率">
+              <td data-label={t('col.phrase')}>{phrase.phrase}</td>
+              <td data-label={t('col.meaning')}>{phrase.meaningJa}</td>
+              <td className="example" data-label={t('col.example')}>{phrase.example ? phrase.example : '-'}</td>
+              <td data-label={t('col.category')}>{phrase.category}</td>
+              <td data-label={t('col.importance')}>{t(`importance.${phrase.importance}`)}</td>
+              <td data-label={t('col.accuracy')}>
                 {phrase.answeredCount > 0
                   ? `${Math.round(phrase.accuracy * 100)}%`
                   : '-'}
               </td>
-              <td data-label="回答回数">{phrase.answeredCount}</td>
-              <td data-label="最終復習日">{formatDate(phrase.lastReviewedAt)}</td>
-              <td data-label="操作">
+              <td data-label={t('col.answeredCount')}>{phrase.answeredCount}</td>
+              <td data-label={t('col.lastReviewed')}>{formatDate(phrase.lastReviewedAt)}</td>
+              <td data-label={t('col.actions')}>
                 <div className="actions">
-                  <button onClick={() => onEdit(phrase.id)}>編集</button>
+                  <button onClick={() => onEdit(phrase.id)}>{t('action.edit')}</button>
                   <button onClick={() => handleDelete(phrase.id)} className="delete">
-                    削除
+                    {t('action.delete')}
                   </button>
                 </div>
               </td>

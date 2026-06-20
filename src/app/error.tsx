@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useI18n } from '@/i18n/I18nContext';
 
 export default function Error({
   error,
@@ -10,6 +11,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useI18n();
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -18,16 +20,16 @@ export default function Error({
     <main className="container" style={{ textAlign: 'center' }}>
       <div className="empty-state">
         <div className="empty-state-icon" aria-hidden>⚠️</div>
-        <h2 style={{ fontSize: '1.4rem', marginBottom: '0.75rem' }}>予期せぬエラーが発生しました</h2>
+        <h2 style={{ fontSize: '1.4rem', marginBottom: '0.75rem' }}>{t('error.title')}</h2>
         <p style={{ color: 'var(--muted)', marginBottom: '1.75rem' }}>
-          申し訳ありません。問題が発生しました。もう一度お試しいただくか、ホームに戻ってください。
+          {t('error.body')}
         </p>
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => reset()} className="btn btn-primary">
-            再試行
+            {t('error.retry')}
           </button>
           <Link href="/" className="btn btn-ghost">
-            ホームへ戻る
+            {t('common.home')}
           </Link>
         </div>
       </div>

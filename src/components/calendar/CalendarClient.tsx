@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { getMonthlyStatsAction } from '@/lib/actions/statsActions';
+import { useI18n } from '@/i18n/I18nContext';
 
 type DayData = {
   date: string;
@@ -28,6 +29,7 @@ function getDayColor(reviewCount: number): string {
 }
 
 export function CalendarClient({ initialData }: Props) {
+  const { t } = useI18n();
   const now = new Date();
   const [year, setYear] = useState(initialData.year);
   const [month, setMonth] = useState(initialData.month);
@@ -73,7 +75,7 @@ export function CalendarClient({ initialData }: Props) {
         >
           ◀
         </button>
-        <h2 style={{ margin: 0 }}>{year}年{month}月</h2>
+        <h2 style={{ margin: 0 }}>{t('calendar.ymd', { year, month })}</h2>
         <button
           onClick={() => navigate(year, month + 1)}
           disabled={isCurrentMonth}
@@ -83,11 +85,11 @@ export function CalendarClient({ initialData }: Props) {
         </button>
       </div>
 
-      {loading && <p style={{ textAlign: 'center', color: '#666' }}>読み込み中...</p>}
+      {loading && <p style={{ textAlign: 'center', color: '#666' }}>{t('calendar.loading')}</p>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '1.5rem' }}>
-        {['日', '月', '火', '水', '木', '金', '土'].map(d => (
-          <div key={d} style={{ textAlign: 'center', fontSize: '0.8rem', color: '#666', padding: '0.25rem' }}>{d}</div>
+        {[0, 1, 2, 3, 4, 5, 6].map(d => (
+          <div key={d} style={{ textAlign: 'center', fontSize: '0.8rem', color: '#666', padding: '0.25rem' }}>{t(`calendar.dow${d}`)}</div>
         ))}
         {cells.map((day, i) => {
           if (day === null) return <div key={`empty-${i}`} />;
@@ -98,7 +100,7 @@ export function CalendarClient({ initialData }: Props) {
           return (
             <div
               key={dateStr}
-              title={reviewCount > 0 ? `${reviewCount}件復習` : ''}
+              title={reviewCount > 0 ? t('calendar.reviewCount', { count: reviewCount }) : ''}
               style={{
                 aspectRatio: '1',
                 borderRadius: '4px',
@@ -119,16 +121,16 @@ export function CalendarClient({ initialData }: Props) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '0.85rem', color: '#666' }}>少ない</span>
+        <span style={{ fontSize: '0.85rem', color: '#666' }}>{t('calendar.less')}</span>
         {[0, 3, 7, 11].map(count => (
           <div key={count} style={{ width: '16px', height: '16px', borderRadius: '3px', background: getDayColor(count) }} />
         ))}
-        <span style={{ fontSize: '0.85rem', color: '#666' }}>多い</span>
+        <span style={{ fontSize: '0.85rem', color: '#666' }}>{t('calendar.more')}</span>
       </div>
 
       <div style={{ background: '#f8f9fa', borderRadius: '8px', padding: '1rem', textAlign: 'center' }}>
         <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{data.streakDays}</span>
-        <span style={{ color: '#555', marginLeft: '0.5rem' }}>日連続学習中</span>
+        <span style={{ color: '#555', marginLeft: '0.5rem' }}>{t('calendar.streakSuffix')}</span>
       </div>
     </div>
   );

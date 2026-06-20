@@ -2,8 +2,10 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/i18n/I18nContext';
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,10 +27,10 @@ export default function LoginPage() {
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error ?? '認証に失敗しました');
+        setError(data.error ?? t('login.errAuth'));
       }
     } catch {
-      setError('ログインに失敗しました');
+      setError(t('login.errLogin'));
     } finally {
       setLoading(false);
     }
@@ -39,12 +41,12 @@ export default function LoginPage() {
       <div className="card" style={{ padding: '2rem', width: '100%', maxWidth: '380px', boxShadow: 'var(--shadow-lg)' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <span className="brand-mark" style={{ width: 44, height: 44, fontSize: '1.2rem', margin: '0 auto 0.85rem', display: 'inline-flex' }}>英</span>
-          <h1 style={{ fontSize: '1.4rem', marginBottom: '0.35rem' }}>英語フレーズ学習</h1>
-          <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>ログインして学習を続けましょう</p>
+          <h1 style={{ fontSize: '1.4rem', marginBottom: '0.35rem' }}>{t('header.brand')}</h1>
+          <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{t('login.subtitle')}</p>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label htmlFor="email" className="field-label">メールアドレス</label>
+            <label htmlFor="email" className="field-label">{t('login.email')}</label>
             <input
               id="email"
               type="email"
@@ -57,7 +59,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="field">
-            <label htmlFor="password" className="field-label">パスワード</label>
+            <label htmlFor="password" className="field-label">{t('login.password')}</label>
             <input
               id="password"
               type="password"
@@ -66,7 +68,7 @@ export default function LoginPage() {
               required
               autoComplete="current-password"
               className="input"
-              placeholder="パスワードを入力"
+              placeholder={t('login.passwordPlaceholder')}
             />
           </div>
           {error && (
@@ -80,7 +82,7 @@ export default function LoginPage() {
             className="btn btn-primary btn-block"
             style={{ marginTop: '0.25rem' }}
           >
-            {loading ? 'ログイン中…' : 'ログイン'}
+            {loading ? t('login.submitting') : t('login.submit')}
           </button>
         </form>
       </div>

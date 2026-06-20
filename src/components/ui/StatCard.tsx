@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
+
 type StatCardProps = {
-  label: string;
+  label: ReactNode;
   value: string | number;
-  sub?: string;
+  sub?: ReactNode;
 };
 
 export function StatCard({ label, value, sub }: StatCardProps) {

@@ -63,5 +63,5 @@ jobs:
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "ALLOWED_USER_EMAILS=sota.moro@gmail.com" \
+            --set-env-vars "ALLOWED_USER_EMAILS=sota.moro@gmail.com,GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=gen-lang-client-0243034020,GOOGLE_CLOUD_LOCATION=us-central1,GEMINI_MODEL=gemini-2.5-flash" \
             --set-secrets "FIREBASE_WEB_API_KEY=FIREBASE_API_KEY:latest,AUTH_SECRET=english-phrase-trainer-auth-secret:latest"

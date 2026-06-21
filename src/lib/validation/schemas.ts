@@ -24,6 +24,12 @@ export const phraseGenerateSchema = z.object({
   text: z.string().min(1),
 });
 
+// Free-form bulk parse: one blob of mixed text is split by AI into many phrase
+// candidates. Capped to keep prompt size and latency bounded.
+export const phraseParseSchema = z.object({
+  text: z.string().min(1).max(20000),
+});
+
 export const learningRecordSchema = z.object({
   phraseId: z.string().min(1),
   quizType: z.enum(['meaning_to_phrase', 'blank']),

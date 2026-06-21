@@ -75,6 +75,36 @@ export async function createPhrase(input: PhraseInput): Promise<Phrase> {
   return serializePhrase(doc.id, doc.data()!);
 }
 
+/**
+ * Create many phrases in one or more Firestore batched writes. Returns the
+ * number of documents written. Splits into chunks below Firestore's 500-op
+ * limit so large bulk registrations succeed.
+ */
+export async function createPhrases(inputs: PhraseInput[]): Promise<number> {
+  const CHUNK = 450;
+  let written = 0;
+  for (let i = 0; i < inputs.length; i += CHUNK) {
+    const chunk = inputs.slice(i, i + CHUNK);
+    const batch = db.batch();
+    for (const input of chunk) {
+      const ref = db.collection(COLLECTION).doc();
+      batch.set(ref, {
+        ...input,
+        correctCount: 0,
+        wrongCount: 0,
+        answeredCount: 0,
+        accuracy: 0,
+        lastReviewedAt: null,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    }
+    await batch.commit();
+    written += chunk.length;
+  }
+  return written;
+}
+
 export async function updatePhrase(id: string, input: Partial<PhraseInput>): Promise<void> {
   await db.collection(COLLECTION).doc(id).update({
     ...input,

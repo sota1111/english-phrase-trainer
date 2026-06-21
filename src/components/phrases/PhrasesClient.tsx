@@ -6,6 +6,7 @@ import { Phrase, PhraseInput } from '@/types/phrase';
 import { PhraseFilter, FilterState } from '@/components/phrases/PhraseFilter';
 import { PhraseList } from '@/components/phrases/PhraseList';
 import { PhraseForm } from '@/components/phrases/PhraseForm';
+import { BulkRegisterForm } from '@/components/phrases/BulkRegisterForm';
 import { useI18n } from '@/i18n/I18nContext';
 import {
   getPhrasesAction,
@@ -29,6 +30,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
     onlyWeak: false,
   });
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
   const [editingPhraseId, setEditingPhraseId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [justCreated, setJustCreated] = useState(false);
@@ -129,9 +131,14 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           </Link>
           <h1>{t('phrases.list.title')}</h1>
         </div>
-        <button className="add-button" onClick={() => setModalMode('create')}>
-          {t('phrases.add')}
-        </button>
+        <div className="header-actions">
+          <button className="bulk-button" onClick={() => setIsBulkOpen(true)}>
+            {t('phrases.bulkAdd')}
+          </button>
+          <button className="add-button" onClick={() => setModalMode('create')}>
+            {t('phrases.add')}
+          </button>
+        </div>
       </header>
 
       <PhraseFilter
@@ -185,6 +192,17 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         </div>
       )}
 
+      {isBulkOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content modal-content-wide">
+            <BulkRegisterForm
+              onComplete={refetch}
+              onCancel={() => setIsBulkOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .container {
           padding: 2rem;
@@ -222,6 +240,12 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           margin: 0;
           font-size: 1.5rem;
         }
+        .header-actions {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
         .add-button {
           background-color: var(--primary);
           color: white;
@@ -233,6 +257,18 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         }
         .add-button:hover {
           background-color: var(--primary-hover);
+        }
+        .bulk-button {
+          background-color: var(--surface-muted);
+          color: var(--foreground);
+          border: 1px solid var(--border);
+          padding: 0.6rem 1.1rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+        }
+        .bulk-button:hover {
+          border-color: var(--border-strong);
         }
         .modal-overlay {
           position: fixed;
@@ -256,6 +292,9 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           max-height: 90vh;
           overflow-y: auto;
           box-shadow: var(--shadow-lg);
+        }
+        .modal-content-wide {
+          max-width: 820px;
         }
         .modal-content h2 {
           margin-top: 0;

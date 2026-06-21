@@ -264,7 +264,8 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           gap: 0.75rem;
           max-width: 640px;
           margin: 0 auto;
-          background: white;
+          background: var(--surface);
+          color: var(--foreground);
           padding: 1rem 1.25rem;
           border-radius: 8px;
         }
@@ -287,9 +288,24 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
         }
         input, select, textarea {
           padding: 0.4rem;
-          border: 1px solid #ccc;
+          border: 1px solid var(--border-strong);
           border-radius: 4px;
           font-size: 0.95rem;
+          background: var(--surface);
+          color: var(--foreground);
+        }
+        /* Non-color (structural) active indicator: a visible ring + thicker border
+           so the focused/active field is identifiable even when color is hard to see. */
+        input:focus,
+        select:focus,
+        textarea:focus,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+          outline: none;
+          border-color: var(--primary);
+          border-width: 2px;
+          box-shadow: 0 0 0 3px var(--primary-soft);
         }
         .category-new {
           display: flex;
@@ -311,10 +327,10 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           margin-top: 0.25rem;
         }
         .auto-gen-section {
-          background: #f9f9f9;
+          background: var(--surface-muted);
           padding: 0.6rem 0.75rem;
           border-radius: 4px;
-          border: 1px dashed #ccc;
+          border: 1px dashed var(--border-strong);
         }
         .gen-buttons {
           display: flex;
@@ -330,12 +346,13 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           flex: 1;
           font-size: 0.8rem;
           padding: 0.4rem;
-          background: #eef;
-          border-color: #ccd;
+          background: var(--primary-soft);
+          color: var(--primary-soft-fg);
+          border-color: var(--primary-soft);
         }
         .gen-note {
           font-size: 0.75rem;
-          color: #666;
+          color: var(--muted);
           margin: 0;
         }
         .gen-message {
@@ -353,13 +370,14 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           padding: 0.5rem 1.5rem;
           border-radius: 4px;
           cursor: pointer;
-          border: 1px solid #ccc;
-          background: white;
+          border: 1px solid var(--border-strong);
+          background: var(--surface);
+          color: var(--foreground);
         }
         button.submit {
-          background: #0070f3;
-          color: white;
-          border-color: #0070f3;
+          background: var(--primary);
+          color: #fff;
+          border-color: var(--primary);
         }
         button:disabled {
           opacity: 0.5;

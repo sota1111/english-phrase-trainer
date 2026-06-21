@@ -41,6 +41,9 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [genMessage, setGenMessage] = useState<{ type: 'error' | 'info'; text: string } | null>(null);
+  // True when neither Japanese nor English was entered on submit. Drives the
+  // top instruction line into an error style — the only validation message shown.
+  const [inputError, setInputError] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -97,11 +100,21 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // At least one of Japanese / English must be entered; the rest can be
+    // auto-generated. Show only the single top instruction message otherwise.
+    if (!formData.phrase.trim() && !formData.meaningJa.trim()) {
+      setInputError(true);
+      return;
+    }
+    setInputError(false);
     onSubmit(formData);
   };
 
   return (
     <form onSubmit={handleSubmit} className="phrase-form">
+      <p className={`form-instruction${inputError ? ' error' : ''}`} role="note">
+        {t('form.inputHint')}
+      </p>
       <div className="form-grid">
         <div className="form-field">
           <label htmlFor="phrase">{t('form.phrase')}</label>
@@ -111,7 +124,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             type="text"
             value={formData.phrase}
             onChange={handleChange}
-            required
           />
         </div>
         <div className="form-field">
@@ -122,7 +134,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             type="text"
             value={formData.meaningJa}
             onChange={handleChange}
-            required
           />
         </div>
         <div className="form-field">
@@ -133,7 +144,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             type="text"
             value={formData.example}
             onChange={handleChange}
-            required
           />
         </div>
         <div className="form-field">
@@ -144,7 +154,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             type="text"
             value={formData.exampleJa}
             onChange={handleChange}
-            required
           />
         </div>
         <div className="form-field">
@@ -158,7 +167,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
                 value={formData.category}
                 onChange={handleChange}
                 placeholder={t('form.newCategoryPlaceholder')}
-                required
               />
               {categoryOptions.length > 0 && (
                 <button
@@ -179,7 +187,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
               name="category"
               value={formData.category}
               onChange={handleCategorySelect}
-              required
             >
               <option value="" disabled>
                 {t('form.selectPlaceholder')}
@@ -200,7 +207,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             name="importance"
             value={formData.importance ?? 'normal'}
             onChange={handleChange}
-            required
           >
             {IMPORTANCE_VALUES.map((value) => (
               <option key={value} value={value}>
@@ -238,9 +244,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             {t('form.genEn2Ja')}
           </button>
         </div>
-        <p className="gen-note">
-          {t('form.genNote')}
-        </p>
         {genMessage && (
           <p className={`gen-message ${genMessage.type}`}>
             {genMessage.text}
@@ -285,6 +288,17 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
         label {
           font-weight: bold;
           font-size: 0.8rem;
+        }
+        /* Single input guidance / validation message, shown at the top of the
+           form with a clearly visible (non-muted) color. */
+        .form-instruction {
+          margin: 0;
+          font-size: 0.85rem;
+          font-weight: bold;
+          color: var(--foreground);
+        }
+        .form-instruction.error {
+          color: #e00;
         }
         input, select, textarea {
           padding: 0.4rem;
@@ -349,11 +363,6 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
           background: var(--primary-soft);
           color: var(--primary-soft-fg);
           border-color: var(--primary-soft);
-        }
-        .gen-note {
-          font-size: 0.75rem;
-          color: var(--muted);
-          margin: 0;
         }
         .gen-message {
           font-size: 0.8rem;

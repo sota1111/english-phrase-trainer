@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseJson } from '@/lib/validation/api-helper';
 import { phraseGenerateSchema } from '@/lib/validation/schemas';
+import { aiAvailable, getGenAIClient, getModelName, withRetry } from '@/lib/ai/gemini';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,12 +11,12 @@ export async function POST(request: NextRequest) {
     }
     const { mode, text } = result.data;
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-    if (!apiKey) {
+    if (!aiAvailable()) {
       return NextResponse.json(
         {
           error: 'API_KEY_NOT_CONFIGURED',
-          message: 'GEMINI_API_KEY が未設定のため自動生成は利用できません。手動で入力してください。',
+          message:
+            '自動生成が未設定のため利用できません（Vertex AI または API キー設定が必要です）。手動で入力してください。',
         },
         { status: 503 }
       );
@@ -38,34 +39,33 @@ Keys:
       userMessage = `Generate Japanese translation and data for the English phrase: "${text.trim()}"`;
     }
 
-    const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
+    const model = getModelName();
+    let contentText = '';
+    try {
+      const ai = getGenAIClient();
+      const response = await withRetry(() =>
+        ai.models.generateContent({
+          model,
           contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-          generationConfig: {
+          config: {
+            systemInstruction: systemPrompt,
             maxOutputTokens: 512,
             responseMimeType: 'application/json',
           },
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Gemini API error:', response.status, errorData);
+        })
+      );
+      contentText = String(response.text ?? '').trim();
+    } catch (genError) {
+      console.error('Gemini (Vertex AI) generation error:', genError);
       return NextResponse.json(
-        { error: 'GENERATION_FAILED', message: '自動生成に失敗しました。手動で入力してください。' },
+        {
+          error: 'GENERATION_FAILED',
+          message:
+            '自動生成に失敗しました（Vertex AI のクォータ超過の可能性があります）。手動で入力してください。',
+        },
         { status: 502 }
       );
     }
-
-    const data = await response.json();
-    let contentText = String(data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '').trim();
 
     // Defensive parsing: strip markdown fences if present
     if (contentText.startsWith('```')) {

@@ -88,7 +88,8 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
           gap: 1rem;
           margin-bottom: 2rem;
           padding: 1rem;
-          background: #f9f9f9;
+          background: var(--surface-muted);
+          color: var(--foreground);
           border-radius: 8px;
         }
         .filter-group {
@@ -99,8 +100,20 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
         }
         input[type="text"], select {
           padding: 0.5rem;
-          border: 1px solid #ccc;
+          border: 1px solid var(--border-strong);
           border-radius: 4px;
+          background: var(--surface);
+          color: var(--foreground);
+        }
+        /* Non-color (structural) active indicator: a visible ring + thicker border. */
+        input[type="text"]:focus,
+        select:focus,
+        input[type="text"]:focus-visible,
+        select:focus-visible {
+          outline: none;
+          border-color: var(--primary);
+          border-width: 2px;
+          box-shadow: 0 0 0 3px var(--primary-soft);
         }
         label {
           display: flex;

@@ -155,7 +155,7 @@ export function OneHandedReviewClient({ items }: Props) {
               {answerText}
             </p>
             {answerSub && (
-              <p style={{ color: '#666', fontSize: '1rem' }}>
+              <p style={{ color: '#111', fontSize: '1rem' }}>
                 {answerSub}
               </p>
             )}

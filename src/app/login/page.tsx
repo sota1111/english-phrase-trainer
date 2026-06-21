@@ -40,7 +40,6 @@ export default function LoginPage() {
     <main style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 'calc(100vh - var(--header-h))', padding: '1.5rem' }}>
       <div className="card" style={{ padding: '2rem', width: '100%', maxWidth: '380px', boxShadow: 'var(--shadow-lg)' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <span className="brand-mark" style={{ width: 44, height: 44, fontSize: '1.2rem', margin: '0 auto 0.85rem', display: 'inline-flex' }}>英</span>
           <h1 style={{ fontSize: '1.4rem', marginBottom: '0.35rem' }}>{t('header.brand')}</h1>
           <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{t('login.subtitle')}</p>
         </div>

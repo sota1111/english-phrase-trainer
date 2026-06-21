@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { PhraseInput } from '@/types/phrase';
 import { IMPORTANCE_VALUES } from '@/lib/importance';
 import { useI18n } from '@/i18n/I18nContext';
+import { categoryLabel } from '@/i18n/categoryLabels';
 
 const NEW_CATEGORY_OPTION = '__new__';
 
@@ -16,7 +17,7 @@ type PhraseFormProps = {
 };
 
 export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, isLoading }: PhraseFormProps) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [formData, setFormData] = useState<PhraseInput>({
     phrase: initialData?.phrase ?? '',
     meaningJa: initialData?.meaningJa ?? '',
@@ -185,7 +186,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
               </option>
               {categoryOptions.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat}
+                  {categoryLabel(cat, lang)}
                 </option>
               ))}
               <option value={NEW_CATEGORY_OPTION}>{t('form.addNewCategory')}</option>

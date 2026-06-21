@@ -2,6 +2,7 @@
 
 import { Phrase } from '@/types/phrase';
 import { useI18n } from '@/i18n/I18nContext';
+import { categoryLabel } from '@/i18n/categoryLabels';
 
 type PhraseListProps = {
   phrases: Phrase[];
@@ -10,7 +11,7 @@ type PhraseListProps = {
 };
 
 export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   const formatDate = (
     timestamp: { seconds?: number; _seconds?: number } | null | undefined
@@ -60,7 +61,7 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
               <td data-label={t('col.phrase')}>{phrase.phrase}</td>
               <td data-label={t('col.meaning')}>{phrase.meaningJa}</td>
               <td className="example" data-label={t('col.example')}>{phrase.example ? phrase.example : '-'}</td>
-              <td data-label={t('col.category')}>{phrase.category}</td>
+              <td data-label={t('col.category')}>{categoryLabel(phrase.category, lang)}</td>
               <td data-label={t('col.importance')}>{t(`importance.${phrase.importance}`)}</td>
               <td data-label={t('col.accuracy')}>
                 {phrase.answeredCount > 0

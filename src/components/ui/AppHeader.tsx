@@ -10,15 +10,10 @@ export default function AppHeader() {
   return (
     <header className="app-header">
       <Link href="/" className="brand">
-        <span className="brand-mark">英</span>
-        <span>{t('header.brand')}</span>
+        <span className="brand-text">{t('header.brand')}</span>
       </Link>
       <div className="header-actions">
         <LanguageToggle />
-        <span className="status-pill">
-          <span className="status-dot" />
-          {t('header.loggedIn')}
-        </span>
         <LogoutButton />
       </div>
     </header>

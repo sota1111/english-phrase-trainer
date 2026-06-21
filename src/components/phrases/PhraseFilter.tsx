@@ -3,6 +3,7 @@
 import { Importance } from '@/types/phrase';
 import { IMPORTANCE_VALUES } from '@/lib/importance';
 import { useI18n } from '@/i18n/I18nContext';
+import { categoryLabel } from '@/i18n/categoryLabels';
 
 export type FilterState = {
   keyword: string;
@@ -19,7 +20,7 @@ type PhraseFilterProps = {
 };
 
 export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -46,7 +47,7 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
           <option value="">{t('filter.allCategories')}</option>
           {categories.map((cat) => (
             <option key={cat} value={cat}>
-              {cat}
+              {categoryLabel(cat, lang)}
             </option>
           ))}
         </select>

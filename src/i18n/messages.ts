@@ -94,7 +94,7 @@ export const messages: Record<Lang, Record<string, string>> = {
     'form.genJa2En': '日本語から英文を生成',
     'form.genEn2Ja': '英文から日本語を生成',
     'form.genNote':
-      '日本語または英語のどちらかを入力して生成できます。ANTHROPIC_API_KEY 未設定時は自動生成は使えませんが手動入力は可能です。',
+      '日本語または英語のどちらかを入力して生成できます。GEMINI_API_KEY 未設定時は自動生成は使えませんが手動入力は可能です。',
     'form.genSuccess': '自動生成しました。内容を確認・編集して保存してください。',
     'form.genFail': '自動生成に失敗しました。手動で入力してください。',
     'form.genCommError': '通信エラーが発生しました。手動で入力してください。',
@@ -222,7 +222,7 @@ export const messages: Record<Lang, Record<string, string>> = {
     'form.genJa2En': 'Generate English from Japanese',
     'form.genEn2Ja': 'Generate Japanese from English',
     'form.genNote':
-      'Enter either Japanese or English to generate. Auto-generation needs ANTHROPIC_API_KEY; manual entry always works.',
+      'Enter either Japanese or English to generate. Auto-generation needs GEMINI_API_KEY; manual entry always works.',
     'form.genSuccess': 'Generated. Review/edit, then save.',
     'form.genFail': 'Generation failed. Please enter manually.',
     'form.genCommError': 'Communication error. Please enter manually.',

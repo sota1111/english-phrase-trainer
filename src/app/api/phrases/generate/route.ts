@@ -10,12 +10,12 @@ export async function POST(request: NextRequest) {
     }
     const { mode, text } = result.data;
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         {
           error: 'API_KEY_NOT_CONFIGURED',
-          message: 'ANTHROPIC_API_KEY が未設定のため自動生成は利用できません。手動で入力してください。',
+          message: 'GEMINI_API_KEY が未設定のため自動生成は利用できません。手動で入力してください。',
         },
         { status: 503 }
       );
@@ -38,24 +38,26 @@ Keys:
       userMessage = `Generate Japanese translation and data for the English phrase: "${text.trim()}"`;
     }
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 512,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }],
-      }),
-    });
+    const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+          generationConfig: {
+            maxOutputTokens: 512,
+            responseMimeType: 'application/json',
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('Anthropic API error:', response.status, errorData);
+      console.error('Gemini API error:', response.status, errorData);
       return NextResponse.json(
         { error: 'GENERATION_FAILED', message: '自動生成に失敗しました。手動で入力してください。' },
         { status: 502 }
@@ -63,8 +65,8 @@ Keys:
     }
 
     const data = await response.json();
-    let contentText = data.content[0].text.trim();
-    
+    let contentText = String(data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '').trim();
+
     // Defensive parsing: strip markdown fences if present
     if (contentText.startsWith('```')) {
       contentText = contentText.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();

@@ -27,8 +27,14 @@ export function OneHandedReviewClient({ items }: Props) {
   const { t } = useI18n();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [direction, setDirection] = useState<'en-to-ja' | 'ja-to-en'>('en-to-ja');
   const [completed, setCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const changeDirection = (next: 'en-to-ja' | 'ja-to-en') => {
+    setDirection(next);
+    setShowAnswer(false);
+  };
   const [results, setResults] = useState<{ correct: number; incorrect: number }>({ correct: 0, incorrect: 0 });
 
   if (items.length === 0) {
@@ -62,6 +68,12 @@ export function OneHandedReviewClient({ items }: Props) {
 
   const current = items[currentIndex];
   const total = items.length;
+
+  const isEnToJa = direction === 'en-to-ja';
+  const promptText = isEnToJa ? current.phrase.phrase : current.phrase.meaningJa;
+  const promptSub = isEnToJa ? current.phrase.example : current.phrase.exampleJa;
+  const answerText = isEnToJa ? current.phrase.meaningJa : current.phrase.phrase;
+  const answerSub = isEnToJa ? current.phrase.exampleJa : current.phrase.example;
 
   const handleAnswer = async (isCorrect: boolean) => {
     if (submitting) return;
@@ -102,6 +114,22 @@ export function OneHandedReviewClient({ items }: Props) {
       {/* Progress Header */}
       <div style={{ padding: '12px 16px 8px' }}>
         <ProgressBar current={currentIndex} total={total} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+          <div style={{ display: 'inline-flex', border: '1px solid #d1d5db', borderRadius: '8px', overflow: 'hidden' }}>
+            <button
+              onClick={(e) => { e.stopPropagation(); changeDirection('en-to-ja'); }}
+              style={{ padding: '0.35rem 0.75rem', border: 'none', cursor: 'pointer', fontSize: '0.8rem', background: isEnToJa ? '#0070f3' : '#fff', color: isEnToJa ? '#fff' : '#374151' }}
+            >
+              {t('review.direction.enToJa')}
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); changeDirection('ja-to-en'); }}
+              style={{ padding: '0.35rem 0.75rem', border: 'none', cursor: 'pointer', fontSize: '0.8rem', background: !isEnToJa ? '#0070f3' : '#fff', color: !isEnToJa ? '#fff' : '#374151' }}
+            >
+              {t('review.direction.jaToEn')}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Card Content */}
@@ -111,11 +139,11 @@ export function OneHandedReviewClient({ items }: Props) {
       >
         <div style={{ marginBottom: '2rem' }}>
           <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', wordBreak: 'break-word', color: '#111' }}>
-            {current.phrase.phrase}
+            {promptText}
           </h2>
-          {current.phrase.example && (
+          {promptSub && (
             <p style={{ color: '#666', fontSize: '1.1rem', fontStyle: 'italic' }}>
-              {current.phrase.example}
+              {promptSub}
             </p>
           )}
         </div>
@@ -124,11 +152,11 @@ export function OneHandedReviewClient({ items }: Props) {
           <div style={{ animation: 'fadeIn 0.2s ease-in' }}>
             <div style={{ height: '1px', background: '#eee', margin: '2rem 0' }} />
             <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111', marginBottom: '0.5rem' }}>
-              {current.phrase.meaningJa}
+              {answerText}
             </p>
-            {current.phrase.exampleJa && (
+            {answerSub && (
               <p style={{ color: '#666', fontSize: '1rem' }}>
-                {current.phrase.exampleJa}
+                {answerSub}
               </p>
             )}
           </div>
@@ -160,7 +188,7 @@ export function OneHandedReviewClient({ items }: Props) {
               boxShadow: '0 4px 6px rgba(0, 112, 243, 0.2)'
             }}
           >
-            {t('review.showMeaningShort')}
+            {isEnToJa ? t('review.showMeaningShort') : t('review.showEnglishShort')}
           </button>
         ) : (
           <div style={{ display: 'flex', gap: '12px' }}>

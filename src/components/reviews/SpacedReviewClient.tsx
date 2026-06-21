@@ -130,9 +130,9 @@ export function SpacedReviewClient({ items }: Props) {
         ) : (
           <div>
             <div style={{ background: '#f8f9fa', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-              <p style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>{answerText}</p>
+              <p style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: '#111' }}>{answerText}</p>
               {answerSub && (
-                <p style={{ color: '#666', fontSize: '0.9rem' }}>{answerSub}</p>
+                <p style={{ color: '#111', fontSize: '0.9rem' }}>{answerSub}</p>
               )}
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>

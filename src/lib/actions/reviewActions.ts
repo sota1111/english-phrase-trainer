@@ -4,7 +4,7 @@ import { getPhrases, getPhraseById, updatePhraseStats } from '@/lib/firestore/ph
 import { getDueReviews, getReviewSchedule, upsertReviewSchedule } from '@/lib/firestore/reviewSchedules';
 import { incrementDailyStat } from '@/lib/firestore/dailyStats';
 import { createLearningRecord } from '@/lib/firestore/learningRecords';
-import { calculateNextReview, orderByReviewUrgency, DEFAULT_SM2_PARAMS } from '@/lib/sm2';
+import { calculateNextReview, shuffle, DEFAULT_SM2_PARAMS } from '@/lib/sm2';
 import { filterByImportance } from '@/lib/importance';
 import { Importance } from '@/types/phrase';
 import { spacedReviewResultSchema, learningRecordSchema } from '@/lib/validation/schemas';
@@ -44,13 +44,10 @@ export async function getDuePhrasesAction(importance?: Importance) {
     schedule: item.schedule,
   }));
 
-  // Narrow to the chosen importance BEFORE ordering so SRS urgency order survives.
+  // Narrow to the chosen importance before randomizing the review queue.
   const scoped = filterByImportance(combined, importance);
 
-  // SRS ordering: most overdue (earliest dueDate) first; never-scheduled phrases last.
-  return orderByReviewUrgency(scoped, item =>
-    item.schedule?.dueDate ? item.schedule.dueDate.toMillis() : null,
-  );
+  return shuffle(scoped);
 }
 
 export async function submitReviewResultAction(input: SpacedReviewResultInput) {

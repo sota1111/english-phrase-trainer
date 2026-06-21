@@ -1,10 +1,11 @@
 'use server';
 
-import { 
-  getPhrases, 
-  createPhrase, 
-  updatePhrase, 
-  deletePhrase 
+import {
+  getPhrases,
+  createPhrase,
+  createPhrases,
+  updatePhrase,
+  deletePhrase
 } from '@/lib/firestore/phrases';
 import { PhraseInput } from '@/types/phrase';
 import { idParamSchema, phraseInputSchema, phraseUpdateSchema } from '@/lib/validation/schemas';
@@ -20,6 +21,14 @@ export async function createPhraseAction(input: PhraseInput) {
   revalidatePath('/phrases');
   revalidatePath('/');
   return result;
+}
+
+export async function createPhrasesAction(inputs: PhraseInput[]) {
+  const validated = inputs.map((input) => phraseInputSchema.parse(input));
+  const count = await createPhrases(validated);
+  revalidatePath('/phrases');
+  revalidatePath('/');
+  return count;
 }
 
 export async function updatePhraseAction(id: string, input: Partial<PhraseInput>) {

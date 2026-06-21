@@ -87,7 +87,8 @@ src/
     api/
       auth/login/        POST（ログイン）
       auth/logout/       POST（ログアウト）
-      phrases/generate/  POST（Anthropic API で日本語⇄英文・例文を自動生成）
+      phrases/generate/  POST（Gemini で日本語⇄英文・例文を自動生成）
+      phrases/parse/     POST（不定形テキストを Gemini で複数フレーズに分解し一括登録候補を生成）
     login/               ログイン画面
     phrases/             フレーズ管理画面
     spaced-review/       間隔反復（SM-2）復習画面
@@ -105,7 +106,9 @@ src/
   middleware.ts          認証ミドルウェア（全ルート保護）
 ```
 
-> フレーズ CRUD・ダッシュボード・カレンダー・統計のデータ取得/更新は **Server Actions（`src/lib/actions/*`）とサーバーコンポーネント** 経由で行います。汎用の REST API エンドポイント（`/api/phrases` 等）は提供していません。認証（`/api/auth/*`）と AI 生成（`/api/phrases/generate`）のみ Route Handler として実装しています。
+> フレーズ CRUD・ダッシュボード・カレンダー・統計のデータ取得/更新は **Server Actions（`src/lib/actions/*`）とサーバーコンポーネント** 経由で行います。汎用の REST API エンドポイント（`/api/phrases` 等）は提供していません。認証（`/api/auth/*`）と AI 生成・解析（`/api/phrases/generate`・`/api/phrases/parse`）のみ Route Handler として実装しています。
+
+> **AI 一括登録**: フレーズ管理画面の「AIで一括登録」から、英単語・熟語・例文・日本語の意味などが混在した不定形テキストを貼り付けると、Gemini が英語/日本語/重要度/カテゴリを自動判別して複数フレーズに分解します。内容を確認・編集してまとめて登録できます。
 
 ## ローカル起動手順
 

@@ -54,3 +54,16 @@ export function orderByReviewUrgency<T>(
     })
     .map(({ item }) => item);
 }
+
+/**
+ * Fisher-Yates shuffle. Non-mutating; returns a shuffled copy of the input.
+ * Accepts an injectable RNG for deterministic tests.
+ */
+export function shuffle<T>(items: T[], rng: () => number = Math.random): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}

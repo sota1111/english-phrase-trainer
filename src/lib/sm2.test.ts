@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateNextReview,
   orderByReviewUrgency,
+  shuffle,
   DEFAULT_SM2_PARAMS,
   type SM2Params,
 } from '@/lib/sm2';
@@ -92,5 +93,20 @@ describe('orderByReviewUrgency', () => {
     const snapshot = items.map(i => i.id);
     orderByReviewUrgency(items, i => i.due);
     expect(items.map(i => i.id)).toEqual(snapshot);
+  });
+});
+
+describe('shuffle', () => {
+  it('returns a deterministic non-mutating permutation with an injected rng', () => {
+    const items = ['a', 'b', 'c', 'd'];
+    const rngValues = [0.1, 0.8, 0.3];
+    const rng = () => rngValues.shift() ?? 0;
+
+    const shuffled = shuffle(items, rng);
+
+    expect(shuffled).toEqual(['b', 'd', 'c', 'a']);
+    expect(shuffled).not.toEqual(items);
+    expect([...shuffled].sort()).toEqual([...items].sort());
+    expect(items).toEqual(['a', 'b', 'c', 'd']);
   });
 });

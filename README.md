@@ -204,7 +204,8 @@ ALLOWED_USER_EMAILS=your-email@example.com,another@example.com
 | `ALLOWED_USER_EMAILS` | 許可メールアドレス（カンマ区切り） | 推奨 |
 | `AUTH_SECRET` | セッション Cookie 署名用シークレット（32文字以上） | Yes |
 | `GOOGLE_CLOUD_PROJECT` | GCP プロジェクト ID（Firestore 接続用） | Yes |
-| `ANTHROPIC_API_KEY` | Anthropic API キー（日本語⇄英文 自動生成用） | No |
+| `GEMINI_API_KEY` | Gemini API キー（日本語⇄英文 自動生成用） | No |
+| `GEMINI_MODEL` | 使用する Gemini モデル（既定 `gemini-2.0-flash`） | No |
 
 ### GCP Secret Manager セットアップ（本番環境）
 

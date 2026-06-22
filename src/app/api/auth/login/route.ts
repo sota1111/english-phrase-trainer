@@ -20,9 +20,12 @@ export async function POST(request: NextRequest) {
   const { email, password } = result.data;
 
   const authSecret = process.env.AUTH_SECRET;
-  const apiKey = process.env.FIREBASE_WEB_API_KEY || process.env.FIREBASE_API_KEY;
+  const apiKey =
+    process.env.FIREBASE_WEB_API_KEY ||
+    process.env.FIREBASE_API_KEY ||
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   const allowedEmails = process.env.ALLOWED_USER_EMAILS
-    ? process.env.ALLOWED_USER_EMAILS.split(',').map((e) => e.trim()).filter(Boolean)
+    ? process.env.ALLOWED_USER_EMAILS.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
     : [];
 
   if (!authSecret || !apiKey) {
@@ -67,7 +70,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
   }
 
-  if (allowedEmails.length > 0 && !allowedEmails.includes(verifiedEmail)) {
+  if (allowedEmails.length > 0 && !allowedEmails.includes(verifiedEmail.toLowerCase())) {
     return NextResponse.json({ error: 'このメールアドレスは許可されていません' }, { status: 403 });
   }
 

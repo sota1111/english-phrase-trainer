@@ -38,6 +38,9 @@ function serializePhrase(id: string, data: FirebaseFirestore.DocumentData): Phra
     // Legacy phrases predate the importance field; default them to 'normal' so
     // they stay classified with no data migration.
     importance: data.importance ?? 'normal',
+    // 提案2: legacy phrases predate these; default to empty arrays.
+    synonyms: Array.isArray(data.synonyms) ? data.synonyms : [],
+    collocations: Array.isArray(data.collocations) ? data.collocations : [],
     correctCount: data.correctCount ?? 0,
     wrongCount: data.wrongCount ?? 0,
     answeredCount: data.answeredCount ?? 0,

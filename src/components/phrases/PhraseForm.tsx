@@ -26,6 +26,8 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
     category: initialData?.category ?? '',
     importance: initialData?.importance ?? 'normal',
     memo: initialData?.memo ?? '',
+    synonyms: initialData?.synonyms ?? [],
+    collocations: initialData?.collocations ?? [],
   });
 
   // Category options: existing categories plus the current value (when editing a
@@ -41,6 +43,8 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [genMessage, setGenMessage] = useState<{ type: 'error' | 'info'; text: string } | null>(null);
+  const [isEnriching, setIsEnriching] = useState(false);
+  const [enrichMessage, setEnrichMessage] = useState<{ type: 'error' | 'info'; text: string } | null>(null);
   // True when neither Japanese nor English was entered on submit. Drives the
   // top instruction line into an error style — the only validation message shown.
   const [inputError, setInputError] = useState(false);
@@ -95,6 +99,55 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
       setGenMessage({ type: 'error', text: t('form.genCommError') });
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // Comma-separated <-> string[] binding for the synonyms / collocations inputs.
+  const handleListChange = (
+    field: 'synonyms' | 'collocations',
+    value: string
+  ) => {
+    const list = value
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    setFormData((prev) => ({ ...prev, [field]: list }));
+  };
+
+  const handleEnrich = async () => {
+    if (!formData.phrase.trim()) return;
+    setIsEnriching(true);
+    setEnrichMessage(null);
+
+    try {
+      const response = await fetch('/api/phrases/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phrase: formData.phrase, meaningJa: formData.meaningJa }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        const { synonyms = [], collocations = [], examples = [] } = data.result ?? {};
+        setFormData((prev) => ({
+          ...prev,
+          synonyms,
+          collocations,
+          // Only fill the example when the user has not entered one yet.
+          example: prev.example.trim() ? prev.example : (examples[0] ?? prev.example),
+        }));
+        setEnrichMessage({ type: 'info', text: t('form.enrichSuccess') });
+      } else {
+        setEnrichMessage({
+          type: response.status === 503 ? 'info' : 'error',
+          text: data.message || t('form.enrichFail'),
+        });
+      }
+    } catch (error) {
+      console.error('Enrich error:', error);
+      setEnrichMessage({ type: 'error', text: t('form.genCommError') });
+    } finally {
+      setIsEnriching(false);
     }
   };
 
@@ -225,6 +278,28 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             rows={2}
           />
         </div>
+        <div className="form-field form-field-full">
+          <label htmlFor="synonyms">{t('form.synonyms')}</label>
+          <input
+            id="synonyms"
+            name="synonyms"
+            type="text"
+            value={(formData.synonyms ?? []).join(', ')}
+            onChange={(e) => handleListChange('synonyms', e.target.value)}
+            placeholder={t('form.listPlaceholder')}
+          />
+        </div>
+        <div className="form-field form-field-full">
+          <label htmlFor="collocations">{t('form.collocations')}</label>
+          <input
+            id="collocations"
+            name="collocations"
+            type="text"
+            value={(formData.collocations ?? []).join(', ')}
+            onChange={(e) => handleListChange('collocations', e.target.value)}
+            placeholder={t('form.listPlaceholder')}
+          />
+        </div>
       </div>
 
       <div className="auto-gen-section">
@@ -249,13 +324,27 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             {genMessage.text}
           </p>
         )}
+        <div className="gen-buttons enrich-row">
+          <button
+            type="button"
+            onClick={handleEnrich}
+            disabled={isEnriching || isGenerating || isLoading || !formData.phrase.trim()}
+          >
+            {isEnriching ? t('form.enriching') : t('form.enrich')}
+          </button>
+        </div>
+        {enrichMessage && (
+          <p className={`gen-message ${enrichMessage.type}`}>
+            {enrichMessage.text}
+          </p>
+        )}
       </div>
 
       <div className="form-actions">
-        <button type="button" onClick={onCancel} disabled={isLoading || isGenerating}>
+        <button type="button" onClick={onCancel} disabled={isLoading || isGenerating || isEnriching}>
           {t('form.cancel')}
         </button>
-        <button type="submit" className="submit" disabled={isLoading || isGenerating}>
+        <button type="submit" className="submit" disabled={isLoading || isGenerating || isEnriching}>
           {isLoading ? t('form.saving') : t('form.save')}
         </button>
       </div>

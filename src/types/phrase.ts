@@ -25,6 +25,10 @@ export interface Phrase {
   category: string;
   memo: string;
   importance: Importance;
+  // AI-enriched study aids (提案2). Optional on write; always present (possibly
+  // empty) on the serialized `Phrase` so legacy docs without them stay valid.
+  synonyms: string[];
+  collocations: string[];
   correctCount: number;
   wrongCount: number;
   answeredCount: number;
@@ -39,5 +43,15 @@ export interface Phrase {
 // On the serialized `Phrase` it is always present.
 export type PhraseInput = Omit<
   Phrase,
-  'id' | 'correctCount' | 'wrongCount' | 'answeredCount' | 'accuracy' | 'lastReviewedAt' | 'createdAt' | 'updatedAt' | 'importance'
-> & { importance?: Importance };
+  | 'id'
+  | 'correctCount'
+  | 'wrongCount'
+  | 'answeredCount'
+  | 'accuracy'
+  | 'lastReviewedAt'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'importance'
+  | 'synonyms'
+  | 'collocations'
+> & { importance?: Importance; synonyms?: string[]; collocations?: string[] };

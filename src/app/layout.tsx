@@ -4,6 +4,7 @@ import "./globals.css";
 import { I18nProvider } from "@/i18n/I18nContext";
 import AppHeader from "@/components/ui/AppHeader";
 import AppFooter from "@/components/ui/AppFooter";
+import BottomTabBar from "@/components/ui/BottomTabBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
           <AppHeader />
           {children}
           <AppFooter />
+          <BottomTabBar />
         </I18nProvider>
       </body>
     </html>

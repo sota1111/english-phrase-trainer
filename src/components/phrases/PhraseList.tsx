@@ -175,6 +175,12 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
             text-align: left;
             white-space: nowrap;
           }
+          tr:active,
+          tr:active td,
+          tr:active td::before,
+          tr:active .example {
+            color: #000;
+          }
           .actions {
             justify-content: flex-end;
           }

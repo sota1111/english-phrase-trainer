@@ -29,7 +29,9 @@ export function ImportancePicker({ basePath, current }: Props) {
       </span>
       {options.map((opt) => {
         const active = opt.value === current;
-        const href = opt.value ? `${basePath}?importance=${opt.value}` : basePath;
+        // basePath may already carry a query (e.g. ?deck=...), so pick the right separator.
+        const sep = basePath.includes('?') ? '&' : '?';
+        const href = opt.value ? `${basePath}${sep}importance=${opt.value}` : basePath;
         return (
           <Link
             key={opt.key}

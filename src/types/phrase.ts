@@ -25,6 +25,14 @@ export interface Phrase {
   category: string;
   memo: string;
   importance: Importance;
+  // AI-enriched study aids (提案2). Optional on write; always present (possibly
+  // empty) on the serialized `Phrase` so legacy docs without them stay valid.
+  synonyms: string[];
+  collocations: string[];
+  // Deck / tag organization (提案3). `deck` is a free-text deck name ('' = 未分類);
+  // `tags` is a free list. Both default empty for legacy phrases.
+  deck: string;
+  tags: string[];
   correctCount: number;
   wrongCount: number;
   answeredCount: number;
@@ -39,5 +47,23 @@ export interface Phrase {
 // On the serialized `Phrase` it is always present.
 export type PhraseInput = Omit<
   Phrase,
-  'id' | 'correctCount' | 'wrongCount' | 'answeredCount' | 'accuracy' | 'lastReviewedAt' | 'createdAt' | 'updatedAt' | 'importance'
-> & { importance?: Importance };
+  | 'id'
+  | 'correctCount'
+  | 'wrongCount'
+  | 'answeredCount'
+  | 'accuracy'
+  | 'lastReviewedAt'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'importance'
+  | 'synonyms'
+  | 'collocations'
+  | 'deck'
+  | 'tags'
+> & {
+  importance?: Importance;
+  synonyms?: string[];
+  collocations?: string[];
+  deck?: string;
+  tags?: string[];
+};

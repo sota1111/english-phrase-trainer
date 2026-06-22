@@ -13,6 +13,18 @@ export const phraseInputSchema = z.object({
   category: z.string().optional().default(''),
   memo: z.string().optional().default(''),
   importance: z.enum(['high', 'normal', 'low']).optional().default('normal'),
+  // AI-enriched study aids (提案2)
+  synonyms: z.array(z.string()).optional().default([]),
+  collocations: z.array(z.string()).optional().default([]),
+  // Deck / tag organization (提案3)
+  deck: z.string().optional().default(''),
+  tags: z.array(z.string()).optional().default([]),
+});
+
+// AI enrichment request (提案2): given a phrase + meaning, return study aids.
+export const phraseEnrichSchema = z.object({
+  phrase: z.string().min(1),
+  meaningJa: z.string().optional().default(''),
 });
 
 export const phraseUpdateSchema = phraseInputSchema.partial();

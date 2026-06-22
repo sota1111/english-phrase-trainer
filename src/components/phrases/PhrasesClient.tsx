@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Phrase, PhraseInput } from '@/types/phrase';
-import { PhraseFilter, FilterState } from '@/components/phrases/PhraseFilter';
+import { PhraseFilter, FilterState, UNCLASSIFIED_DECK } from '@/components/phrases/PhraseFilter';
 import { PhraseList } from '@/components/phrases/PhraseList';
 import { PhraseForm } from '@/components/phrases/PhraseForm';
 import { BulkRegisterForm } from '@/components/phrases/BulkRegisterForm';
@@ -27,6 +27,8 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
     keyword: '',
     category: '',
     importance: '',
+    deck: '',
+    tag: '',
     onlyUnanswered: false,
     onlyWeak: false,
   });
@@ -67,6 +69,17 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
       if (filter.importance && p.importance !== filter.importance) {
         return false;
       }
+      if (filter.deck) {
+        const phraseDeck = p.deck ?? '';
+        if (filter.deck === UNCLASSIFIED_DECK) {
+          if (phraseDeck !== '') return false;
+        } else if (phraseDeck !== filter.deck) {
+          return false;
+        }
+      }
+      if (filter.tag && !(p.tags ?? []).includes(filter.tag)) {
+        return false;
+      }
       if (filter.onlyUnanswered && p.answeredCount > 0) {
         return false;
       }
@@ -80,6 +93,39 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
   const categories = useMemo(() => {
     const cats = new Set(phrases.map((p) => p.category));
     return Array.from(cats).sort();
+  }, [phrases]);
+
+  const decks = useMemo(() => {
+    const set = new Set(phrases.map((p) => p.deck ?? '').filter((d) => d !== ''));
+    return Array.from(set).sort();
+  }, [phrases]);
+
+  const tags = useMemo(() => {
+    const set = new Set(phrases.flatMap((p) => p.tags ?? []));
+    return Array.from(set).sort();
+  }, [phrases]);
+
+  // Per-deck stats (提案3): count + average accuracy of answered phrases per deck,
+  // shown only when at least one deck exists. Selecting a card filters the list.
+  const deckStats = useMemo(() => {
+    const stats = new Map<string, { count: number; answered: number; accuracySum: number }>();
+    for (const p of phrases) {
+      const key = p.deck ?? '';
+      const entry = stats.get(key) ?? { count: 0, answered: 0, accuracySum: 0 };
+      entry.count += 1;
+      if (p.answeredCount > 0) {
+        entry.answered += 1;
+        entry.accuracySum += p.accuracy;
+      }
+      stats.set(key, entry);
+    }
+    return Array.from(stats.entries())
+      .map(([deck, s]) => ({
+        deck,
+        count: s.count,
+        accuracy: s.answered > 0 ? s.accuracySum / s.answered : null,
+      }))
+      .sort((a, b) => b.count - a.count);
   }, [phrases]);
 
   const handleCreate = async (data: PhraseInput) => {
@@ -145,8 +191,51 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         </div>
       </header>
 
+      {deckStats.length > 0 && (decks.length > 0 || deckStats.some((d) => d.deck === '')) && (
+        <section className="deck-stats" aria-label={t('decks.title')}>
+          <h2 className="deck-stats-title">{t('decks.title')}</h2>
+          <div className="deck-cards">
+            {deckStats.map((d) => {
+              const isActive =
+                (d.deck === '' && filter.deck === UNCLASSIFIED_DECK) ||
+                (d.deck !== '' && filter.deck === d.deck);
+              return (
+                <div key={d.deck || '__none__'} className={`deck-card${isActive ? ' active' : ''}`}>
+                  <button
+                    type="button"
+                    className="deck-card-main"
+                    onClick={() =>
+                      setFilter((prev) => ({
+                        ...prev,
+                        deck: isActive ? '' : d.deck === '' ? UNCLASSIFIED_DECK : d.deck,
+                      }))
+                    }
+                  >
+                    <span className="deck-name">{d.deck || t('decks.unclassified')}</span>
+                    <span className="deck-meta">
+                      {t('decks.count', { n: d.count })}
+                      {d.accuracy !== null ? ` ・ ${t('decks.accuracy', { n: Math.round(d.accuracy * 100) })}` : ''}
+                    </span>
+                  </button>
+                  {d.deck !== '' && (
+                    <Link
+                      href={`/spaced-review?deck=${encodeURIComponent(d.deck)}`}
+                      className="deck-review-link"
+                    >
+                      {t('decks.review')}
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <PhraseFilter
         categories={categories}
+        decks={decks}
+        tags={tags}
         filter={filter}
         onChange={setFilter}
       />
@@ -223,6 +312,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
                   key={editingPhraseId || 'create'}
                   initialData={editingPhrase}
                   categories={categories}
+                  decks={decks}
                   onSubmit={modalMode === 'create' ? handleCreate : handleEdit}
                   onCancel={closeModal}
                   isLoading={isLoading}
@@ -398,6 +488,59 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         }
         .created-close:hover {
           background-color: var(--primary-hover);
+        }
+        .deck-stats {
+          margin-bottom: 1.5rem;
+        }
+        .deck-stats-title {
+          font-size: 1rem;
+          margin: 0 0 0.5rem;
+        }
+        .deck-cards {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.6rem;
+        }
+        .deck-card {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          padding: 0.6rem 0.75rem;
+          background: var(--surface-muted);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          min-width: 9rem;
+        }
+        .deck-card.active {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 2px var(--primary-soft);
+        }
+        .deck-card-main {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.15rem;
+          background: none;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          text-align: left;
+          color: var(--foreground);
+        }
+        .deck-name {
+          font-weight: 600;
+        }
+        .deck-meta {
+          font-size: 0.8rem;
+          color: var(--muted);
+        }
+        .deck-review-link {
+          font-size: 0.8rem;
+          color: var(--primary);
+          text-decoration: none;
+        }
+        .deck-review-link:hover {
+          text-decoration: underline;
         }
       `}</style>
     </div>

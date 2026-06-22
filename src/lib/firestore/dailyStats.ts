@@ -78,6 +78,20 @@ export async function getStreakDays(): Promise<number> {
   return streak;
 }
 
+/**
+ * Most recent `days` daily-stat docs, ascending by date (oldest first). Used by
+ * the analytics dashboard (提案4) to draw the recent learning trend.
+ */
+export async function getRecentDailyStats(days: number): Promise<DailyStat[]> {
+  const snapshot = await db.collection(COLLECTION)
+    .orderBy('date', 'desc')
+    .limit(days)
+    .get();
+  return snapshot.docs
+    .map(doc => ({ date: doc.id, ...doc.data() } as DailyStat))
+    .reverse();
+}
+
 export async function getTotalReviewCount(): Promise<number> {
   const snapshot = await db.collection(COLLECTION).get();
   return snapshot.docs.reduce((sum, doc) => sum + (doc.data().reviewCount || 0), 0);

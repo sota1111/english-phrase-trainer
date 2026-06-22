@@ -31,11 +31,31 @@ export const messages: Record<Lang, Record<string, string>> = {
     'home.oneHanded': '片手モードで復習',
     'home.managePhrases': 'フレーズ管理',
     'home.calendar': '学習カレンダー',
+    'home.analytics': '学習分析',
+    'home.quiz': 'クイズ',
     // mobile bottom tabs (SOT-1020 / 提案6)
     'tab.home': 'ホーム',
     'tab.review': '復習',
+    'tab.quiz': 'クイズ',
     'tab.phrases': 'フレーズ',
+    'tab.analytics': '分析',
     'tab.calendar': 'カレンダー',
+
+    // Analytics dashboard (提案4)
+    'analytics.title': '学習分析',
+    'analytics.subtitle': '定着率・弱点フレーズ・学習推移を確認できます。',
+    'analytics.empty': 'まだフレーズがありません。フレーズを追加して学習を始めましょう。',
+    'analytics.overallAccuracy': '全体の正答率',
+    'analytics.answeredTotal': '累計{n}回回答',
+    'analytics.answeredPhrases': '回答済みフレーズ',
+    'analytics.ofTotal': '全{n}件中',
+    'analytics.unanswered': '未回答フレーズ',
+    'analytics.distribution': '正答率の分布',
+    'analytics.noAnswered': '回答済みのフレーズがまだありません。',
+    'analytics.weak': '弱点フレーズ（正答率50%未満）',
+    'analytics.noWeak': '弱点フレーズはありません。順調です！',
+    'analytics.trend': '直近の学習推移',
+    'analytics.noTrend': '学習履歴がまだありません。',
 
     // Review
     'review.title': '今日の復習',
@@ -216,11 +236,31 @@ export const messages: Record<Lang, Record<string, string>> = {
     'home.oneHanded': 'One-handed review',
     'home.managePhrases': 'Manage phrases',
     'home.calendar': 'Study calendar',
+    'home.analytics': 'Analytics',
+    'home.quiz': 'Quiz',
     // mobile bottom tabs (SOT-1020 / proposal 6)
     'tab.home': 'Home',
     'tab.review': 'Review',
+    'tab.quiz': 'Quiz',
     'tab.phrases': 'Phrases',
+    'tab.analytics': 'Analytics',
     'tab.calendar': 'Calendar',
+
+    // Analytics dashboard (proposal 4)
+    'analytics.title': 'Learning analytics',
+    'analytics.subtitle': 'Check retention, weak phrases, and your study trend.',
+    'analytics.empty': 'No phrases yet. Add some phrases to start learning.',
+    'analytics.overallAccuracy': 'Overall accuracy',
+    'analytics.answeredTotal': '{n} answers total',
+    'analytics.answeredPhrases': 'Answered phrases',
+    'analytics.ofTotal': 'of {n} total',
+    'analytics.unanswered': 'Unanswered phrases',
+    'analytics.distribution': 'Accuracy distribution',
+    'analytics.noAnswered': 'No answered phrases yet.',
+    'analytics.weak': 'Weak phrases (accuracy < 50%)',
+    'analytics.noWeak': 'No weak phrases. Great job!',
+    'analytics.trend': 'Recent study trend',
+    'analytics.noTrend': 'No study history yet.',
 
     // Review
     'review.title': "Today's review",

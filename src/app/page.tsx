@@ -46,6 +46,12 @@ export default async function HomePage() {
         <Link href="/calendar" className="btn btn-ghost">
           <T k="home.calendar" />
         </Link>
+        <Link href="/analytics" className="btn btn-ghost">
+          <T k="home.analytics" />
+        </Link>
+        <Link href="/quiz" className="btn btn-ghost">
+          <T k="home.quiz" />
+        </Link>
       </nav>
     </main>
   );

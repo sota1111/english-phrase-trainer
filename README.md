@@ -2,11 +2,14 @@
 
 ## アプリ概要
 
-英語フレーズを登録・管理し、クイズ形式で学習するWebアプリ。
+英語フレーズを登録・管理し、復習・クイズ・英作文で学習するWebアプリ。
 
 - フレーズ一覧・追加・編集・削除
-- 間隔反復（SM-2）に基づく復習スケジューリング
-- 正誤記録・学習カレンダー
+- AI 一括登録（不定形テキストを Gemini で複数フレーズに分解）・日本語⇄英文の自動生成
+- AI 拡充（類義語・コロケーション生成）/ AI 英作文フィードバック
+- 間隔反復（SM-2）に基づく復習スケジューリング（出題方向トグル・片手モード）
+- クイズ（選択 / 穴埋め）
+- 正誤記録・学習カレンダー・分析ダッシュボード（`/analytics`）
 - Firebase Authentication による個人利用向け認証
 
 ## GCP最適化方針
@@ -39,7 +42,6 @@
 | example | string | 例文（英語） |
 | exampleJa | string | 例文（日本語） |
 | category | string | カテゴリ |
-| difficulty | 'easy'｜'normal'｜'hard' | 難易度 |
 | importance | 'high'｜'normal'｜'low' | 重要度（間隔反復の出題対象を絞り込む。未設定で書き込まれたデータは `'normal'` として読み出す） |
 | memo | string | メモ |
 | correctCount | number | 正解数 |
@@ -53,7 +55,7 @@
 #### 初期フレーズの投入 (seed)
 
 業務でよく使う語彙・定型表現・優先暗記フレーズを初期データとして `src/data/initialPhrases.ts`
-に定義しています（`category`: `word` / `expression` / `pattern`、優先10件は `difficulty: 'hard'`）。
+に定義しています（`category` は `日常` / `ビジネス` / `技術` のトピック区分、優先フレーズは `importance: 'high'`）。
 
 冪等な seed スクリプトで `phrases` コレクションへ投入できます。`phrase` テキストが既に存在する
 エントリはスキップされるため、再実行しても重複は作られません。
@@ -85,18 +87,24 @@ GOOGLE_CLOUD_PROJECT=<your-gcp-project-id> npx tsx scripts/seed-phrases.ts
 src/
   app/
     api/
-      auth/login/        POST（ログイン）
-      auth/logout/       POST（ログアウト）
-      phrases/generate/  POST（Gemini で日本語⇄英文・例文を自動生成）
-      phrases/parse/     POST（不定形テキストを Gemini で複数フレーズに分解し一括登録候補を生成）
+      auth/login/                POST（ログイン）
+      auth/logout/               POST（ログアウト）
+      phrases/generate/          POST（Gemini で日本語⇄英文・例文を自動生成）
+      phrases/parse/             POST（不定形テキストを Gemini で複数フレーズに分解し一括登録候補を生成）
+      phrases/enrich/            POST（類義語・コロケーションを Gemini で生成）
+      phrases/writing-feedback/  POST（英作文への AI フィードバック）
     login/               ログイン画面
     phrases/             フレーズ管理画面
     spaced-review/       間隔反復（SM-2）復習画面
       one-handed/        片手モード復習画面
+    quiz/                クイズ画面（選択 / 穴埋め）
+    writing/             AI 英作文フィードバック画面
+    analytics/           分析ダッシュボード画面
     calendar/            学習カレンダー画面
     page.tsx             ダッシュボード（トップページ）
   components/            UIコンポーネント（calendar / phrases / reviews / ui）
   lib/
+    ai/                  Gemini クライアント（gemini.ts。Vertex AI / API-key 両対応）
     actions/             Server Actions（phraseActions / reviewActions / statsActions）
     firestore/           Firestore アクセス（phrases / learningRecords / dailyStats / reviewSchedules）
     firebase-admin.ts
@@ -106,7 +114,7 @@ src/
   middleware.ts          認証ミドルウェア（全ルート保護）
 ```
 
-> フレーズ CRUD・ダッシュボード・カレンダー・統計のデータ取得/更新は **Server Actions（`src/lib/actions/*`）とサーバーコンポーネント** 経由で行います。汎用の REST API エンドポイント（`/api/phrases` 等）は提供していません。認証（`/api/auth/*`）と AI 生成・解析（`/api/phrases/generate`・`/api/phrases/parse`）のみ Route Handler として実装しています。
+> フレーズ CRUD・ダッシュボード・カレンダー・統計のデータ取得/更新は **Server Actions（`src/lib/actions/*`）とサーバーコンポーネント** 経由で行います。汎用の REST API エンドポイント（`/api/phrases` 等）は提供していません。認証（`/api/auth/*`）と AI 機能（`/api/phrases/generate`・`/api/phrases/parse`・`/api/phrases/enrich`・`/api/phrases/writing-feedback`）のみ Route Handler として実装しています。
 
 > **AI 一括登録**: フレーズ管理画面の「AIで一括登録」から、英単語・熟語・例文・日本語の意味などが混在した不定形テキストを貼り付けると、Gemini が英語/日本語/重要度/カテゴリを自動判別して複数フレーズに分解します。内容を確認・編集してまとめて登録できます。
 
@@ -207,8 +215,10 @@ ALLOWED_USER_EMAILS=your-email@example.com,another@example.com
 | `ALLOWED_USER_EMAILS` | 許可メールアドレス（カンマ区切り） | 推奨 |
 | `AUTH_SECRET` | セッション Cookie 署名用シークレット（32文字以上） | Yes |
 | `GOOGLE_CLOUD_PROJECT` | GCP プロジェクト ID（Firestore 接続用） | Yes |
-| `GEMINI_API_KEY` | Gemini API キー（日本語⇄英文 自動生成用） | No |
-| `GEMINI_MODEL` | 使用する Gemini モデル（既定 `gemini-2.0-flash`） | No |
+| `GOOGLE_GENAI_USE_VERTEXAI` | truthy で Vertex AI モード（APIキー不要。本番 Cloud Run の SA 認証で利用） | 本番推奨 |
+| `GOOGLE_CLOUD_LOCATION` | Vertex AI のロケーション（既定 `us-central1`） | No |
+| `GEMINI_API_KEY` / `GOOGLE_API_KEY` | Gemini API キー（ローカルの API-key モード時のみ） | No |
+| `GEMINI_MODEL` | 使用する Gemini モデル（既定 `gemini-2.5-flash`） | No |
 
 ### GCP Secret Manager セットアップ（本番環境）
 

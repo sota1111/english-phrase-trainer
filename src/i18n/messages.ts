@@ -31,6 +31,11 @@ export const messages: Record<Lang, Record<string, string>> = {
     'home.oneHanded': '片手モードで復習',
     'home.managePhrases': 'フレーズ管理',
     'home.calendar': '学習カレンダー',
+    // mobile bottom tabs (SOT-1020 / 提案6)
+    'tab.home': 'ホーム',
+    'tab.review': '復習',
+    'tab.phrases': 'フレーズ',
+    'tab.calendar': 'カレンダー',
 
     // Review
     'review.title': '今日の復習',
@@ -190,6 +195,11 @@ export const messages: Record<Lang, Record<string, string>> = {
     'home.oneHanded': 'One-handed review',
     'home.managePhrases': 'Manage phrases',
     'home.calendar': 'Study calendar',
+    // mobile bottom tabs (SOT-1020 / proposal 6)
+    'tab.home': 'Home',
+    'tab.review': 'Review',
+    'tab.phrases': 'Phrases',
+    'tab.calendar': 'Calendar',
 
     // Review
     'review.title': "Today's review",

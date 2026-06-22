@@ -327,6 +327,12 @@ a {
   margin-bottom: 0.5rem;
 }
 
+/* ===== Mobile bottom tab bar (SOT-1020 / 提案6) ===== */
+/* Hidden by default (desktop/tablet); shown only on narrow screens below. */
+.bottom-tabs {
+  display: none;
+}
+
 @media (max-width: 480px) {
   .container {
     padding: 1.5rem 1rem 2.5rem;
@@ -337,5 +343,43 @@ a {
   }
   .header-actions {
     gap: 0.5rem;
+  }
+
+  /* Reserve space so the fixed bar never covers page content/footer. */
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bottom-tabs {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: saturate(180%) blur(8px);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottom-tab {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 0.5rem 0.25rem;
+    min-height: 56px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.7rem;
+  }
+  .bottom-tab.active {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .bottom-tab-icon {
+    display: inline-flex;
   }
 }

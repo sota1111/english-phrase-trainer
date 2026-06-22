@@ -52,6 +52,9 @@ export default async function HomePage() {
         <Link href="/quiz" className="btn btn-ghost">
           <T k="home.quiz" />
         </Link>
+        <Link href="/writing" className="btn btn-ghost">
+          <T k="home.writing" />
+        </Link>
       </nav>
     </main>
   );

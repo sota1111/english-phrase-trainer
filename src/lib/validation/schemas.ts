@@ -27,6 +27,14 @@ export const phraseEnrichSchema = z.object({
   meaningJa: z.string().optional().default(''),
 });
 
+// AI writing feedback (SOT-1075 / B2): user writes one English sentence using a
+// phrase; AI grades grammar & naturalness and proposes an improved version.
+export const writingFeedbackSchema = z.object({
+  phrase: z.string().min(1),
+  meaningJa: z.string().optional().default(''),
+  sentence: z.string().min(1).max(2000),
+});
+
 export const phraseUpdateSchema = phraseInputSchema.partial();
 
 export const idParamSchema = z.string().min(1);

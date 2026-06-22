@@ -33,10 +33,12 @@ export const messages: Record<Lang, Record<string, string>> = {
     'home.calendar': '学習カレンダー',
     'home.analytics': '学習分析',
     'home.quiz': 'クイズ',
+    'home.writing': 'AI英作文',
     // mobile bottom tabs (SOT-1020 / 提案6)
     'tab.home': 'ホーム',
     'tab.review': '復習',
     'tab.quiz': 'クイズ',
+    'tab.writing': '英作文',
     'tab.phrases': 'フレーズ',
     'tab.analytics': '分析',
     'tab.calendar': 'カレンダー',
@@ -78,6 +80,23 @@ export const messages: Record<Lang, Record<string, string>> = {
     'quiz.score': '正解 {correct} / {total}',
     'quiz.again': 'もう一度',
     'quiz.backMenu': 'モード選択へ',
+
+    // AI writing feedback (SOT-1075 / B2)
+    'writing.title': 'AI英作文フィードバック',
+    'writing.subtitle': 'フレーズを使って英作文。AIが文法と自然さを採点し、改善案を返します。',
+    'writing.empty': 'フレーズがありません。フレーズを追加してから英作文に挑戦してください。',
+    'writing.prompt': 'このフレーズを使って英語で1文を書いてください',
+    'writing.placeholder': '英語で1文を入力…',
+    'writing.check': 'AIに添削してもらう',
+    'writing.checking': '添削中…',
+    'writing.skip': '別のフレーズ',
+    'writing.next': '次のフレーズ',
+    'writing.unavailable': 'AI添削は現在利用できません。お手本なしで英作文の練習を続けてください。',
+    'writing.error': 'AI添削に失敗しました。少し時間をおいて再度お試しください。',
+    'writing.notUsed': 'フレーズ未使用',
+    'writing.corrected': '改善案',
+    'writing.good': '良かった点',
+    'writing.improve': '改善点',
 
     // Review
     'review.title': '今日の復習',
@@ -262,10 +281,12 @@ export const messages: Record<Lang, Record<string, string>> = {
     'home.calendar': 'Study calendar',
     'home.analytics': 'Analytics',
     'home.quiz': 'Quiz',
+    'home.writing': 'AI Writing',
     // mobile bottom tabs (SOT-1020 / proposal 6)
     'tab.home': 'Home',
     'tab.review': 'Review',
     'tab.quiz': 'Quiz',
+    'tab.writing': 'Writing',
     'tab.phrases': 'Phrases',
     'tab.analytics': 'Analytics',
     'tab.calendar': 'Calendar',
@@ -307,6 +328,23 @@ export const messages: Record<Lang, Record<string, string>> = {
     'quiz.score': '{correct} / {total} correct',
     'quiz.again': 'Play again',
     'quiz.backMenu': 'Back to modes',
+
+    // AI writing feedback (SOT-1075 / B2)
+    'writing.title': 'AI writing feedback',
+    'writing.subtitle': 'Write a sentence with the phrase. AI grades grammar & naturalness and suggests improvements.',
+    'writing.empty': 'No phrases yet. Add some phrases before trying writing practice.',
+    'writing.prompt': 'Write one English sentence using this phrase',
+    'writing.placeholder': 'Type one English sentence…',
+    'writing.check': 'Get AI feedback',
+    'writing.checking': 'Checking…',
+    'writing.skip': 'Another phrase',
+    'writing.next': 'Next phrase',
+    'writing.unavailable': 'AI feedback is currently unavailable. Keep practicing writing on your own.',
+    'writing.error': 'AI feedback failed. Please try again in a moment.',
+    'writing.notUsed': 'Phrase not used',
+    'writing.corrected': 'Suggested revision',
+    'writing.good': 'What went well',
+    'writing.improve': 'Improvements',
 
     // Review
     'review.title': "Today's review",

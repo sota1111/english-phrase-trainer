@@ -15,7 +15,6 @@ type Phrase = {
 
 type ReviewItem = {
   phrase: Phrase;
-  schedule: unknown;
 };
 
 type Props = {

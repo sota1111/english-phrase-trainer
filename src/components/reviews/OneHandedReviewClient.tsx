@@ -16,7 +16,6 @@ export type Phrase = {
 
 export type ReviewItem = {
   phrase: Phrase;
-  schedule: unknown;
 };
 
 type Props = {

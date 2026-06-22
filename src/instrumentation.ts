@@ -8,7 +8,9 @@ export async function register() {
   }
 
   const firebaseApiKey =
-    process.env.FIREBASE_WEB_API_KEY || process.env.FIREBASE_API_KEY;
+    process.env.FIREBASE_WEB_API_KEY ||
+    process.env.FIREBASE_API_KEY ||
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   const authSecret = process.env.AUTH_SECRET;
   const allowedEmails = process.env.ALLOWED_USER_EMAILS;
 

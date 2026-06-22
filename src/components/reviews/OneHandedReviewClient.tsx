@@ -133,33 +133,35 @@ export function OneHandedReviewClient({ items }: Props) {
 
       {/* Card Content */}
       <div 
-        style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '24px', textAlign: 'center' }}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY: 'auto', padding: '24px', textAlign: 'center' }}
         onClick={() => !showAnswer && setShowAnswer(true)}
       >
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 className={isEnToJa ? 'text-en' : undefined} style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', wordBreak: 'break-word', color: 'var(--foreground)' }}>
-            {promptText}
-          </h2>
-          {promptSub && (
-            <p className={isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--muted)', fontSize: '1.1rem', fontStyle: 'italic' }}>
-              {promptSub}
-            </p>
-          )}
-        </div>
-
-        {showAnswer && (
-          <div style={{ animation: 'fadeIn 0.2s ease-in' }}>
-            <div style={{ height: '1px', background: 'var(--border)', margin: '2rem 0' }} />
-            <p className={!isEnToJa ? 'text-en' : undefined} style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
-              {answerText}
-            </p>
-            {answerSub && (
-              <p className={!isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--foreground)', fontSize: '1rem' }}>
-                {answerSub}
+        <div style={{ margin: 'auto 0', width: '100%' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <h2 className={isEnToJa ? 'text-en' : undefined} style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem', wordBreak: 'break-word', color: 'var(--foreground)' }}>
+              {promptText}
+            </h2>
+            {promptSub && (
+              <p className={isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--muted)', fontSize: '1.1rem', fontStyle: 'italic' }}>
+                {promptSub}
               </p>
             )}
           </div>
-        )}
+
+          {showAnswer && (
+            <div style={{ animation: 'fadeIn 0.2s ease-in' }}>
+              <div style={{ height: '1px', background: 'var(--border)', margin: '1rem 0' }} />
+              <p className={!isEnToJa ? 'text-en' : undefined} style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
+                {answerText}
+              </p>
+              {answerSub && (
+                <p className={!isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--foreground)', fontSize: '1rem' }}>
+                  {answerSub}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* One-handed Controls */}

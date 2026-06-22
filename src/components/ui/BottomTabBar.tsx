@@ -39,6 +39,9 @@ const AnalyticsIcon = () => (
 const QuizIcon = () => (
   <svg {...svg}><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3" /><path d="M12 17h.01" /></svg>
 );
+const WritingIcon = () => (
+  <svg {...svg}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+);
 
 type Tab = { href: string; labelKey: string; icon: ReactNode; match: (path: string) => boolean };
 
@@ -46,6 +49,7 @@ const TABS: Tab[] = [
   { href: '/', labelKey: 'tab.home', icon: <HomeIcon />, match: p => p === '/' },
   { href: '/spaced-review', labelKey: 'tab.review', icon: <ReviewIcon />, match: p => p.startsWith('/spaced-review') },
   { href: '/quiz', labelKey: 'tab.quiz', icon: <QuizIcon />, match: p => p.startsWith('/quiz') },
+  { href: '/writing', labelKey: 'tab.writing', icon: <WritingIcon />, match: p => p.startsWith('/writing') },
   { href: '/phrases', labelKey: 'tab.phrases', icon: <PhrasesIcon />, match: p => p.startsWith('/phrases') },
   { href: '/analytics', labelKey: 'tab.analytics', icon: <AnalyticsIcon />, match: p => p.startsWith('/analytics') },
   { href: '/calendar', labelKey: 'tab.calendar', icon: <CalendarIcon />, match: p => p.startsWith('/calendar') },

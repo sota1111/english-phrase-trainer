@@ -8,6 +8,7 @@ import { PhraseList } from '@/components/phrases/PhraseList';
 import { PhraseForm } from '@/components/phrases/PhraseForm';
 import { BulkRegisterForm } from '@/components/phrases/BulkRegisterForm';
 import { useI18n } from '@/i18n/I18nContext';
+import { categoryLabel } from '@/i18n/categoryLabels';
 import {
   getPhrasesAction,
   createPhraseAction, 
@@ -20,7 +21,7 @@ type PhrasesClientProps = {
 };
 
 export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [phrases, setPhrases] = useState<Phrase[]>(initialPhrases);
   const [filter, setFilter] = useState<FilterState>({
     keyword: '',
@@ -34,11 +35,13 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
   const [editingPhraseId, setEditingPhraseId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [justCreated, setJustCreated] = useState(false);
+  const [createdPhrase, setCreatedPhrase] = useState<Phrase | null>(null);
 
   const closeModal = useCallback(() => {
     setModalMode(null);
     setEditingPhraseId(null);
     setJustCreated(false);
+    setCreatedPhrase(null);
   }, []);
 
   const refetch = useCallback(async () => {
@@ -82,8 +85,9 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
   const handleCreate = async (data: PhraseInput) => {
     setIsLoading(true);
     try {
-      await createPhraseAction(data);
+      const created = await createPhraseAction(data);
       await refetch();
+      setCreatedPhrase(created);
       setJustCreated(true);
     } catch (error) {
       console.error('Failed to create phrase:', error);
@@ -163,12 +167,49 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
               <div className="created-view">
                 <h2>{t('phrases.created.title')}</h2>
                 <p className="created-message">{t('phrases.created.body')}</p>
+                {createdPhrase && (
+                  <section className="created-summary" aria-label={t('phrases.created.savedHeading')}>
+                    <h3 className="created-summary-heading">{t('phrases.created.savedHeading')}</h3>
+                    <dl className="created-fields">
+                      <div className="created-field">
+                        <dt>{t('col.phrase')}</dt>
+                        <dd>{createdPhrase.phrase || '-'}</dd>
+                      </div>
+                      <div className="created-field">
+                        <dt>{t('col.meaning')}</dt>
+                        <dd>{createdPhrase.meaningJa || '-'}</dd>
+                      </div>
+                      <div className="created-field">
+                        <dt>{t('col.example')}</dt>
+                        <dd>{createdPhrase.example || '-'}</dd>
+                      </div>
+                      <div className="created-field">
+                        <dt>{t('col.category')}</dt>
+                        <dd>{categoryLabel(createdPhrase.category, lang)}</dd>
+                      </div>
+                      <div className="created-field">
+                        <dt>{t('col.importance')}</dt>
+                        <dd>{t(`importance.${createdPhrase.importance}`)}</dd>
+                      </div>
+                    </dl>
+                  </section>
+                )}
                 <div className="created-actions">
                   <button
                     type="button"
-                    onClick={() => setJustCreated(false)}
+                    onClick={() => {
+                      setJustCreated(false);
+                      setCreatedPhrase(null);
+                    }}
                   >
                     {t('phrases.created.again')}
+                  </button>
+                  <button
+                    type="button"
+                    className="created-close"
+                    onClick={closeModal}
+                  >
+                    {t('phrases.created.close')}
                   </button>
                   <Link href="/" className="home-link">
                     {t('common.home')}
@@ -300,6 +341,63 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           margin-top: 0;
           margin-bottom: 1.5rem;
           text-align: center;
+        }
+        .created-message {
+          text-align: center;
+          color: var(--muted);
+          margin-top: 0;
+        }
+        .created-summary {
+          margin: 1.25rem 0;
+          padding: 1rem 1.25rem;
+          background: var(--surface-muted);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+        }
+        .created-summary-heading {
+          margin: 0 0 0.75rem;
+          font-size: 1rem;
+        }
+        .created-fields {
+          margin: 0;
+        }
+        .created-field {
+          display: flex;
+          gap: 1rem;
+          padding: 0.4rem 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .created-field:last-child {
+          border-bottom: 0;
+        }
+        .created-field dt {
+          flex: 0 0 6.5rem;
+          font-weight: 600;
+          color: var(--muted);
+        }
+        .created-field dd {
+          margin: 0;
+          flex: 1;
+          overflow-wrap: anywhere;
+        }
+        .created-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          justify-content: center;
+          align-items: center;
+        }
+        .created-close {
+          background-color: var(--primary);
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+        }
+        .created-close:hover {
+          background-color: var(--primary-hover);
         }
       `}</style>
     </div>

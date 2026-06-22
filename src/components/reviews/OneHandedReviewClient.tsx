@@ -137,11 +137,11 @@ export function OneHandedReviewClient({ items }: Props) {
         onClick={() => !showAnswer && setShowAnswer(true)}
       >
         <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', wordBreak: 'break-word', color: '#111' }}>
+          <h2 className={isEnToJa ? 'text-en' : undefined} style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', wordBreak: 'break-word', color: 'var(--foreground)' }}>
             {promptText}
           </h2>
           {promptSub && (
-            <p style={{ color: '#666', fontSize: '1.1rem', fontStyle: 'italic' }}>
+            <p className={isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--muted)', fontSize: '1.1rem', fontStyle: 'italic' }}>
               {promptSub}
             </p>
           )}
@@ -149,12 +149,12 @@ export function OneHandedReviewClient({ items }: Props) {
 
         {showAnswer && (
           <div style={{ animation: 'fadeIn 0.2s ease-in' }}>
-            <div style={{ height: '1px', background: '#eee', margin: '2rem 0' }} />
-            <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111', marginBottom: '0.5rem' }}>
+            <div style={{ height: '1px', background: 'var(--border)', margin: '2rem 0' }} />
+            <p className={!isEnToJa ? 'text-en' : undefined} style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
               {answerText}
             </p>
             {answerSub && (
-              <p style={{ color: '#111', fontSize: '1rem' }}>
+              <p className={!isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--foreground)', fontSize: '1rem' }}>
                 {answerSub}
               </p>
             )}
@@ -163,10 +163,10 @@ export function OneHandedReviewClient({ items }: Props) {
       </div>
 
       {/* One-handed Controls */}
-      <div style={{ 
+      <div style={{
         padding: `16px 16px calc(env(safe-area-inset-bottom) + 16px)`,
-        background: '#fff',
-        borderTop: '1px solid #eee'
+        background: 'var(--surface)',
+        borderTop: '1px solid var(--border)'
       }}>
         {!showAnswer ? (
           <button

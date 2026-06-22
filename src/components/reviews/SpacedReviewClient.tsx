@@ -109,12 +109,12 @@ export function SpacedReviewClient({ items }: Props) {
         </div>
       </div>
 
-      <div style={{ border: '1px solid #e0e0e0', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', background: '#fff' }}>
-        <p style={{ fontSize: '1.4rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#111' }}>
+      <div style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '2rem', marginBottom: '1.5rem', background: 'var(--surface)', boxShadow: 'var(--shadow-sm)' }}>
+        <p className={isEnToJa ? 'text-en' : undefined} style={{ fontSize: '1.4rem', fontWeight: 'bold', marginBottom: '0.5rem', color: 'var(--foreground)' }}>
           {promptText}
         </p>
         {promptSub && (
-          <p style={{ color: '#374151', fontSize: '0.95rem', marginBottom: '1rem' }}>
+          <p className={isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--muted)', fontSize: '0.95rem', marginBottom: '1rem' }}>
             {t('review.example')}: {promptSub}
           </p>
         )}
@@ -122,16 +122,16 @@ export function SpacedReviewClient({ items }: Props) {
         {!showAnswer ? (
           <button
             onClick={() => setShowAnswer(true)}
-            style={{ padding: '0.6rem 1.2rem', background: '#f0f0f0', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}
+            style={{ padding: '0.6rem 1.2rem', background: 'var(--surface-muted)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}
           >
             {isEnToJa ? t('review.showMeaning') : t('review.showEnglish')}
           </button>
         ) : (
-          <div>
-            <div style={{ background: '#f8f9fa', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
-              <p style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: '#111' }}>{answerText}</p>
+          <div className="flashcard-reveal">
+            <div style={{ background: 'var(--surface-muted)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
+              <p className={!isEnToJa ? 'text-en' : undefined} style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: 'var(--foreground)' }}>{answerText}</p>
               {answerSub && (
-                <p style={{ color: '#111', fontSize: '0.9rem' }}>{answerSub}</p>
+                <p className={!isEnToJa ? 'text-en' : undefined} style={{ color: 'var(--foreground)', fontSize: '0.9rem' }}>{answerSub}</p>
               )}
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>

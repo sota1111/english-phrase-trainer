@@ -25,23 +25,16 @@ export async function getDuePhrasesAction(importance?: Importance) {
 
   const phraseMap = new Map(allPhrases.map(p => [p.id, p]));
   const duePhrases = dueSchedules
-    .map(s => ({
-      schedule: s,
-      phrase: phraseMap.get(s.phraseId),
-    }))
+    .map(s => ({ phrase: phraseMap.get(s.phraseId) }))
     .filter(item => item.phrase !== undefined);
 
   const scheduledIds = new Set(dueSchedules.map(s => s.phraseId));
   const unscheduledPhrases = allPhrases
     .filter(p => !scheduledIds.has(p.id))
-    .map(p => ({
-      schedule: null,
-      phrase: p,
-    }));
+    .map(p => ({ phrase: p }));
 
   const combined = [...duePhrases, ...unscheduledPhrases].map(item => ({
     phrase: item.phrase!,
-    schedule: item.schedule,
   }));
 
   // Narrow to the chosen importance before randomizing the review queue.

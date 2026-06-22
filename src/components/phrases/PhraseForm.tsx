@@ -339,17 +339,17 @@ export function PhraseForm({ initialData, categories = [], decks = [], onSubmit,
         <div className="gen-buttons">
           <button
             type="button"
-            onClick={() => handleGenerate('ja2en')}
-            disabled={isGenerating || isLoading || !formData.meaningJa.trim()}
-          >
-            {t('form.genJa2En')}
-          </button>
-          <button
-            type="button"
             onClick={() => handleGenerate('en2ja')}
             disabled={isGenerating || isLoading || !formData.phrase.trim()}
           >
             {t('form.genEn2Ja')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleGenerate('ja2en')}
+            disabled={isGenerating || isLoading || !formData.meaningJa.trim()}
+          >
+            {t('form.genJa2En')}
           </button>
         </div>
         {genMessage && (

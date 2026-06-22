@@ -16,6 +16,9 @@ export const phraseInputSchema = z.object({
   // AI-enriched study aids (提案2)
   synonyms: z.array(z.string()).optional().default([]),
   collocations: z.array(z.string()).optional().default([]),
+  // Deck / tag organization (提案3)
+  deck: z.string().optional().default(''),
+  tags: z.array(z.string()).optional().default([]),
 });
 
 // AI enrichment request (提案2): given a phrase + meaning, return study aids.

@@ -29,6 +29,10 @@ export interface Phrase {
   // empty) on the serialized `Phrase` so legacy docs without them stay valid.
   synonyms: string[];
   collocations: string[];
+  // Deck / tag organization (提案3). `deck` is a free-text deck name ('' = 未分類);
+  // `tags` is a free list. Both default empty for legacy phrases.
+  deck: string;
+  tags: string[];
   correctCount: number;
   wrongCount: number;
   answeredCount: number;
@@ -54,4 +58,12 @@ export type PhraseInput = Omit<
   | 'importance'
   | 'synonyms'
   | 'collocations'
-> & { importance?: Importance; synonyms?: string[]; collocations?: string[] };
+  | 'deck'
+  | 'tags'
+> & {
+  importance?: Importance;
+  synonyms?: string[];
+  collocations?: string[];
+  deck?: string;
+  tags?: string[];
+};

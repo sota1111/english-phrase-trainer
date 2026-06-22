@@ -75,6 +75,14 @@ export const messages: Record<Lang, Record<string, string>> = {
     'phrases.modal.create': '新規フレーズ登録',
     'phrases.modal.edit': 'フレーズ編集',
 
+    // Decks (提案3)
+    'decks.title': 'デッキ',
+    'decks.unclassified': '未分類',
+    'decks.count': '{n}件',
+    'decks.accuracy': '正答率{n}%',
+    'decks.review': 'このデッキを復習 →',
+    'decks.reviewing': 'デッキ「{name}」を復習中',
+
     // Bulk AI registration
     'phrases.bulk.title': 'AIで一括登録',
     'phrases.bulk.inputLabel': '不定形のテキストを貼り付け',
@@ -99,6 +107,9 @@ export const messages: Record<Lang, Record<string, string>> = {
     'filter.keyword': 'キーワード検索',
     'filter.allCategories': 'すべてのカテゴリ',
     'filter.allImportance': 'すべての重要度',
+    'filter.allDecks': 'すべてのデッキ',
+    'filter.unclassifiedDeck': '未分類デッキ',
+    'filter.allTags': 'すべてのタグ',
     'filter.onlyUnanswered': '未回答のみ',
     'filter.onlyWeak': '苦手フレーズのみ（正答率50%未満）',
     'list.empty': 'フレーズがありません',
@@ -130,6 +141,9 @@ export const messages: Record<Lang, Record<string, string>> = {
     'form.enriching': 'AI拡充中...',
     'form.enrichSuccess': 'AIで拡充しました。内容を確認・編集して保存してください。',
     'form.enrichFail': 'AI拡充に失敗しました。手動で入力してください。',
+    'form.deck': 'デッキ（任意）',
+    'form.deckPlaceholder': 'デッキ名（例: TOEIC, 日常会話）',
+    'form.tags': 'タグ（任意・カンマ区切り）',
     'form.newCategoryPlaceholder': '新しいカテゴリ名',
     'form.selectFromList': '一覧から選択',
     'form.selectPlaceholder': '選択してください',
@@ -246,6 +260,14 @@ export const messages: Record<Lang, Record<string, string>> = {
     'phrases.modal.create': 'New phrase',
     'phrases.modal.edit': 'Edit phrase',
 
+    // Decks (proposal 3)
+    'decks.title': 'Decks',
+    'decks.unclassified': 'Unclassified',
+    'decks.count': '{n} items',
+    'decks.accuracy': '{n}% correct',
+    'decks.review': 'Review this deck →',
+    'decks.reviewing': 'Reviewing deck "{name}"',
+
     // Bulk AI registration
     'phrases.bulk.title': 'AI bulk registration',
     'phrases.bulk.inputLabel': 'Paste free-form text',
@@ -270,6 +292,9 @@ export const messages: Record<Lang, Record<string, string>> = {
     'filter.keyword': 'Search keyword',
     'filter.allCategories': 'All categories',
     'filter.allImportance': 'All importance',
+    'filter.allDecks': 'All decks',
+    'filter.unclassifiedDeck': 'Unclassified deck',
+    'filter.allTags': 'All tags',
     'filter.onlyUnanswered': 'Unanswered only',
     'filter.onlyWeak': 'Weak phrases only (accuracy < 50%)',
     'list.empty': 'No phrases',
@@ -301,6 +326,9 @@ export const messages: Record<Lang, Record<string, string>> = {
     'form.enriching': 'Enriching...',
     'form.enrichSuccess': 'Enriched with AI. Review/edit, then save.',
     'form.enrichFail': 'AI enrichment failed. Please enter manually.',
+    'form.deck': 'Deck (optional)',
+    'form.deckPlaceholder': 'Deck name (e.g. TOEIC, Daily)',
+    'form.tags': 'Tags (optional, comma-separated)',
     'form.newCategoryPlaceholder': 'New category name',
     'form.selectFromList': 'Select from list',
     'form.selectPlaceholder': 'Please select',

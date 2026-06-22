@@ -11,12 +11,13 @@ const NEW_CATEGORY_OPTION = '__new__';
 type PhraseFormProps = {
   initialData?: Partial<PhraseInput>;
   categories?: string[];
+  decks?: string[];
   onSubmit: (data: PhraseInput) => void;
   onCancel: () => void;
   isLoading?: boolean;
 };
 
-export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, isLoading }: PhraseFormProps) {
+export function PhraseForm({ initialData, categories = [], decks = [], onSubmit, onCancel, isLoading }: PhraseFormProps) {
   const { t, lang } = useI18n();
   const [formData, setFormData] = useState<PhraseInput>({
     phrase: initialData?.phrase ?? '',
@@ -28,6 +29,8 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
     memo: initialData?.memo ?? '',
     synonyms: initialData?.synonyms ?? [],
     collocations: initialData?.collocations ?? [],
+    deck: initialData?.deck ?? '',
+    tags: initialData?.tags ?? [],
   });
 
   // Category options: existing categories plus the current value (when editing a
@@ -104,7 +107,7 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
 
   // Comma-separated <-> string[] binding for the synonyms / collocations inputs.
   const handleListChange = (
-    field: 'synonyms' | 'collocations',
+    field: 'synonyms' | 'collocations' | 'tags',
     value: string
   ) => {
     const list = value
@@ -297,6 +300,36 @@ export function PhraseForm({ initialData, categories = [], onSubmit, onCancel, i
             type="text"
             value={(formData.collocations ?? []).join(', ')}
             onChange={(e) => handleListChange('collocations', e.target.value)}
+            placeholder={t('form.listPlaceholder')}
+          />
+        </div>
+        <div className="form-field">
+          <label htmlFor="deck">{t('form.deck')}</label>
+          <input
+            id="deck"
+            name="deck"
+            type="text"
+            value={formData.deck ?? ''}
+            onChange={handleChange}
+            placeholder={t('form.deckPlaceholder')}
+            list="deck-options"
+          />
+          {decks.length > 0 && (
+            <datalist id="deck-options">
+              {decks.map((d) => (
+                <option key={d} value={d} />
+              ))}
+            </datalist>
+          )}
+        </div>
+        <div className="form-field">
+          <label htmlFor="tags">{t('form.tags')}</label>
+          <input
+            id="tags"
+            name="tags"
+            type="text"
+            value={(formData.tags ?? []).join(', ')}
+            onChange={(e) => handleListChange('tags', e.target.value)}
             placeholder={t('form.listPlaceholder')}
           />
         </div>

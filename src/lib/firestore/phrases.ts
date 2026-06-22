@@ -41,6 +41,9 @@ function serializePhrase(id: string, data: FirebaseFirestore.DocumentData): Phra
     // 提案2: legacy phrases predate these; default to empty arrays.
     synonyms: Array.isArray(data.synonyms) ? data.synonyms : [],
     collocations: Array.isArray(data.collocations) ? data.collocations : [],
+    // 提案3: deck/tags default to empty for legacy phrases.
+    deck: data.deck ?? '',
+    tags: Array.isArray(data.tags) ? data.tags : [],
     correctCount: data.correctCount ?? 0,
     wrongCount: data.wrongCount ?? 0,
     answeredCount: data.answeredCount ?? 0,

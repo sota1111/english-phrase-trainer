@@ -14,7 +14,7 @@ import { z } from 'zod';
 type SpacedReviewResultInput = z.infer<typeof spacedReviewResultSchema>;
 type LearningRecordInput = z.infer<typeof learningRecordSchema>;
 
-export async function getDuePhrasesAction(importance?: Importance) {
+export async function getDuePhrasesAction(importance?: Importance, deck?: string) {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
@@ -38,7 +38,12 @@ export async function getDuePhrasesAction(importance?: Importance) {
   }));
 
   // Narrow to the chosen importance before randomizing the review queue.
-  const scoped = filterByImportance(combined, importance);
+  let scoped = filterByImportance(combined, importance);
+
+  // Deck-scoped study (提案3): narrow to a single deck when requested.
+  if (deck) {
+    scoped = scoped.filter((item) => (item.phrase.deck ?? '') === deck);
+  }
 
   return shuffle(scoped);
 }

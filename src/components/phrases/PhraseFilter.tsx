@@ -9,17 +9,23 @@ export type FilterState = {
   keyword: string;
   category: string;
   importance: '' | Importance;
+  deck: string;
+  tag: string;
   onlyUnanswered: boolean;
   onlyWeak: boolean;
 };
 
 type PhraseFilterProps = {
   categories: string[];
+  decks: string[];
+  tags: string[];
   filter: FilterState;
   onChange: (filter: FilterState) => void;
 };
 
-export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps) {
+export const UNCLASSIFIED_DECK = '__none__';
+
+export function PhraseFilter({ categories, decks, tags, filter, onChange }: PhraseFilterProps) {
   const { t, lang } = useI18n();
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -59,6 +65,25 @@ export function PhraseFilter({ categories, filter, onChange }: PhraseFilterProps
             </option>
           ))}
         </select>
+        <select name="deck" value={filter.deck} onChange={handleChange}>
+          <option value="">{t('filter.allDecks')}</option>
+          <option value={UNCLASSIFIED_DECK}>{t('filter.unclassifiedDeck')}</option>
+          {decks.map((deck) => (
+            <option key={deck} value={deck}>
+              {deck}
+            </option>
+          ))}
+        </select>
+        {tags.length > 0 && (
+          <select name="tag" value={filter.tag} onChange={handleChange}>
+            <option value="">{t('filter.allTags')}</option>
+            {tags.map((tag) => (
+              <option key={tag} value={tag}>
+                {tag}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
       <div className="filter-group">
         <label>

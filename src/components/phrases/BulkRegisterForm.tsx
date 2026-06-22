@@ -135,6 +135,8 @@ export function BulkRegisterForm({ onComplete, onCancel }: BulkRegisterFormProps
               <span className="col-include">{t('phrases.bulk.include')}</span>
               <span>{t('phrases.bulk.colPhrase')}</span>
               <span>{t('phrases.bulk.colMeaning')}</span>
+              <span>{t('phrases.bulk.colExample')}</span>
+              <span>{t('phrases.bulk.colExampleJa')}</span>
               <span>{t('phrases.bulk.colCategory')}</span>
               <span>{t('phrases.bulk.colImportance')}</span>
             </div>
@@ -157,6 +159,18 @@ export function BulkRegisterForm({ onComplete, onCancel }: BulkRegisterFormProps
                   type="text"
                   value={draft.meaningJa}
                   onChange={(e) => updateDraft(index, { meaningJa: e.target.value })}
+                />
+                <input
+                  type="text"
+                  value={draft.example}
+                  onChange={(e) => updateDraft(index, { example: e.target.value })}
+                  aria-label={t('phrases.bulk.colExample')}
+                />
+                <input
+                  type="text"
+                  value={draft.exampleJa}
+                  onChange={(e) => updateDraft(index, { exampleJa: e.target.value })}
+                  aria-label={t('phrases.bulk.colExampleJa')}
                 />
                 <input
                   type="text"
@@ -238,7 +252,7 @@ export function BulkRegisterForm({ onComplete, onCancel }: BulkRegisterFormProps
         }
         .draft-row {
           display: grid;
-          grid-template-columns: 2.5rem 1.4fr 1.4fr 1fr 5rem;
+          grid-template-columns: 2.5rem 1.3fr 1.3fr 1.5fr 1.5fr 1fr 5rem;
           gap: 0.4rem;
           align-items: center;
         }
@@ -309,6 +323,7 @@ export function BulkRegisterForm({ onComplete, onCancel }: BulkRegisterFormProps
           .draft-row.header {
             display: none;
           }
+          .draft-row input[type='text'],
           .draft-row select {
             grid-column: 2 / -1;
           }

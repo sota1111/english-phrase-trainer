@@ -96,16 +96,18 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
           border: 1px solid #eee;
           padding: 0.75rem;
           text-align: left;
+          color: #1a1a1a;
         }
         th {
           background-color: #f4f4f4;
           font-weight: bold;
+          color: #111;
         }
         tr:hover {
           background-color: #fafafa;
         }
         .example {
-          color: #555;
+          color: #333;
           font-size: 0.9rem;
           max-width: 24rem;
         }
@@ -171,7 +173,7 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
             content: attr(data-label);
             flex: 0 0 auto;
             font-weight: bold;
-            color: #666;
+            color: #333;
             text-align: left;
             white-space: nowrap;
           }

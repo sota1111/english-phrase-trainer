@@ -211,6 +211,7 @@ export const messages: Record<Lang, Record<string, string>> = {
     'form.selectFromList': '一覧から選択',
     'form.selectPlaceholder': '選択してください',
     'form.addNewCategory': '＋ 新規カテゴリを追加',
+    'form.aiSectionTitle': '✨ AIで自動入力',
     'form.genJa2En': '日本語から英文を生成',
     'form.genEn2Ja': '英文から日本語を生成',
     'form.genNote':
@@ -459,6 +460,7 @@ export const messages: Record<Lang, Record<string, string>> = {
     'form.selectFromList': 'Select from list',
     'form.selectPlaceholder': 'Please select',
     'form.addNewCategory': '+ Add new category',
+    'form.aiSectionTitle': '✨ AI auto-fill',
     'form.genJa2En': 'Generate English from Japanese',
     'form.genEn2Ja': 'Generate Japanese from English',
     'form.genNote':

@@ -336,6 +336,7 @@ export function PhraseForm({ initialData, categories = [], decks = [], onSubmit,
       </div>
 
       <div className="auto-gen-section">
+        <p className="ai-section-title">{t('form.aiSectionTitle')}</p>
         <div className="gen-buttons">
           <button
             type="button"
@@ -464,14 +465,23 @@ export function PhraseForm({ initialData, categories = [], decks = [], onSubmit,
         }
         .auto-gen-section {
           background: var(--surface-muted);
-          padding: 0.6rem 0.75rem;
-          border-radius: 4px;
-          border: 1px dashed var(--border-strong);
+          padding: 0.75rem 0.85rem;
+          border-radius: 8px;
+          border: 2px solid var(--primary);
+        }
+        .ai-section-title {
+          margin: 0 0 0.5rem;
+          font-size: 0.9rem;
+          font-weight: bold;
+          color: var(--primary);
         }
         .gen-buttons {
           display: flex;
           gap: 0.5rem;
-          margin-bottom: 0.4rem;
+          margin-bottom: 0.5rem;
+        }
+        .enrich-row {
+          margin-bottom: 0;
         }
         @media (max-width: 520px) {
           .form-grid {
@@ -480,11 +490,15 @@ export function PhraseForm({ initialData, categories = [], decks = [], onSubmit,
         }
         .gen-buttons button {
           flex: 1;
-          font-size: 0.8rem;
-          padding: 0.4rem;
-          background: var(--primary-soft);
-          color: var(--primary-soft-fg);
-          border-color: var(--primary-soft);
+          font-size: 0.9rem;
+          font-weight: bold;
+          padding: 0.55rem 0.5rem;
+          background: var(--primary);
+          color: #fff;
+          border-color: var(--primary);
+        }
+        .gen-buttons button:not(:disabled):hover {
+          filter: brightness(0.95);
         }
         .gen-message {
           font-size: 0.8rem;

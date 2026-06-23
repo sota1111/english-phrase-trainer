@@ -42,31 +42,9 @@
   --font-jp-stack: var(--font-jp), "Hiragino Kaku Gothic ProN", sans-serif;
 
   --background: var(--canvas);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --canvas: #0f1318;
-    --surface: #171c23;
-    --surface-muted: #1f262f;
-    --border: #2a323d;
-    --border-strong: #353f4c;
-    --foreground: #e8ebf0;
-    --muted: #a3acba;
-    --muted-2: #7c8696;
-    --primary: #3b82f6;
-    --primary-hover: #60a5fa;
-    --primary-soft: #1b2942;
-    --primary-soft-fg: #93c5fd;
-    --success-soft: #14301f;
-    --danger-soft: #3a1d1d;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
-  }
-  html {
-    color-scheme: dark;
-  }
+  /* Light theme only: ignore OS dark preference so contrast stays readable. */
+  color-scheme: light;
 }
 
 /* ===== Base ===== */
@@ -78,6 +56,7 @@
 
 html {
   height: 100%;
+  color-scheme: light;
 }
 
 html,

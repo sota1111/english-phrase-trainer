@@ -49,23 +49,42 @@ export function buildMultipleChoice(
 const BLANK = '______';
 
 /**
- * Turn a phrase's example into a fill-in-the-blank question by masking the
- * phrase occurrence (case-insensitive). Returns null when the example does not
- * contain the phrase, so callers can skip phrases that cannot form a blank.
+ * Turn a phrase into a fill-in-the-blank question.
+ *
+ * Preferred form: mask the phrase occurrence inside its example sentence
+ * (case-insensitive). When the phrase has no usable example (the `example`
+ * field is optional, so many phrases lack one — or the example does not contain
+ * the phrase), fall back to a meaning-prompt blank: a bare blank whose answer is
+ * the phrase itself. The quiz UI renders `meaningJa` as the hint, so this reads
+ * as "type the English phrase for this Japanese meaning".
+ *
+ * Returns null only when the phrase has no answer text or no Japanese meaning to
+ * prompt with — otherwise every phrase is blankable, so the fill-in-the-blank
+ * quiz mode stays selectable whenever at least one phrase exists.
  */
 export function buildBlank(
   phrase: QuizPhrase
 ): { sentence: string; answer: string; exampleJa: string } | null {
-  const example = phrase.example?.trim();
   const target = phrase.phrase?.trim();
-  if (!example || !target) return null;
-  const idx = example.toLowerCase().indexOf(target.toLowerCase());
-  if (idx === -1) return null;
-  const sentence = example.slice(0, idx) + BLANK + example.slice(idx + target.length);
-  return { sentence, answer: target, exampleJa: phrase.exampleJa?.trim() ?? '' };
+  const meaning = phrase.meaningJa?.trim();
+  if (!target || !meaning) return null;
+  const example = phrase.example?.trim();
+  if (example) {
+    const idx = example.toLowerCase().indexOf(target.toLowerCase());
+    if (idx !== -1) {
+      const sentence = example.slice(0, idx) + BLANK + example.slice(idx + target.length);
+      return { sentence, answer: target, exampleJa: phrase.exampleJa?.trim() ?? '' };
+    }
+  }
+  // Fallback when there is no example sentence containing the phrase.
+  return { sentence: BLANK, answer: target, exampleJa: '' };
 }
 
-/** Phrases eligible for a fill-in-the-blank question (their example contains the phrase). */
+/**
+ * Phrases eligible for a fill-in-the-blank question. With the meaning-prompt
+ * fallback in `buildBlank`, this is every phrase that has both a phrase and a
+ * Japanese meaning.
+ */
 export function blankablePhrases(pool: QuizPhrase[]): QuizPhrase[] {
   return pool.filter((p) => buildBlank(p) !== null);
 }

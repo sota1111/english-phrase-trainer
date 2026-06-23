@@ -51,21 +51,45 @@ describe('buildBlank', () => {
     expect(result!.sentence.toLowerCase()).not.toContain('kick off');
   });
 
-  it('returns null when the example does not contain the phrase', () => {
-    expect(buildBlank(p('1', 'kick off', 'A different sentence.'))).toBeNull();
+  it('falls back to a meaning-prompt blank when the example does not contain the phrase', () => {
+    const result = buildBlank(p('1', 'kick off', 'A different sentence.'));
+    expect(result).not.toBeNull();
+    expect(result!.sentence).toBe('______');
+    expect(result!.answer).toBe('kick off');
   });
 
-  it('returns null when there is no example', () => {
-    expect(buildBlank(p('1', 'kick off', ''))).toBeNull();
+  it('falls back to a meaning-prompt blank when there is no example', () => {
+    const result = buildBlank(p('1', 'kick off', ''));
+    expect(result).not.toBeNull();
+    expect(result!.sentence).toBe('______');
+    expect(result!.answer).toBe('kick off');
+  });
+
+  it('returns null when the phrase has no Japanese meaning', () => {
+    const phrase: QuizPhrase = { id: '1', phrase: 'kick off', meaningJa: '', example: '', exampleJa: '' };
+    expect(buildBlank(phrase)).toBeNull();
+  });
+
+  it('returns null when the phrase text is empty', () => {
+    const phrase: QuizPhrase = { id: '1', phrase: '   ', meaningJa: 'なにか', example: '', exampleJa: '' };
+    expect(buildBlank(phrase)).toBeNull();
   });
 });
 
 describe('blankablePhrases', () => {
-  it('keeps only phrases whose example contains the phrase', () => {
+  it('includes every phrase that has a phrase and a meaning (example optional)', () => {
+    const pool = [
+      p('1', 'apple', 'I ate an apple.'), // example-based blank
+      p('2', 'banana', 'No fruit here.'), // example present but no match -> fallback
+      p('3', 'cherry', ''), // no example -> fallback
+    ];
+    expect(blankablePhrases(pool).map((x) => x.id)).toEqual(['1', '2', '3']);
+  });
+
+  it('excludes phrases missing a meaning', () => {
     const pool = [
       p('1', 'apple', 'I ate an apple.'),
-      p('2', 'banana', 'No fruit here.'),
-      p('3', 'cherry', ''),
+      { id: '2', phrase: 'banana', meaningJa: '', example: '', exampleJa: '' },
     ];
     expect(blankablePhrases(pool).map((x) => x.id)).toEqual(['1']);
   });

@@ -137,7 +137,7 @@ export function OneHandedReviewClient({ items }: Props) {
         onClick={() => !showAnswer && setShowAnswer(true)}
       >
         <div style={{ margin: 'auto 0', width: '100%' }}>
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: '0.5rem' }}>
             <h2 className={isEnToJa ? 'text-en' : undefined} style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem', wordBreak: 'break-word', color: 'var(--foreground)' }}>
               {promptText}
             </h2>
@@ -150,7 +150,7 @@ export function OneHandedReviewClient({ items }: Props) {
 
           {showAnswer && (
             <div style={{ animation: 'fadeIn 0.2s ease-in' }}>
-              <div style={{ height: '1px', background: 'var(--border)', margin: '1rem 0' }} />
+              <div style={{ height: '1px', background: 'var(--border)', margin: '0.5rem 0' }} />
               <p className={!isEnToJa ? 'text-en' : undefined} style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                 {answerText}
               </p>

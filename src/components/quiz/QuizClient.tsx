@@ -368,7 +368,8 @@ function QuizStyles() {
         display: flex;
         align-items: center;
         gap: 1rem;
-        padding: 1.15rem 1.25rem;
+        min-height: 76px;
+        padding: 1.25rem;
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
@@ -465,12 +466,16 @@ function QuizStyles() {
         gap: 0.65rem;
       }
       .option {
-        padding: 0.9rem 1.1rem;
+        display: flex;
+        align-items: center;
+        min-height: 58px;
+        padding: 0.85rem 1.15rem;
         background: var(--surface);
-        border: 1.5px solid var(--border);
+        border: 1.5px solid var(--border-strong);
         border-radius: var(--radius-sm);
         cursor: pointer;
-        font-size: 1.02rem;
+        font-size: 1.08rem;
+        line-height: 1.4;
         text-align: left;
         color: var(--foreground);
         transition: border-color 0.12s ease, background 0.12s ease, transform 0.12s ease;
@@ -496,34 +501,65 @@ function QuizStyles() {
       }
       input {
         width: 100%;
-        padding: 0.7rem;
-        border: 1px solid var(--border-strong);
-        border-radius: 8px;
-        font-size: 1rem;
+        min-height: 50px;
+        padding: 0.75rem 0.9rem;
+        border: 1.5px solid var(--border-strong);
+        border-radius: var(--radius-sm);
+        font-size: 1.1rem;
         background: var(--surface);
         color: var(--foreground);
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.85rem;
+        transition: border-color 0.12s ease, box-shadow 0.12s ease;
+      }
+      input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-soft);
       }
       .feedback {
-        margin-top: 1rem;
+        margin-top: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+      .feedback .ok,
+      .feedback .ng {
+        margin: 0;
+        padding: 0.85rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 1.05rem;
+        font-weight: 700;
       }
       .feedback .ok {
-        color: #15803d;
-        font-weight: 700;
+        color: #14532d;
+        background: var(--success-soft);
+        border: 1px solid var(--success);
       }
       .feedback .ng {
-        color: #b91c1c;
-        font-weight: 700;
+        color: #7f1d1d;
+        background: var(--danger-soft);
+        border: 1px solid var(--danger);
+      }
+      .feedback .ok::before {
+        content: '✓ ';
+      }
+      .feedback .ng::before {
+        content: '✗ ';
       }
       .next {
-        padding: 0.6rem 1.5rem;
+        width: 100%;
+        min-height: 52px;
+        padding: 0.75rem 1.5rem;
         background: var(--primary);
         color: #fff;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--radius-sm);
         cursor: pointer;
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+      .next:hover:not(:disabled) {
+        background: var(--primary-hover);
       }
       .next:disabled {
         opacity: 0.5;
@@ -575,18 +611,41 @@ function QuizStyles() {
         justify-content: center;
       }
       .result-actions button {
-        padding: 0.6rem 1.5rem;
+        flex: 1 1 0;
+        min-height: 52px;
+        padding: 0.75rem 1.5rem;
         background: var(--primary);
         color: #fff;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--radius-sm);
         cursor: pointer;
-        font-weight: 600;
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+      .result-actions button:hover {
+        background: var(--primary-hover);
       }
       .result-actions button.ghost {
         background: var(--surface-muted);
         color: var(--foreground);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-strong);
+      }
+      .result-actions button.ghost:hover {
+        background: var(--surface);
+      }
+      @media (max-width: 480px) {
+        .quiz {
+          padding: 1.5rem 1rem 2.5rem;
+        }
+        .card-q {
+          padding: 1.4rem 1.1rem;
+        }
+        .q-prompt {
+          font-size: 1.4rem;
+        }
+        .result-actions {
+          flex-direction: column;
+        }
       }
     `}</style>
   );

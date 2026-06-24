@@ -1,25 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useI18n } from '@/i18n/I18nContext';
 import { QuizPhrase } from '@/lib/quiz';
 import { QuizClient } from '@/components/quiz/QuizClient';
 import { WritingClient } from '@/components/writing/WritingClient';
-import { SpacedReviewClient } from '@/components/reviews/SpacedReviewClient';
 
-type HubMode = 'review' | 'quiz' | 'writing';
+type HubMode = 'quiz' | 'writing';
 
 type Props = {
   phrases: QuizPhrase[];
-  reviewItems: Parameters<typeof SpacedReviewClient>[0]['items'];
 };
 
-export function QuizHubClient({ phrases, reviewItems }: Props) {
+export function QuizHubClient({ phrases }: Props) {
   const { t } = useI18n();
   const [mode, setMode] = useState<HubMode>('quiz');
 
   const tabs: { key: HubMode; label: string }[] = [
-    { key: 'review', label: t('tab.review') },
     { key: 'quiz', label: t('tab.quiz') },
     { key: 'writing', label: t('tab.writing') },
   ];
@@ -27,6 +25,10 @@ export function QuizHubClient({ phrases, reviewItems }: Props) {
   return (
     <div className="quiz-hub">
       <div className="hub-tabs" role="tablist" aria-label={t('tab.quiz')}>
+        {/* 復習はホームの復習画面 (/spaced-review) に統一 (SOT-1226)。 */}
+        <Link href="/spaced-review" className="hub-tab" role="tab" aria-selected={false}>
+          {t('tab.review')}
+        </Link>
         {tabs.map((tab) => {
           const active = mode === tab.key;
           return (
@@ -45,7 +47,6 @@ export function QuizHubClient({ phrases, reviewItems }: Props) {
       </div>
 
       <div role="tabpanel">
-        {mode === 'review' && <SpacedReviewClient items={reviewItems} />}
         {mode === 'quiz' && <QuizClient phrases={phrases} />}
         {mode === 'writing' && <WritingClient phrases={phrases} />}
       </div>
@@ -67,6 +68,8 @@ export function QuizHubClient({ phrases, reviewItems }: Props) {
           color: var(--foreground, #1a1a1a);
           font-size: 0.95rem;
           font-weight: 500;
+          text-align: center;
+          text-decoration: none;
           cursor: pointer;
           transition: background 0.15s, color 0.15s, border-color 0.15s;
         }

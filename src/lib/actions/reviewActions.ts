@@ -67,11 +67,17 @@ export async function submitReviewResultAction(input: SpacedReviewResultInput) {
   const next = calculateNextReview(params, isCorrect);
   await upsertReviewSchedule(phraseId, next);
   await incrementDailyStat(new Date(), isCorrect, phraseId);
+  // Reviews must also feed per-phrase stats (answeredCount/correctCount/accuracy);
+  // otherwise the analytics screen — which aggregates from phrase stats — ignores
+  // spaced reviews entirely and undercounts how much was reviewed (SOT-1228).
+  await updatePhraseStats(phraseId, isCorrect);
 
   revalidatePath('/');
   revalidatePath('/spaced-review');
   revalidatePath('/calendar');
-  
+  revalidatePath('/analytics');
+  revalidatePath('/phrases');
+
   return {
     phraseId,
     isCorrect,

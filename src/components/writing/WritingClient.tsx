@@ -111,7 +111,7 @@ export function WritingClient({ phrases }: { phrases: QuizPhrase[] }) {
           onChange={(e) => setSentence(e.target.value)}
           disabled={status === 'loading'}
           placeholder={t('writing.placeholder')}
-          rows={3}
+          rows={5}
         />
 
         <div className="actions">
@@ -246,15 +246,16 @@ function WritingStyles() {
       }
       textarea {
         width: 100%;
-        padding: 0.85rem;
+        min-height: 128px;
+        padding: 0.9rem 1rem;
         border: 1.5px solid var(--border-strong);
         border-radius: var(--radius-sm);
-        font-size: 1rem;
+        font-size: 1.1rem;
         background: var(--surface);
         color: var(--foreground);
         resize: vertical;
         font-family: inherit;
-        line-height: 1.5;
+        line-height: 1.6;
         transition: border-color 0.12s ease, box-shadow 0.12s ease;
       }
       textarea:focus {
@@ -267,12 +268,16 @@ function WritingStyles() {
         gap: 0.75rem;
         margin-top: 1rem;
       }
+      .actions button {
+        flex: 1 1 0;
+      }
       button {
-        padding: 0.6rem 1.4rem;
-        border-radius: 8px;
+        min-height: 52px;
+        padding: 0.75rem 1.4rem;
+        border-radius: var(--radius-sm);
         cursor: pointer;
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: 1.05rem;
+        font-weight: 700;
         border: none;
       }
       button:disabled {
@@ -283,10 +288,19 @@ function WritingStyles() {
         background: var(--primary);
         color: #fff;
       }
+      .primary:hover:not(:disabled) {
+        background: var(--primary-hover);
+      }
       .ghost {
         background: var(--surface-muted);
         color: var(--foreground);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-strong);
+      }
+      .ghost:hover:not(:disabled) {
+        background: var(--surface);
+      }
+      .next {
+        width: 100%;
       }
       .notice {
         margin: 1rem 0 0;
@@ -393,6 +407,17 @@ function WritingStyles() {
       }
       .next {
         margin-top: 1rem;
+      }
+      @media (max-width: 480px) {
+        .writing {
+          padding: 1.5rem 1rem 2.5rem;
+        }
+        .card {
+          padding: 1.4rem 1.1rem;
+        }
+        .actions {
+          flex-direction: column;
+        }
       }
     `}</style>
   );

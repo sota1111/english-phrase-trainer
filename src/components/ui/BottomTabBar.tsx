@@ -24,9 +24,6 @@ const svg = {
 const HomeIcon = () => (
   <svg {...svg}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></svg>
 );
-const ReviewIcon = () => (
-  <svg {...svg}><path d="M3 5a2 2 0 0 1 2-2h6v18H5a2 2 0 0 1-2-2Z" /><path d="M21 5a2 2 0 0 0-2-2h-6v18h6a2 2 0 0 0 2-2Z" /></svg>
-);
 const PhrasesIcon = () => (
   <svg {...svg}><path d="M8 6h12" /><path d="M8 12h12" /><path d="M8 18h12" /><path d="M3 6h.01" /><path d="M3 12h.01" /><path d="M3 18h.01" /></svg>
 );
@@ -39,17 +36,13 @@ const AnalyticsIcon = () => (
 const QuizIcon = () => (
   <svg {...svg}><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3" /><path d="M12 17h.01" /></svg>
 );
-const WritingIcon = () => (
-  <svg {...svg}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
-);
 
 type Tab = { href: string; labelKey: string; icon: ReactNode; match: (path: string) => boolean };
 
 const TABS: Tab[] = [
   { href: '/', labelKey: 'tab.home', icon: <HomeIcon />, match: p => p === '/' },
-  { href: '/spaced-review', labelKey: 'tab.review', icon: <ReviewIcon />, match: p => p.startsWith('/spaced-review') },
-  { href: '/quiz', labelKey: 'tab.quiz', icon: <QuizIcon />, match: p => p.startsWith('/quiz') },
-  { href: '/writing', labelKey: 'tab.writing', icon: <WritingIcon />, match: p => p.startsWith('/writing') },
+  // 復習 / クイズ / 英作文 は /quiz ページに統合（SOT-1204）。
+  { href: '/quiz', labelKey: 'tab.quiz', icon: <QuizIcon />, match: p => p.startsWith('/quiz') || p.startsWith('/spaced-review') || p.startsWith('/writing') },
   { href: '/phrases', labelKey: 'tab.phrases', icon: <PhrasesIcon />, match: p => p.startsWith('/phrases') },
   { href: '/analytics', labelKey: 'tab.analytics', icon: <AnalyticsIcon />, match: p => p.startsWith('/analytics') },
   { href: '/calendar', labelKey: 'tab.calendar', icon: <CalendarIcon />, match: p => p.startsWith('/calendar') },

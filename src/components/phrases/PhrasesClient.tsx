@@ -177,14 +177,6 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         <div className="header-left">
           <h1>{t('phrases.list.title')}</h1>
         </div>
-        <div className="header-actions">
-          <button className="bulk-button" onClick={() => setIsBulkOpen(true)}>
-            {t('phrases.bulkAdd')}
-          </button>
-          <button className="add-button" onClick={() => setModalMode('create')}>
-            {t('phrases.add')}
-          </button>
-        </div>
       </header>
 
       {deckStats.length > 0 && (
@@ -240,6 +232,15 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         }}
         onDelete={handleDelete}
       />
+
+      <div className="list-actions">
+        <button className="bulk-button" onClick={() => setIsBulkOpen(true)}>
+          {t('phrases.bulkAdd')}
+        </button>
+        <button className="add-button" onClick={() => setModalMode('create')}>
+          {t('phrases.add')}
+        </button>
+      </div>
 
       {modalMode && (
         <div className="modal-overlay">
@@ -347,12 +348,12 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           margin: 0;
           font-size: 1.5rem;
         }
-        .header-actions {
+        .list-actions {
           display: flex;
-          flex-direction: row;
           flex-wrap: wrap;
-          align-items: center;
+          justify-content: center;
           gap: 0.5rem;
+          margin-top: 1.5rem;
         }
         .add-button,
         .bulk-button {

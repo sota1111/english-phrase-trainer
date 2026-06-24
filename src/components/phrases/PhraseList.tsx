@@ -93,7 +93,7 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
           margin-top: 1rem;
         }
         th, td {
-          border: 1px solid #eee;
+          border: 1px solid #aab2bd;
           padding: 0.75rem;
           text-align: left;
           color: #1a1a1a;
@@ -149,7 +149,7 @@ export function PhraseList({ phrases, onEdit, onDelete }: PhraseListProps) {
           }
           tr {
             display: block;
-            border: 1px solid #eee;
+            border: 1.5px solid #aab2bd;
             border-radius: 8px;
             margin-bottom: 0.75rem;
             padding: 0.25rem 0.5rem;

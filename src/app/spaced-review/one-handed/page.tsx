@@ -21,7 +21,7 @@ export default async function OneHandedReviewPage({
   }
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: 'var(--onehand-h)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <OneHandedReviewClient items={items} />
     </div>
   );

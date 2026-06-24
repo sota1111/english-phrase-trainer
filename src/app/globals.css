@@ -36,6 +36,12 @@
   /* Layout */
   --content-max: 880px;
   --header-h: 56px;
+  /* SOT-1074: usable height for the full-screen one-handed review.
+     The review sits below the sticky 56px header, so a raw 100dvh block
+     overflows the viewport and pushes its bottom controls off-screen.
+     Subtract the header here; the mobile rule below also subtracts the
+     fixed bottom tab bar so the answer buttons stay on-screen without scroll. */
+  --onehand-h: calc(100dvh - var(--header-h));
 
   /* Typography (SOT-1019): serif for English phrase display, Noto Sans JP for JP. */
   --font-serif-stack: var(--font-serif), Georgia, "Times New Roman", serif;
@@ -354,6 +360,12 @@ a {
   /* Reserve space so the fixed bar never covers page content/footer. */
   body {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* SOT-1074: on mobile the fixed bottom tab bar overlays the bottom 64px,
+     so the one-handed review must also subtract it to keep its controls visible. */
+  :root {
+    --onehand-h: calc(100dvh - var(--header-h) - 64px - env(safe-area-inset-bottom, 0px));
   }
 
   .bottom-tabs {

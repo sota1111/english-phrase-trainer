@@ -109,7 +109,7 @@ export function OneHandedReviewClient({ items }: Props) {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: 'var(--onehand-h)', minHeight: 0, position: 'relative', overflow: 'hidden' }}>
       {/* Progress Header */}
       <div style={{ padding: '12px 16px 8px' }}>
         <ProgressBar current={currentIndex} total={total} />

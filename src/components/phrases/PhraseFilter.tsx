@@ -67,7 +67,6 @@ export function PhraseFilter({ categories, decks, tags, filter, onChange }: Phra
         </select>
         <select name="deck" value={filter.deck} onChange={handleChange}>
           <option value="">{t('filter.allDecks')}</option>
-          <option value={UNCLASSIFIED_DECK}>{t('filter.unclassifiedDeck')}</option>
           {decks.map((deck) => (
             <option key={deck} value={deck}>
               {deck}

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { submitReviewResultAction } from '@/lib/actions/reviewActions';
@@ -41,7 +40,6 @@ export function OneHandedReviewClient({ items }: Props) {
       <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{t('review.none.title')}</h2>
         <p style={{ color: '#666', marginBottom: '2rem' }}>{t('review.none.body')}</p>
-        <Link href="/" style={{ color: '#0070f3', fontWeight: 'bold' }}>{t('common.home')}</Link>
       </div>
     );
   }
@@ -58,9 +56,6 @@ export function OneHandedReviewClient({ items }: Props) {
             {t('review.forgot')}: <span style={{ fontWeight: 'bold', color: '#ef4444' }}>{results.incorrect}</span> {t('unit.count')}
           </p>
         </div>
-        <Link href="/" style={{ padding: '1rem 2rem', background: '#0070f3', color: '#fff', borderRadius: '8px', textDecoration: 'none', display: 'inline-block', fontSize: '1.1rem', fontWeight: 'bold' }}>
-          {t('common.home')}
-        </Link>
       </div>
     );
   }

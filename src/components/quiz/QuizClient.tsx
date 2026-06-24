@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useI18n } from '@/i18n/I18nContext';
 import { createLearningRecordAction } from '@/lib/actions/reviewActions';
@@ -100,7 +99,6 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
     return (
       <div className="quiz">
         <header className="quiz-header">
-          <Link href="/" className="back-home">{t('common.backHome')}</Link>
           <h1>{t('quiz.title')}</h1>
           <p className="subtitle">{t('quiz.subtitle')}</p>
         </header>
@@ -281,17 +279,6 @@ function QuizStyles() {
       }
       .quiz-header {
         margin-bottom: 1.5rem;
-      }
-      .back-home {
-        display: inline-block;
-        margin-bottom: 0.5rem;
-        padding: 0.35rem 0.75rem;
-        background: var(--surface-muted);
-        color: var(--muted);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 0.85rem;
       }
       h1 {
         margin: 0;

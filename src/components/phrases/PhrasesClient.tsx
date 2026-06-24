@@ -176,9 +176,6 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
     <div className="container">
       <header>
         <div className="header-left">
-          <Link href="/" className="back-home">
-            {t('common.backHome')}
-          </Link>
           <h1>{t('phrases.list.title')}</h1>
         </div>
         <div className="header-actions">
@@ -300,9 +297,6 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
                   >
                     {t('phrases.created.close')}
                   </button>
-                  <Link href="/" className="home-link">
-                    {t('common.home')}
-                  </Link>
                 </div>
               </div>
             ) : (
@@ -352,20 +346,6 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           flex-direction: column;
           align-items: flex-start;
           gap: 0.5rem;
-        }
-        .back-home {
-          display: inline-block;
-          padding: 0.35rem 0.75rem;
-          background: var(--surface-muted);
-          color: var(--muted);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          text-decoration: none;
-          font-size: 0.875rem;
-        }
-        .back-home:hover {
-          border-color: var(--border-strong);
-          color: var(--foreground);
         }
         h1 {
           margin: 0;

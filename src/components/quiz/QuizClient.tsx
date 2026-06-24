@@ -107,14 +107,22 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
         ) : (
           <div className="mode-cards">
             <button className="mode-card" onClick={startMultiple} disabled={!canMultiple}>
-              <span className="mode-name">{t('quiz.multiple')}</span>
-              <span className="mode-desc">{t('quiz.multipleDesc')}</span>
+              <span className="mode-icon" aria-hidden="true">A</span>
+              <span className="mode-text">
+                <span className="mode-name">{t('quiz.multiple')}</span>
+                <span className="mode-desc">{t('quiz.multipleDesc')}</span>
+              </span>
+              <span className="mode-arrow" aria-hidden="true">→</span>
             </button>
             <button className="mode-card" onClick={startBlank} disabled={!canBlank}>
-              <span className="mode-name">{t('quiz.blank')}</span>
-              <span className="mode-desc">
-                {canBlank ? t('quiz.blankDesc') : t('quiz.blankUnavailable')}
+              <span className="mode-icon" aria-hidden="true">_</span>
+              <span className="mode-text">
+                <span className="mode-name">{t('quiz.blank')}</span>
+                <span className="mode-desc">
+                  {canBlank ? t('quiz.blankDesc') : t('quiz.blankUnavailable')}
+                </span>
               </span>
+              <span className="mode-arrow" aria-hidden="true">→</span>
             </button>
           </div>
         )}
@@ -128,6 +136,10 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
     return (
       <div className="quiz">
         <div className="result">
+          <div className="score-ring">
+            <span className="score-num nums">{score.correct}</span>
+            <span className="score-den nums">/ {score.total}</span>
+          </div>
           <h2>{t('quiz.done')}</h2>
           <p className="score">{t('quiz.score', { correct: score.correct, total: score.total })}</p>
           <div className="result-actions">
@@ -149,7 +161,7 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
     const correctValue = q.phrase.phrase.trim();
     return (
       <div className="quiz">
-        <QuizTopBar progress={progress} onBack={backToMenu} backLabel={t('quiz.backMenu')} />
+        <QuizTopBar progress={progress} current={index + 1} total={total} onBack={backToMenu} backLabel={t('quiz.backMenu')} />
         <div className="card-q">
           <p className="q-label">{t('quiz.pickEnglish')}</p>
           <p className="q-prompt">{q.phrase.meaningJa}</p>
@@ -201,7 +213,7 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
   const isCorrectBlank = input.trim().toLowerCase() === q.answer.trim().toLowerCase();
   return (
     <div className="quiz">
-      <QuizTopBar progress={progress} onBack={backToMenu} backLabel={t('quiz.backMenu')} />
+      <QuizTopBar progress={progress} current={index + 1} total={total} onBack={backToMenu} backLabel={t('quiz.backMenu')} />
       <div className="card-q">
         <p className="q-label">{t('quiz.fillBlank')}</p>
         <p className="q-prompt blank-sentence">{q.sentence}</p>
@@ -240,29 +252,80 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
   );
 }
 
-function QuizTopBar({ progress, onBack, backLabel }: { progress: string; onBack: () => void; backLabel: string }) {
+function QuizTopBar({
+  progress,
+  current,
+  total,
+  onBack,
+  backLabel,
+}: {
+  progress: string;
+  current: number;
+  total: number;
+  onBack: () => void;
+  backLabel: string;
+}) {
+  const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
   return (
     <div className="topbar">
-      <button className="link-btn" onClick={onBack}>{backLabel}</button>
-      <span className="progress">{progress}</span>
+      <div className="topbar-row">
+        <button className="link-btn" onClick={onBack}>
+          <span aria-hidden="true">←</span> {backLabel}
+        </button>
+        <span className="progress nums">{progress}</span>
+      </div>
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-valuenow={current}
+      >
+        <span className="progress-fill" style={{ width: `${pct}%` }} />
+      </div>
       <style jsx>{`
         .topbar {
+          margin-bottom: 1.25rem;
+        }
+        .topbar-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 1rem;
+          margin-bottom: 0.6rem;
         }
         .link-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
           background: none;
           border: none;
           color: var(--primary);
           cursor: pointer;
           font-size: 0.9rem;
+          font-weight: 600;
           padding: 0;
+        }
+        .link-btn:hover {
+          color: var(--primary-hover);
         }
         .progress {
           color: var(--muted);
-          font-size: 0.9rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+        }
+        .progress-track {
+          height: 8px;
+          width: 100%;
+          background: var(--surface-muted);
+          border-radius: 999px;
+          overflow: hidden;
+        }
+        .progress-fill {
+          display: block;
+          height: 100%;
+          background: var(--primary);
+          border-radius: 999px;
+          transition: width 0.3s ease;
         }
       `}</style>
     </div>
@@ -273,7 +336,7 @@ function QuizStyles() {
   return (
     <style jsx>{`
       .quiz {
-        padding: 2rem;
+        padding: 2rem 1.25rem 2.5rem;
         max-width: 640px;
         margin: 0 auto;
       }
@@ -285,14 +348,17 @@ function QuizStyles() {
         font-size: 1.5rem;
       }
       .subtitle {
-        margin: 0.25rem 0 0;
+        margin: 0.35rem 0 0;
         color: var(--muted);
-        font-size: 0.9rem;
+        font-size: 0.92rem;
       }
       .empty {
         text-align: center;
         padding: 3rem 1rem;
         color: var(--muted);
+        background: var(--surface);
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius);
       }
       .mode-cards {
         display: grid;
@@ -300,21 +366,46 @@ function QuizStyles() {
       }
       .mode-card {
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.35rem;
-        padding: 1.25rem;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.15rem 1.25rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         cursor: pointer;
         text-align: left;
         color: var(--foreground);
         box-shadow: var(--shadow-sm);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      }
+      .mode-card:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        border-color: var(--primary);
       }
       .mode-card:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+      }
+      .mode-icon {
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--primary-soft);
+        color: var(--primary-soft-fg);
+        font-size: 1.25rem;
+        font-weight: 800;
+        font-family: var(--font-serif-stack);
+      }
+      .mode-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        flex: 1 1 auto;
+        min-width: 0;
       }
       .mode-name {
         font-size: 1.1rem;
@@ -324,58 +415,84 @@ function QuizStyles() {
         font-size: 0.85rem;
         color: var(--muted);
       }
+      .mode-arrow {
+        flex: none;
+        color: var(--muted-2);
+        font-size: 1.2rem;
+        transition: transform 0.15s ease, color 0.15s ease;
+      }
+      .mode-card:hover:not(:disabled) .mode-arrow {
+        transform: translateX(3px);
+        color: var(--primary);
+      }
       .card-q {
-        padding: 1.5rem;
+        padding: 1.75rem 1.5rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 12px;
-        box-shadow: var(--shadow-sm);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
       }
       .q-label {
-        margin: 0 0 0.5rem;
-        font-size: 0.8rem;
-        color: var(--muted);
+        display: inline-block;
+        margin: 0 0 0.75rem;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--primary-soft-fg);
+        background: var(--primary-soft);
+        border-radius: 999px;
       }
       .q-prompt {
-        margin: 0 0 1rem;
-        font-size: 1.4rem;
+        margin: 0 0 1.25rem;
+        font-size: 1.55rem;
+        line-height: 1.35;
         font-weight: 700;
         color: var(--foreground);
       }
       .blank-sentence {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
+        font-family: var(--font-serif-stack);
       }
       .q-hint {
-        margin: -0.5rem 0 1rem;
+        margin: -0.6rem 0 1.25rem;
         color: var(--muted);
         font-size: 0.95rem;
       }
       .options {
         display: grid;
-        gap: 0.6rem;
+        gap: 0.65rem;
       }
       .option {
-        padding: 0.8rem 1rem;
-        background: var(--surface-muted);
-        border: 1px solid var(--border);
-        border-radius: 8px;
+        padding: 0.9rem 1.1rem;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
         cursor: pointer;
-        font-size: 1rem;
+        font-size: 1.02rem;
         text-align: left;
         color: var(--foreground);
+        transition: border-color 0.12s ease, background 0.12s ease, transform 0.12s ease;
+      }
+      .option:hover:not(:disabled) {
+        border-color: var(--primary);
+        background: var(--primary-soft);
       }
       .option:disabled {
         cursor: default;
       }
       .option.correct {
-        background: #dcfce7;
-        border-color: #22c55e;
+        background: var(--success-soft);
+        border-color: var(--success);
         color: #14532d;
+        font-weight: 600;
       }
       .option.wrong {
-        background: #fee2e2;
-        border-color: #ef4444;
+        background: var(--danger-soft);
+        border-color: var(--danger);
         color: #7f1d1d;
+        font-weight: 600;
       }
       input {
         width: 100%;
@@ -414,15 +531,47 @@ function QuizStyles() {
       }
       .result {
         text-align: center;
-        padding: 2rem;
+        padding: 2.5rem 1.5rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+      }
+      .score-ring {
+        display: grid;
+        place-content: center;
+        gap: 0.1rem;
+        width: 132px;
+        height: 132px;
+        margin: 0 auto 1.25rem;
+        border-radius: 50%;
+        background: var(--primary-soft);
+        border: 3px solid var(--primary);
+        color: var(--primary-soft-fg);
+      }
+      .score-num {
+        font-size: 2.6rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .score-den {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary-soft-fg);
+        opacity: 0.8;
+      }
+      .result h2 {
+        margin: 0;
+        font-size: 1.35rem;
       }
       .score {
-        font-size: 1.2rem;
-        margin: 1rem 0;
+        font-size: 1.05rem;
+        color: var(--muted);
+        margin: 0.5rem 0 1.5rem;
       }
       .result-actions {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem;
         justify-content: center;
       }
       .result-actions button {

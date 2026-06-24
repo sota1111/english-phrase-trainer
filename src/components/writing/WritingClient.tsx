@@ -133,8 +133,10 @@ export function WritingClient({ phrases }: { phrases: QuizPhrase[] }) {
         {status === 'done' && feedback && (
           <div className="feedback">
             <div className="score-row">
-              <span className={scoreClass}>{feedback.score}</span>
-              <span className="score-max">/ 100</span>
+              <div className="score-chip">
+                <span className={scoreClass}>{feedback.score}</span>
+                <span className="score-max">/ 100</span>
+              </div>
               {!feedback.usesPhrase && (
                 <span className="badge-warn">{t('writing.notUsed')}</span>
               )}
@@ -187,7 +189,7 @@ function WritingStyles() {
   return (
     <style jsx>{`
       .writing {
-        padding: 2rem;
+        padding: 2rem 1.25rem 2.5rem;
         max-width: 640px;
         margin: 0 auto;
       }
@@ -199,53 +201,71 @@ function WritingStyles() {
         font-size: 1.5rem;
       }
       .subtitle {
-        margin: 0.25rem 0 0;
+        margin: 0.35rem 0 0;
         color: var(--muted);
-        font-size: 0.9rem;
+        font-size: 0.92rem;
       }
       .empty {
         text-align: center;
         padding: 3rem 1rem;
         color: var(--muted);
+        background: var(--surface);
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius);
       }
       .card {
-        padding: 1.5rem;
+        padding: 1.75rem 1.5rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 12px;
-        box-shadow: var(--shadow-sm);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
       }
       .q-label {
-        margin: 0 0 0.5rem;
-        font-size: 0.8rem;
-        color: var(--muted);
+        display: inline-block;
+        margin: 0 0 0.75rem;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--primary-soft-fg);
+        background: var(--primary-soft);
+        border-radius: 999px;
       }
       .phrase {
-        margin: 0 0 0.25rem;
-        font-size: 1.4rem;
+        margin: 0 0 0.3rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: var(--foreground);
+        font-family: var(--font-serif-stack);
       }
       .meaning {
-        margin: 0 0 1rem;
+        margin: 0 0 1.25rem;
         color: var(--muted);
         font-size: 0.95rem;
       }
       textarea {
         width: 100%;
-        padding: 0.7rem;
-        border: 1px solid var(--border-strong);
-        border-radius: 8px;
+        padding: 0.85rem;
+        border: 1.5px solid var(--border-strong);
+        border-radius: var(--radius-sm);
         font-size: 1rem;
         background: var(--surface);
         color: var(--foreground);
         resize: vertical;
         font-family: inherit;
+        line-height: 1.5;
+        transition: border-color 0.12s ease, box-shadow 0.12s ease;
+      }
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-soft);
       }
       .actions {
         display: flex;
         gap: 0.75rem;
-        margin-top: 0.75rem;
+        margin-top: 1rem;
       }
       button {
         padding: 0.6rem 1.4rem;
@@ -291,27 +311,38 @@ function WritingStyles() {
       }
       .score-row {
         display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+      }
+      .score-chip {
+        display: inline-flex;
         align-items: baseline;
-        gap: 0.4rem;
-        margin-bottom: 1rem;
+        gap: 0.3rem;
+        padding: 0.5rem 1rem;
+        background: var(--surface-muted);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
       }
       .score {
         font-size: 2.2rem;
         font-weight: 800;
         color: var(--foreground);
+        line-height: 1;
       }
       .score.high {
-        color: #15803d;
+        color: var(--success);
       }
       .score.mid {
-        color: #b45309;
+        color: var(--warning);
       }
       .score.low {
-        color: #b91c1c;
+        color: var(--danger);
       }
       .score-max {
         color: var(--muted);
         font-size: 1rem;
+        font-weight: 600;
       }
       .badge-warn {
         margin-left: auto;

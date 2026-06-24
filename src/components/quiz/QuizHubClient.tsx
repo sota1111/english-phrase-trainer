@@ -54,31 +54,32 @@ export function QuizHubClient({ phrases }: Props) {
       <style jsx>{`
         .hub-tabs {
           display: flex;
-          gap: 0.5rem;
-          max-width: 700px;
+          gap: 0.35rem;
+          max-width: 640px;
           margin: 0 auto;
-          padding: 1.5rem 2rem 0;
+          padding: 1.5rem 1.25rem 0;
         }
         .hub-tab {
           flex: 1;
-          padding: 0.6rem 0.75rem;
-          border: 1px solid var(--border, #e2e2e2);
-          border-radius: 8px;
-          background: var(--card, #fff);
-          color: var(--foreground, #1a1a1a);
+          padding: 0.65rem 0.75rem;
+          border: 1px solid transparent;
+          border-radius: 999px;
+          background: var(--surface-muted, #f1f3f6);
+          color: var(--muted, #5b6472);
           font-size: 0.95rem;
-          font-weight: 500;
+          font-weight: 600;
           text-align: center;
           text-decoration: none;
           cursor: pointer;
           transition: background 0.15s, color 0.15s, border-color 0.15s;
         }
         .hub-tab:hover {
-          border-color: var(--primary, #0070f3);
+          background: var(--primary-soft, #e8f0fe);
+          color: var(--primary-soft-fg, #1d4ed8);
         }
         .hub-tab.active {
-          background: var(--primary, #0070f3);
-          border-color: var(--primary, #0070f3);
+          background: var(--primary, #2563eb);
+          border-color: var(--primary, #2563eb);
           color: #fff;
           font-weight: 700;
         }

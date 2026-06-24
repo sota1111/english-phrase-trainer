@@ -337,7 +337,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
           margin-bottom: 2rem;
           gap: 1rem;
         }
@@ -353,15 +353,16 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         }
         .header-actions {
           display: flex;
+          flex-direction: column;
+          align-items: stretch;
           gap: 0.5rem;
-          flex-wrap: wrap;
-          justify-content: flex-end;
         }
         .add-button {
           background-color: var(--primary);
           color: white;
           border: none;
-          padding: 0.6rem 1.1rem;
+          padding: 0.7rem 1.1rem;
+          min-height: 3rem;
           border-radius: 8px;
           cursor: pointer;
           font-weight: 600;
@@ -373,7 +374,8 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           background-color: var(--surface-muted);
           color: var(--foreground);
           border: 1px solid var(--border);
-          padding: 0.6rem 1.1rem;
+          padding: 0.7rem 1.1rem;
+          min-height: 3rem;
           border-radius: 8px;
           cursor: pointer;
           font-weight: 600;

@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Phrase, PhraseInput } from '@/types/phrase';
-import { PhraseFilter, FilterState, UNCLASSIFIED_DECK } from '@/components/phrases/PhraseFilter';
+import { PhraseFilter, FilterState } from '@/components/phrases/PhraseFilter';
 import { PhraseList } from '@/components/phrases/PhraseList';
 import { PhraseForm } from '@/components/phrases/PhraseForm';
 import { BulkRegisterForm } from '@/components/phrases/BulkRegisterForm';
@@ -71,9 +71,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
       }
       if (filter.deck) {
         const phraseDeck = p.deck ?? '';
-        if (filter.deck === UNCLASSIFIED_DECK) {
-          if (phraseDeck !== '') return false;
-        } else if (phraseDeck !== filter.deck) {
+        if (phraseDeck !== filter.deck) {
           return false;
         }
       }
@@ -120,6 +118,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
       stats.set(key, entry);
     }
     return Array.from(stats.entries())
+      .filter(([deck]) => deck !== '')
       .map(([deck, s]) => ({
         deck,
         count: s.count,
@@ -188,40 +187,36 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         </div>
       </header>
 
-      {deckStats.length > 0 && (decks.length > 0 || deckStats.some((d) => d.deck === '')) && (
+      {deckStats.length > 0 && (
         <section className="deck-stats" aria-label={t('decks.title')}>
           <h2 className="deck-stats-title">{t('decks.title')}</h2>
           <div className="deck-cards">
             {deckStats.map((d) => {
-              const isActive =
-                (d.deck === '' && filter.deck === UNCLASSIFIED_DECK) ||
-                (d.deck !== '' && filter.deck === d.deck);
+              const isActive = filter.deck === d.deck;
               return (
-                <div key={d.deck || '__none__'} className={`deck-card${isActive ? ' active' : ''}`}>
+                <div key={d.deck} className={`deck-card${isActive ? ' active' : ''}`}>
                   <button
                     type="button"
                     className="deck-card-main"
                     onClick={() =>
                       setFilter((prev) => ({
                         ...prev,
-                        deck: isActive ? '' : d.deck === '' ? UNCLASSIFIED_DECK : d.deck,
+                        deck: isActive ? '' : d.deck,
                       }))
                     }
                   >
-                    <span className="deck-name">{d.deck || t('decks.unclassified')}</span>
+                    <span className="deck-name">{d.deck}</span>
                     <span className="deck-meta">
                       {t('decks.count', { n: d.count })}
                       {d.accuracy !== null ? ` ・ ${t('decks.accuracy', { n: Math.round(d.accuracy * 100) })}` : ''}
                     </span>
                   </button>
-                  {d.deck !== '' && (
-                    <Link
-                      href={`/spaced-review?deck=${encodeURIComponent(d.deck)}`}
-                      className="deck-review-link"
-                    >
-                      {t('decks.review')}
-                    </Link>
-                  )}
+                  <Link
+                    href={`/spaced-review?deck=${encodeURIComponent(d.deck)}`}
+                    className="deck-review-link"
+                  >
+                    {t('decks.review')}
+                  </Link>
                 </div>
               );
             })}
@@ -304,6 +299,7 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
                 <h2>{modalMode === 'create' ? t('phrases.modal.create') : t('phrases.modal.edit')}</h2>
                 <PhraseForm
                   key={editingPhraseId || 'create'}
+                  mode={modalMode === 'edit' ? 'edit' : 'create'}
                   initialData={editingPhrase}
                   categories={categories}
                   decks={decks}
@@ -353,11 +349,13 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
         }
         .header-actions {
           display: flex;
-          flex-direction: column;
-          align-items: stretch;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
           gap: 0.5rem;
         }
-        .add-button {
+        .add-button,
+        .bulk-button {
           background-color: var(--primary);
           color: white;
           border: none;
@@ -367,21 +365,9 @@ export function PhrasesClient({ initialPhrases }: PhrasesClientProps) {
           cursor: pointer;
           font-weight: 600;
         }
-        .add-button:hover {
-          background-color: var(--primary-hover);
-        }
-        .bulk-button {
-          background-color: var(--surface-muted);
-          color: var(--foreground);
-          border: 1px solid var(--border);
-          padding: 0.7rem 1.1rem;
-          min-height: 3rem;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-        }
+        .add-button:hover,
         .bulk-button:hover {
-          border-color: var(--border-strong);
+          background-color: var(--primary-hover);
         }
         .modal-overlay {
           position: fixed;

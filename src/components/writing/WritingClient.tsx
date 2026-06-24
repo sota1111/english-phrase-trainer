@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useI18n } from '@/i18n/I18nContext';
 import { QuizPhrase, shuffle } from '@/lib/quiz';
@@ -78,7 +77,6 @@ export function WritingClient({ phrases }: { phrases: QuizPhrase[] }) {
     return (
       <div className="writing">
         <header className="writing-header">
-          <Link href="/" className="back-home">{t('common.backHome')}</Link>
           <h1>{t('writing.title')}</h1>
           <p className="subtitle">{t('writing.subtitle')}</p>
         </header>
@@ -99,7 +97,6 @@ export function WritingClient({ phrases }: { phrases: QuizPhrase[] }) {
   return (
     <div className="writing">
       <header className="writing-header">
-        <Link href="/" className="back-home">{t('common.backHome')}</Link>
         <h1>{t('writing.title')}</h1>
         <p className="subtitle">{t('writing.subtitle')}</p>
       </header>
@@ -196,17 +193,6 @@ function WritingStyles() {
       }
       .writing-header {
         margin-bottom: 1.5rem;
-      }
-      .back-home {
-        display: inline-block;
-        margin-bottom: 0.5rem;
-        padding: 0.35rem 0.75rem;
-        background: var(--surface-muted);
-        color: var(--muted);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 0.85rem;
       }
       h1 {
         margin: 0;

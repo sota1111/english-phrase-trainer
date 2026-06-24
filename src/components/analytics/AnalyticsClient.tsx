@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useI18n } from '@/i18n/I18nContext';
 
 type Distribution = { key: string; count: number };
@@ -34,7 +33,6 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
   return (
     <div className="analytics">
       <header className="analytics-header">
-        <Link href="/" className="back-home">{t('common.backHome')}</Link>
         <h1>{t('analytics.title')}</h1>
         <p className="subtitle">{t('analytics.subtitle')}</p>
       </header>
@@ -136,17 +134,6 @@ export function AnalyticsClient({ data }: { data: AnalyticsData }) {
         }
         .analytics-header {
           margin-bottom: 1.5rem;
-        }
-        .back-home {
-          display: inline-block;
-          margin-bottom: 0.5rem;
-          padding: 0.35rem 0.75rem;
-          background: var(--surface-muted);
-          color: var(--muted);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          text-decoration: none;
-          font-size: 0.85rem;
         }
         h1 {
           margin: 0;

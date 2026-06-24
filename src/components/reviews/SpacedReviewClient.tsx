@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { submitReviewResultAction } from '@/lib/actions/reviewActions';
 import { useI18n } from '@/i18n/I18nContext';
@@ -39,7 +38,6 @@ export function SpacedReviewClient({ items }: Props) {
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <h2>{t('review.none.title')}</h2>
         <p>{t('review.none.body')}</p>
-        <Link href="/" style={{ color: '#0070f3' }}>{t('common.home')}</Link>
       </div>
     );
   }
@@ -50,9 +48,6 @@ export function SpacedReviewClient({ items }: Props) {
         <h2>{t('review.done.title')}</h2>
         <p>{t('review.remembered')}: {results.correct} {t('unit.count')}</p>
         <p>{t('review.forgot')}: {results.incorrect} {t('unit.count')}</p>
-        <Link href="/" style={{ padding: '0.75rem 1.5rem', background: '#0070f3', color: '#fff', borderRadius: '6px', textDecoration: 'none', display: 'inline-block', marginTop: '1rem' }}>
-          {t('common.home')}
-        </Link>
       </div>
     );
   }
@@ -84,11 +79,6 @@ export function SpacedReviewClient({ items }: Props) {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '1rem' }}>
-        <Link href="/" style={{ color: '#0070f3', textDecoration: 'none', fontSize: '0.95rem' }}>
-          {t('common.backHome')}
-        </Link>
-      </div>
       <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
         <span style={{ color: '#374151', fontSize: '0.9rem' }}>
           {t('review.remaining', { remaining, total: items.length })}

@@ -26,7 +26,7 @@ export function QuizHubClient({ phrases }: Props) {
     <div className="quiz-hub">
       <div className="hub-tabs" role="tablist" aria-label={t('tab.quiz')}>
         {/* 復習はホームの復習画面 (/spaced-review) に統一 (SOT-1226)。 */}
-        <Link href="/spaced-review" className="hub-tab" role="tab" aria-selected={false}>
+        <Link href="/spaced-review" className="hub-tab" role="tab" aria-selected={false} data-testid="hub-tab-review">
           {t('tab.review')}
         </Link>
         {tabs.map((tab) => {
@@ -39,6 +39,7 @@ export function QuizHubClient({ phrases }: Props) {
               aria-selected={active}
               className={active ? 'hub-tab active' : 'hub-tab'}
               onClick={() => setMode(tab.key)}
+              data-testid={`hub-tab-${tab.key}`}
             >
               {tab.label}
             </button>

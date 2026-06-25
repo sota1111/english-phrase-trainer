@@ -26,14 +26,7 @@ export default async function HomePage() {
         <p className="page-subtitle"><T k="home.subtitle" /></p>
       </header>
 
-      <section className="stat-grid" style={{ marginBottom: '2rem' }}>
-        <StatCard label={<T k="home.stat.due" />} value={data.dueCount} sub={<T k="unit.count" />} />
-        <StatCard label={<T k="home.stat.todayReviews" />} value={data.todayReviewCount} sub={<T k="home.stat.todayCorrect" vars={{ n: data.todayCorrectCount }} />} />
-        <StatCard label={<T k="home.stat.streak" />} value={data.streakDays} sub={<T k="unit.days" />} />
-        <StatCard label={<T k="home.stat.totalReviews" />} value={data.totalReviews} sub={<T k="unit.times" />} />
-      </section>
-
-      <nav className="home-nav" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'nowrap', overflowX: 'auto' }}>
+      <nav className="home-nav" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'nowrap', overflowX: 'auto', marginBottom: '1.5rem' }}>
         <Link href="/spaced-review" className="btn btn-primary">
           <T k="home.startReview" vars={{ count: data.dueCount }} />
         </Link>
@@ -56,6 +49,13 @@ export default async function HomePage() {
           <T k="home.writing" />
         </Link>
       </nav>
+
+      <section className="stat-grid" style={{ marginBottom: '2rem' }}>
+        <StatCard label={<T k="home.stat.due" />} value={data.dueCount} sub={<T k="unit.count" />} />
+        <StatCard label={<T k="home.stat.todayReviews" />} value={data.todayReviewCount} sub={<T k="home.stat.todayCorrect" vars={{ n: data.todayCorrectCount }} />} />
+        <StatCard label={<T k="home.stat.streak" />} value={data.streakDays} sub={<T k="unit.days" />} />
+        <StatCard label={<T k="home.stat.totalReviews" />} value={data.totalReviews} sub={<T k="unit.times" />} />
+      </section>
     </main>
   );
 }

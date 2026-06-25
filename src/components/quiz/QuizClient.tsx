@@ -94,246 +94,274 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
     }
   };
 
-  // ---- Menu ----
-  if (mode === 'menu') {
-    return (
-      <div className="quiz">
-        <header className="quiz-header">
-          <h1>{t('quiz.title')}</h1>
-        </header>
+  const running = (mode === 'multiple' || mode === 'blank') && !completed;
+  const total = questions.length;
+
+  // Single-screen composition (mirrors toddler AskPage):
+  //   title → persistent control card (mode selector) → output area below.
+  return (
+    <div className="quiz">
+      <header className="quiz-header">
+        <h1>{t('quiz.title')}</h1>
+      </header>
+
+      {/* Persistent control card — always visible, like AskPage's input form. */}
+      <div className="mode-panel">
+        <p className="q-label">{t('quiz.modeLabel')}</p>
+        <div className="mode-list">
+          <button
+            className={mode === 'multiple' ? 'mode-card active' : 'mode-card'}
+            onClick={startMultiple}
+            disabled={!canMultiple}
+            aria-pressed={mode === 'multiple'}
+          >
+            <span className="mode-icon" aria-hidden="true">A</span>
+            <span className="mode-text">
+              <span className="mode-name">{t('quiz.multiple')}</span>
+              <span className="mode-desc">{t('quiz.multipleDesc')}</span>
+            </span>
+            <span className="mode-arrow" aria-hidden="true">→</span>
+          </button>
+          <button
+            className={mode === 'blank' ? 'mode-card active' : 'mode-card'}
+            onClick={startBlank}
+            disabled={!canBlank}
+            aria-pressed={mode === 'blank'}
+          >
+            <span className="mode-icon" aria-hidden="true">_</span>
+            <span className="mode-text">
+              <span className="mode-name">{t('quiz.blank')}</span>
+              <span className="mode-desc">
+                {canBlank ? t('quiz.blankDesc') : t('quiz.blankUnavailable')}
+              </span>
+            </span>
+            <span className="mode-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Output area — appears below the control card on the same screen. */}
+      <div className="quiz-output">
         {phrases.length === 0 ? (
           <div className="empty">
             <div className="empty-emoji" aria-hidden="true">📝</div>
             <p className="empty-text">{t('quiz.empty')}</p>
           </div>
-        ) : (
-          <div className="mode-panel">
-            <p className="q-label">{t('quiz.modeLabel')}</p>
-            <div className="mode-list">
-              <button className="mode-card" onClick={startMultiple} disabled={!canMultiple}>
-                <span className="mode-icon" aria-hidden="true">A</span>
-                <span className="mode-text">
-                  <span className="mode-name">{t('quiz.multiple')}</span>
-                  <span className="mode-desc">{t('quiz.multipleDesc')}</span>
-                </span>
-                <span className="mode-arrow" aria-hidden="true">→</span>
-              </button>
-              <button className="mode-card" onClick={startBlank} disabled={!canBlank}>
-                <span className="mode-icon" aria-hidden="true">_</span>
-                <span className="mode-text">
-                  <span className="mode-name">{t('quiz.blank')}</span>
-                  <span className="mode-desc">
-                    {canBlank ? t('quiz.blankDesc') : t('quiz.blankUnavailable')}
-                  </span>
-                </span>
-                <span className="mode-arrow" aria-hidden="true">→</span>
-              </button>
-            </div>
-          </div>
-        )}
-        <QuizStyles />
-      </div>
-    );
-  }
-
-  // ---- Completed ----
-  if (completed) {
-    return (
-      <div className="quiz">
-        <div className="result">
-          <div className="score-ring">
-            <span className="score-num nums">{score.correct}</span>
-            <span className="score-den nums">/ {score.total}</span>
-          </div>
-          <h2>{t('quiz.done')}</h2>
-          <p className="score">{t('quiz.score', { correct: score.correct, total: score.total })}</p>
-          <div className="result-actions">
-            <button onClick={mode === 'multiple' ? startMultiple : startBlank}>{t('quiz.again')}</button>
-            <button className="ghost" onClick={backToMenu}>{t('quiz.backMenu')}</button>
-          </div>
-        </div>
-        <QuizStyles />
-      </div>
-    );
-  }
-
-  const total = questions.length;
-  const progress = t('quiz.progress', { current: index + 1, total });
-
-  // ---- Multiple choice ----
-  if (mode === 'multiple') {
-    const q = multipleQs[index];
-    const correctValue = q.phrase.phrase.trim();
-    return (
-      <div className="quiz">
-        <QuizTopBar progress={progress} current={index + 1} total={total} onBack={backToMenu} backLabel={t('quiz.backMenu')} />
-        <div className="card-q">
-          <p className="q-label">{t('quiz.pickEnglish')}</p>
-          <p className="q-prompt">{q.phrase.meaningJa}</p>
-          <div className="options">
-            {q.options.map((opt) => {
-              const isCorrect = opt.trim().toLowerCase() === correctValue.toLowerCase();
-              const isPicked = selected === opt;
-              const cls = revealed
-                ? isCorrect
-                  ? 'option correct'
-                  : isPicked
-                  ? 'option wrong'
-                  : 'option'
-                : 'option';
-              return (
-                <button
-                  key={opt}
-                  className={cls}
-                  disabled={revealed}
-                  onClick={() => {
-                    setSelected(opt);
-                    setRevealed(true);
-                    record(q.phrase, 'meaning_to_phrase', opt, q.phrase.phrase);
-                  }}
-                >
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-          {revealed && (
-            <div className="feedback">
-              <p className={selected?.trim().toLowerCase() === correctValue.toLowerCase() ? 'ok' : 'ng'}>
-                {selected?.trim().toLowerCase() === correctValue.toLowerCase()
-                  ? t('quiz.correct')
-                  : t('quiz.incorrect', { answer: correctValue })}
-              </p>
-              <button className="next" onClick={advance}>{t('quiz.next')}</button>
-            </div>
-          )}
-        </div>
-        <QuizStyles />
-      </div>
-    );
-  }
-
-  // ---- Fill in the blank ----
-  const q = blankQs[index];
-  const isCorrectBlank = input.trim().toLowerCase() === q.answer.trim().toLowerCase();
-  return (
-    <div className="quiz">
-      <QuizTopBar progress={progress} current={index + 1} total={total} onBack={backToMenu} backLabel={t('quiz.backMenu')} />
-      <div className="card-q">
-        <p className="q-label">{t('quiz.fillBlank')}</p>
-        <p className="q-prompt blank-sentence">{q.sentence}</p>
-        <p className="q-hint">{q.phrase.meaningJa}</p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (revealed) return;
-            setRevealed(true);
-            record(q.phrase, 'blank', input, q.answer);
-          }}
-        >
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={revealed}
-            placeholder={t('quiz.blankPlaceholder')}
-            autoFocus
+        ) : completed ? (
+          <Result
+            score={score}
+            onAgain={mode === 'multiple' ? startMultiple : startBlank}
+            onBack={backToMenu}
+            t={t}
           />
-          {!revealed && (
-            <button type="submit" className="next" disabled={!input.trim()}>{t('quiz.submit')}</button>
-          )}
-        </form>
-        {revealed && (
-          <div className="feedback">
-            <p className={isCorrectBlank ? 'ok' : 'ng'}>
-              {isCorrectBlank ? t('quiz.correct') : t('quiz.incorrect', { answer: q.answer })}
-            </p>
-            <button className="next" onClick={advance}>{t('quiz.next')}</button>
+        ) : running ? (
+          <RunningQuestion
+            mode={mode}
+            index={index}
+            total={total}
+            multipleQs={multipleQs}
+            blankQs={blankQs}
+            selected={selected}
+            setSelected={setSelected}
+            input={input}
+            setInput={setInput}
+            revealed={revealed}
+            setRevealed={setRevealed}
+            advance={advance}
+            backToMenu={backToMenu}
+            record={record}
+            t={t}
+          />
+        ) : (
+          <div className="empty">
+            <div className="empty-emoji" aria-hidden="true">📝</div>
+            <p className="empty-text">{t('quiz.idleMain')}</p>
+            <p className="empty-sub">{t('quiz.idleSub')}</p>
           </div>
         )}
       </div>
+
       <QuizStyles />
     </div>
   );
 }
 
-function QuizTopBar({
-  progress,
-  current,
-  total,
+type TFn = (key: string, vars?: Record<string, string | number>) => string;
+
+function Result({
+  score,
+  onAgain,
   onBack,
-  backLabel,
+  t,
 }: {
-  progress: string;
-  current: number;
-  total: number;
+  score: { correct: number; total: number };
+  onAgain: () => void;
   onBack: () => void;
-  backLabel: string;
+  t: TFn;
 }) {
-  const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
   return (
-    <div className="topbar">
-      <div className="topbar-row">
-        <button className="link-btn" onClick={onBack}>
-          <span aria-hidden="true">←</span> {backLabel}
-        </button>
+    <div className="result">
+      <div className="score-ring">
+        <span className="score-num nums">{score.correct}</span>
+        <span className="score-den nums">/ {score.total}</span>
+      </div>
+      <h2>{t('quiz.done')}</h2>
+      <p className="score">{t('quiz.score', { correct: score.correct, total: score.total })}</p>
+      <div className="result-actions">
+        <button onClick={onAgain}>{t('quiz.again')}</button>
+        <button className="ghost" onClick={onBack}>{t('quiz.backMenu')}</button>
+      </div>
+    </div>
+  );
+}
+
+function RunningQuestion({
+  mode,
+  index,
+  total,
+  multipleQs,
+  blankQs,
+  selected,
+  setSelected,
+  input,
+  setInput,
+  revealed,
+  setRevealed,
+  advance,
+  backToMenu,
+  record,
+  t,
+}: {
+  mode: Mode;
+  index: number;
+  total: number;
+  multipleQs: MultipleQuestion[];
+  blankQs: BlankQuestion[];
+  selected: string | null;
+  setSelected: (v: string | null) => void;
+  input: string;
+  setInput: (v: string) => void;
+  revealed: boolean;
+  setRevealed: (v: boolean) => void;
+  advance: () => void;
+  backToMenu: () => void;
+  record: (
+    phrase: QuizPhrase,
+    quizType: 'meaning_to_phrase' | 'blank',
+    answer: string,
+    correctAnswer: string
+  ) => void;
+  t: TFn;
+}) {
+  const progress = t('quiz.progress', { current: index + 1, total });
+  const pct = total > 0 ? Math.min(100, Math.round(((index + 1) / total) * 100)) : 0;
+
+  return (
+    <>
+      <div className="progress-row">
         <span className="progress nums">{progress}</span>
+        <button className="link-btn" onClick={backToMenu}>{t('quiz.backMenu')}</button>
       </div>
       <div
         className="progress-track"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={total}
-        aria-valuenow={current}
+        aria-valuenow={index + 1}
       >
         <span className="progress-fill" style={{ width: `${pct}%` }} />
       </div>
-      <style jsx>{`
-        .topbar {
-          margin-bottom: 1.25rem;
-        }
-        .topbar-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 0.6rem;
-        }
-        .link-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-          background: none;
-          border: none;
-          color: var(--primary);
-          cursor: pointer;
-          font-size: 0.9rem;
-          font-weight: 600;
-          padding: 0;
-        }
-        .link-btn:hover {
-          color: var(--primary-hover);
-        }
-        .progress {
-          color: var(--muted);
-          font-size: 0.85rem;
-          font-weight: 600;
-        }
-        .progress-track {
-          height: 8px;
-          width: 100%;
-          background: var(--surface-muted);
-          border-radius: 999px;
-          overflow: hidden;
-        }
-        .progress-fill {
-          display: block;
-          height: 100%;
-          background: var(--primary);
-          border-radius: 999px;
-          transition: width 0.3s ease;
-        }
-      `}</style>
-    </div>
+
+      {mode === 'multiple' ? (
+        (() => {
+          const q = multipleQs[index];
+          const correctValue = q.phrase.phrase.trim();
+          return (
+            <div className="card-q">
+              <p className="q-label">{t('quiz.pickEnglish')}</p>
+              <p className="q-prompt">{q.phrase.meaningJa}</p>
+              <div className="options">
+                {q.options.map((opt) => {
+                  const isCorrect = opt.trim().toLowerCase() === correctValue.toLowerCase();
+                  const isPicked = selected === opt;
+                  const cls = revealed
+                    ? isCorrect
+                      ? 'option correct'
+                      : isPicked
+                      ? 'option wrong'
+                      : 'option'
+                    : 'option';
+                  return (
+                    <button
+                      key={opt}
+                      className={cls}
+                      disabled={revealed}
+                      onClick={() => {
+                        setSelected(opt);
+                        setRevealed(true);
+                        record(q.phrase, 'meaning_to_phrase', opt, q.phrase.phrase);
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+              {revealed && (
+                <div className="feedback">
+                  <p className={selected?.trim().toLowerCase() === correctValue.toLowerCase() ? 'ok' : 'ng'}>
+                    {selected?.trim().toLowerCase() === correctValue.toLowerCase()
+                      ? t('quiz.correct')
+                      : t('quiz.incorrect', { answer: correctValue })}
+                  </p>
+                  <button className="next" onClick={advance}>{t('quiz.next')}</button>
+                </div>
+              )}
+            </div>
+          );
+        })()
+      ) : (
+        (() => {
+          const q = blankQs[index];
+          const isCorrectBlank = input.trim().toLowerCase() === q.answer.trim().toLowerCase();
+          return (
+            <div className="card-q">
+              <p className="q-label">{t('quiz.fillBlank')}</p>
+              <p className="q-prompt blank-sentence">{q.sentence}</p>
+              <p className="q-hint">{q.phrase.meaningJa}</p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (revealed) return;
+                  setRevealed(true);
+                  record(q.phrase, 'blank', input, q.answer);
+                }}
+              >
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={revealed}
+                  placeholder={t('quiz.blankPlaceholder')}
+                  autoFocus
+                />
+                {!revealed && (
+                  <button type="submit" className="next" disabled={!input.trim()}>{t('quiz.submit')}</button>
+                )}
+              </form>
+              {revealed && (
+                <div className="feedback">
+                  <p className={isCorrectBlank ? 'ok' : 'ng'}>
+                    {isCorrectBlank ? t('quiz.correct') : t('quiz.incorrect', { answer: q.answer })}
+                  </p>
+                  <button className="next" onClick={advance}>{t('quiz.next')}</button>
+                </div>
+              )}
+            </div>
+          );
+        })()
+      )}
+    </>
   );
 }
 
@@ -352,10 +380,8 @@ function QuizStyles() {
         margin: 0;
         font-size: 1.5rem;
       }
-      .subtitle {
-        margin: 0.35rem 0 0;
-        color: var(--muted);
-        font-size: 0.92rem;
+      .quiz-output {
+        margin-top: 1.5rem;
       }
       .empty {
         text-align: center;
@@ -370,6 +396,11 @@ function QuizStyles() {
       .empty-text {
         margin: 0;
         font-size: 0.95rem;
+      }
+      .empty-sub {
+        margin: 0.3rem 0 0;
+        font-size: 0.82rem;
+        color: var(--muted-2, var(--muted));
       }
       .mode-panel {
         padding: 1.75rem 1.5rem;
@@ -397,6 +428,10 @@ function QuizStyles() {
         transition: border-color 0.12s ease, background 0.12s ease;
       }
       .mode-card:hover:not(:disabled) {
+        border-color: var(--primary);
+        background: var(--primary-soft);
+      }
+      .mode-card.active {
         border-color: var(--primary);
         background: var(--primary-soft);
       }
@@ -438,9 +473,51 @@ function QuizStyles() {
         font-size: 1.2rem;
         transition: transform 0.15s ease, color 0.15s ease;
       }
-      .mode-card:hover:not(:disabled) .mode-arrow {
+      .mode-card:hover:not(:disabled) .mode-arrow,
+      .mode-card.active .mode-arrow {
         transform: translateX(3px);
         color: var(--primary);
+      }
+      .progress-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.6rem;
+      }
+      .link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: none;
+        border: none;
+        color: var(--primary);
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0;
+      }
+      .link-btn:hover {
+        color: var(--primary-hover);
+      }
+      .progress {
+        color: var(--muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .progress-track {
+        height: 8px;
+        width: 100%;
+        background: var(--surface-muted);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+      }
+      .progress-fill {
+        display: block;
+        height: 100%;
+        background: var(--primary);
+        border-radius: 999px;
+        transition: width 0.3s ease;
       }
       .card-q {
         padding: 1.75rem 1.5rem;

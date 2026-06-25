@@ -25,14 +25,14 @@ export function QuizHubClient({ phrases }: Props) {
   return (
     <div className="quiz-hub">
       {/*
-        選択ボタンは toddler-private-rag の登録メニュー(RegisterMenu)と同じ
-        カード型ボタン(アイコン上・ラベル下の縦並び・3カラム)に揃える (SOT-1266)。
+        復習 / クイズ / 英作文 の選択は、横一列に連結したトグルボタン
+        (セグメントコントロール) で3種類を切り替える (SOT-1266)。
       */}
-      <nav className="hub-tabs" role="tablist" aria-label={t('tab.quiz')}>
+      <nav className="hub-toggle" role="tablist" aria-label={t('tab.quiz')}>
         {/* 復習はホームの復習画面 (/spaced-review) に統一 (SOT-1226)。 */}
-        <Link href="/spaced-review" className="hub-card" role="tab" aria-selected={false} data-testid="hub-tab-review">
+        <Link href="/spaced-review" className="hub-toggle-item" role="tab" aria-selected={false} data-testid="hub-tab-review">
           <ReviewIcon />
-          <span className="hub-label">{t('tab.review')}</span>
+          <span className="hub-toggle-label">{t('tab.review')}</span>
         </Link>
         {tabs.map((tab) => {
           const active = mode === tab.key;
@@ -42,12 +42,12 @@ export function QuizHubClient({ phrases }: Props) {
               type="button"
               role="tab"
               aria-selected={active}
-              className={active ? 'hub-card active' : 'hub-card'}
+              className={active ? 'hub-toggle-item active' : 'hub-toggle-item'}
               onClick={() => setMode(tab.key)}
               data-testid={`hub-tab-${tab.key}`}
             >
               {tab.key === 'quiz' ? <QuizIcon /> : <WritingIcon />}
-              <span className="hub-label">{tab.label}</span>
+              <span className="hub-toggle-label">{tab.label}</span>
             </button>
           );
         })}
@@ -59,49 +59,50 @@ export function QuizHubClient({ phrases }: Props) {
       </div>
 
       <style jsx>{`
-        .hub-tabs {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 0.6rem;
-          max-width: 640px;
-          margin: 0 auto;
-          padding: 1.5rem 1.25rem 0;
-        }
-        .hub-card {
+        .hub-toggle {
           display: flex;
-          flex-direction: column;
+          max-width: 640px;
+          margin: 1.5rem auto 0;
+          border: 1px solid var(--border, #e4e7ec);
+          border-radius: var(--radius, 12px);
+          overflow: hidden;
+          background: var(--surface, #ffffff);
+        }
+        .hub-toggle-item {
+          flex: 1 1 0;
+          display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.4rem;
-          padding: 0.9rem 0.5rem;
-          border: 1px solid var(--border, #e4e7ec);
-          border-radius: var(--radius, 12px);
-          background: var(--surface, #ffffff);
+          padding: 0.7rem 0.5rem;
+          border: 0;
+          border-left: 1px solid var(--border, #e4e7ec);
+          background: transparent;
           color: var(--foreground, #1a2230);
-          font-size: 0.9rem;
+          font-size: 0.95rem;
           font-weight: 600;
+          line-height: 1.2;
           text-align: center;
           text-decoration: none;
+          white-space: nowrap;
           cursor: pointer;
-          transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+          transition: background 0.15s, color 0.15s;
         }
-        .hub-card:hover {
-          border-color: var(--primary, #2563eb);
+        .hub-toggle-item:first-child {
+          border-left: 0;
+        }
+        .hub-toggle-item:hover {
           background: var(--primary-soft, #e8f0fe);
         }
-        .hub-card.active {
+        .hub-toggle-item.active {
           background: var(--primary, #2563eb);
-          border-color: var(--primary, #2563eb);
           color: #fff;
           font-weight: 700;
-          box-shadow: var(--shadow-sm, 0 1px 2px rgba(16, 24, 40, 0.05));
         }
-        .hub-card :global(svg) {
-          width: 24px;
-          height: 24px;
-        }
-        .hub-label {
-          white-space: nowrap;
+        .hub-toggle-item :global(svg) {
+          width: 18px;
+          height: 18px;
+          flex-shrink: 0;
         }
       `}</style>
     </div>

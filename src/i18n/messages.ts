@@ -62,6 +62,7 @@ export const messages: Record<Lang, Record<string, string>> = {
     // Quiz (提案5)
     'quiz.title': 'クイズ',
     'quiz.subtitle': 'モードを選んでクイズに挑戦しましょう。結果は学習統計に反映されます。',
+    'quiz.modeLabel': 'モードを選択',
     'quiz.empty': 'フレーズがありません。フレーズを追加してからクイズに挑戦してください。',
     'quiz.multiple': '多肢選択クイズ',
     'quiz.multipleDesc': '日本語の意味に合う英語フレーズを4択から選びます。',
@@ -318,6 +319,7 @@ export const messages: Record<Lang, Record<string, string>> = {
     // Quiz (proposal 5)
     'quiz.title': 'Quiz',
     'quiz.subtitle': 'Pick a mode and take the quiz. Results count toward your study stats.',
+    'quiz.modeLabel': 'Choose a mode',
     'quiz.empty': 'No phrases yet. Add some phrases before taking a quiz.',
     'quiz.multiple': 'Multiple choice',
     'quiz.multipleDesc': 'Choose the English phrase matching the Japanese meaning from 4 options.',

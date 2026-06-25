@@ -100,7 +100,6 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
       <div className="quiz">
         <header className="quiz-header">
           <h1>{t('quiz.title')}</h1>
-          <p className="subtitle">{t('quiz.subtitle')}</p>
         </header>
         {phrases.length === 0 ? (
           <div className="empty">
@@ -108,25 +107,28 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
             <p className="empty-text">{t('quiz.empty')}</p>
           </div>
         ) : (
-          <div className="mode-cards">
-            <button className="mode-card" onClick={startMultiple} disabled={!canMultiple}>
-              <span className="mode-icon" aria-hidden="true">A</span>
-              <span className="mode-text">
-                <span className="mode-name">{t('quiz.multiple')}</span>
-                <span className="mode-desc">{t('quiz.multipleDesc')}</span>
-              </span>
-              <span className="mode-arrow" aria-hidden="true">→</span>
-            </button>
-            <button className="mode-card" onClick={startBlank} disabled={!canBlank}>
-              <span className="mode-icon" aria-hidden="true">_</span>
-              <span className="mode-text">
-                <span className="mode-name">{t('quiz.blank')}</span>
-                <span className="mode-desc">
-                  {canBlank ? t('quiz.blankDesc') : t('quiz.blankUnavailable')}
+          <div className="mode-panel">
+            <p className="q-label">{t('quiz.modeLabel')}</p>
+            <div className="mode-list">
+              <button className="mode-card" onClick={startMultiple} disabled={!canMultiple}>
+                <span className="mode-icon" aria-hidden="true">A</span>
+                <span className="mode-text">
+                  <span className="mode-name">{t('quiz.multiple')}</span>
+                  <span className="mode-desc">{t('quiz.multipleDesc')}</span>
                 </span>
-              </span>
-              <span className="mode-arrow" aria-hidden="true">→</span>
-            </button>
+                <span className="mode-arrow" aria-hidden="true">→</span>
+              </button>
+              <button className="mode-card" onClick={startBlank} disabled={!canBlank}>
+                <span className="mode-icon" aria-hidden="true">_</span>
+                <span className="mode-text">
+                  <span className="mode-name">{t('quiz.blank')}</span>
+                  <span className="mode-desc">
+                    {canBlank ? t('quiz.blankDesc') : t('quiz.blankUnavailable')}
+                  </span>
+                </span>
+                <span className="mode-arrow" aria-hidden="true">→</span>
+              </button>
+            </div>
           </div>
         )}
         <QuizStyles />
@@ -369,29 +371,34 @@ function QuizStyles() {
         margin: 0;
         font-size: 0.95rem;
       }
-      .mode-cards {
+      .mode-panel {
+        padding: 1.75rem 1.5rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+      }
+      .mode-list {
         display: grid;
-        gap: 1rem;
+        gap: 0.65rem;
       }
       .mode-card {
         display: flex;
         align-items: center;
         gap: 1rem;
-        min-height: 76px;
-        padding: 1.25rem;
+        min-height: 72px;
+        padding: 0.9rem 1.1rem;
         background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border: 1.5px solid var(--border-strong);
+        border-radius: var(--radius-sm);
         cursor: pointer;
         text-align: left;
         color: var(--foreground);
-        box-shadow: var(--shadow-sm);
-        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        transition: border-color 0.12s ease, background 0.12s ease;
       }
       .mode-card:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow);
         border-color: var(--primary);
+        background: var(--primary-soft);
       }
       .mode-card:disabled {
         opacity: 0.5;

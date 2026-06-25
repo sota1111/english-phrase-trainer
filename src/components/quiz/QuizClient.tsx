@@ -103,7 +103,10 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
           <p className="subtitle">{t('quiz.subtitle')}</p>
         </header>
         {phrases.length === 0 ? (
-          <p className="empty">{t('quiz.empty')}</p>
+          <div className="empty">
+            <div className="empty-emoji" aria-hidden="true">📝</div>
+            <p className="empty-text">{t('quiz.empty')}</p>
+          </div>
         ) : (
           <div className="mode-cards">
             <button className="mode-card" onClick={startMultiple} disabled={!canMultiple}>
@@ -356,9 +359,15 @@ function QuizStyles() {
         text-align: center;
         padding: 3rem 1rem;
         color: var(--muted);
-        background: var(--surface);
-        border: 1px dashed var(--border-strong);
-        border-radius: var(--radius);
+      }
+      .empty-emoji {
+        font-size: 2.5rem;
+        line-height: 1;
+        margin-bottom: 0.6rem;
+      }
+      .empty-text {
+        margin: 0;
+        font-size: 0.95rem;
       }
       .mode-cards {
         display: grid;
@@ -430,20 +439,17 @@ function QuizStyles() {
         padding: 1.75rem 1.5rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
       }
       .q-label {
-        display: inline-block;
+        display: block;
         margin: 0 0 0.75rem;
-        padding: 0.25rem 0.6rem;
-        font-size: 0.72rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        letter-spacing: 0.02em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--primary-soft-fg);
-        background: var(--primary-soft);
-        border-radius: 999px;
+        color: var(--muted);
       }
       .q-prompt {
         margin: 0 0 1.25rem;
@@ -570,8 +576,8 @@ function QuizStyles() {
         padding: 2.5rem 1.5rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
       }
       .score-ring {
         display: grid;

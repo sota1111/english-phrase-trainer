@@ -25,15 +25,16 @@ export function QuizHubClient({ phrases }: Props) {
   return (
     <div className="quiz-hub">
       {/*
-        復習 / クイズ / 英作文 の選択は、toddler-private-rag の RegisterMenu と
-        サイズ・デザインを1対1で踏襲する (SOT-1266)。横並びの個別カードボタン
-        (アイコンを上・ラベルを下) で、モバイルは3カラム / PC は中央寄せ。
+        復習 / クイズ / 英作文 の選択は、本リポジトリ既存のトグル部品
+        LanguageToggle (src/components/ui/LanguageToggle.tsx, toddler-private-rag の
+        RoleToggle/LanguageToggle と同一デザイン) を踏襲する (SOT-1266)。
+        横並びの連結セグメント型ピル: 外枠1本・角丸999px・overflow:hidden、
+        選択中=青塗り+白文字 / 非選択=透明+muted。
       */}
       <nav className="hub-menu" role="tablist" aria-label={t('tab.quiz')}>
         {/* 復習はホームの復習画面 (/spaced-review) に統一 (SOT-1226)。 */}
         <Link href="/spaced-review" className="hub-menu-item" role="tab" aria-selected={false} data-testid="hub-tab-review">
-          <ReviewIcon />
-          <span className="hub-menu-label">{t('tab.review')}</span>
+          {t('tab.review')}
         </Link>
         {tabs.map((tab) => {
           const active = mode === tab.key;
@@ -47,8 +48,7 @@ export function QuizHubClient({ phrases }: Props) {
               onClick={() => setMode(tab.key)}
               data-testid={`hub-tab-${tab.key}`}
             >
-              {tab.key === 'quiz' ? <QuizIcon /> : <WritingIcon />}
-              <span className="hub-menu-label">{tab.label}</span>
+              {tab.label}
             </button>
           );
         })}
@@ -60,104 +60,46 @@ export function QuizHubClient({ phrases }: Props) {
       </div>
 
       <style jsx>{`
-        /* toddler RegisterMenu 踏襲: モバイル=3カラムグリッド, gap-2 (0.5rem) */
+        /* LanguageToggle 踏襲: 連結セグメント型ピル。中央寄せ。 */
         .hub-menu {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 0.5rem;
-          margin: 1.5rem 0 0;
-        }
-        /* 各ボタン: 隙間を空けた個別の角丸カード, アイコン上・ラベル下の縦並び中央寄せ */
-        .hub-menu-item {
           display: flex;
-          flex-direction: column;
+          width: fit-content;
+          margin: 1.5rem auto 0;
+          border: 1px solid var(--border, #e4e7ec);
+          border-radius: 999px;
+          overflow: hidden;
+        }
+        /* 各セグメント: 枠線なし・透明背景・muted 文字。隙間なしで連結。 */
+        .hub-menu-item {
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 0.25rem;
-          padding: 0.75rem;
-          border: 1px solid var(--border, #e4e7ec);
-          border-radius: var(--radius, 12px);
-          background: var(--surface, #ffffff);
-          color: var(--foreground, #1a2230);
-          font-size: 0.875rem;
+          padding: 0.55rem 1.1rem;
+          border: none;
+          background: transparent;
+          color: var(--muted, #667085);
+          font-size: 0.9rem;
           font-weight: 600;
           line-height: 1.2;
           text-align: center;
           text-decoration: none;
           white-space: nowrap;
           cursor: pointer;
-          transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+          transition: background 0.15s, color 0.15s;
         }
-        .hub-menu-item:hover {
-          border-color: color-mix(in srgb, var(--primary, #2563eb) 40%, transparent);
-          background: color-mix(in srgb, var(--primary, #2563eb) 10%, var(--surface, #ffffff));
+        /* セグメント間の細い区切り線 (最初以外)。 */
+        .hub-menu-item + .hub-menu-item {
+          border-left: 1px solid var(--border, #e4e7ec);
         }
+        .hub-menu-item:hover:not(.active) {
+          background: color-mix(in srgb, var(--primary, #2563eb) 10%, transparent);
+        }
+        /* 選択中=青塗り+白文字 (LanguageToggle と同一)。 */
         .hub-menu-item.active {
-          border-color: var(--primary, #2563eb);
           background: var(--primary, #2563eb);
           color: #fff;
-          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
-        }
-        .hub-menu-item :global(svg) {
-          width: 24px;
-          height: 24px;
-          flex-shrink: 0;
-        }
-        /* PC: 中身幅で中央寄せ (toddler sm:inline-flex sm:gap-3) */
-        @media (min-width: 640px) {
-          .hub-menu {
-            display: inline-flex;
-            gap: 0.75rem;
-          }
-          .hub-menu-item {
-            padding: 0.75rem 1.25rem;
-          }
         }
       `}</style>
     </div>
-  );
-}
-
-const iconProps = {
-  xmlns: 'http://www.w3.org/2000/svg',
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 2,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-  'aria-hidden': true,
-};
-
-// 復習 — 循環する矢印（繰り返し学習）
-function ReviewIcon() {
-  return (
-    <svg {...iconProps}>
-      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-      <path d="M21 3v5h-5" />
-      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-      <path d="M3 21v-5h5" />
-    </svg>
-  );
-}
-
-// クイズ — はてなマークの円
-function QuizIcon() {
-  return (
-    <svg {...iconProps}>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-      <path d="M12 17h.01" />
-    </svg>
-  );
-}
-
-// 英作文 — ペン
-function WritingIcon() {
-  return (
-    <svg {...iconProps}>
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-    </svg>
   );
 }

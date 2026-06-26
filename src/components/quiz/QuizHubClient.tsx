@@ -25,14 +25,15 @@ export function QuizHubClient({ phrases }: Props) {
   return (
     <div className="quiz-hub">
       {/*
-        復習 / クイズ / 英作文 の選択は、横一列に連結したトグルボタン
-        (セグメントコントロール) で3種類を切り替える (SOT-1266)。
+        復習 / クイズ / 英作文 の選択は、toddler-private-rag の RegisterMenu と
+        サイズ・デザインを1対1で踏襲する (SOT-1266)。横並びの個別カードボタン
+        (アイコンを上・ラベルを下) で、モバイルは3カラム / PC は中央寄せ。
       */}
-      <nav className="hub-toggle" role="tablist" aria-label={t('tab.quiz')}>
+      <nav className="hub-menu" role="tablist" aria-label={t('tab.quiz')}>
         {/* 復習はホームの復習画面 (/spaced-review) に統一 (SOT-1226)。 */}
-        <Link href="/spaced-review" className="hub-toggle-item" role="tab" aria-selected={false} data-testid="hub-tab-review">
+        <Link href="/spaced-review" className="hub-menu-item" role="tab" aria-selected={false} data-testid="hub-tab-review">
           <ReviewIcon />
-          <span className="hub-toggle-label">{t('tab.review')}</span>
+          <span className="hub-menu-label">{t('tab.review')}</span>
         </Link>
         {tabs.map((tab) => {
           const active = mode === tab.key;
@@ -42,12 +43,12 @@ export function QuizHubClient({ phrases }: Props) {
               type="button"
               role="tab"
               aria-selected={active}
-              className={active ? 'hub-toggle-item active' : 'hub-toggle-item'}
+              className={active ? 'hub-menu-item active' : 'hub-menu-item'}
               onClick={() => setMode(tab.key)}
               data-testid={`hub-tab-${tab.key}`}
             >
               {tab.key === 'quiz' ? <QuizIcon /> : <WritingIcon />}
-              <span className="hub-toggle-label">{tab.label}</span>
+              <span className="hub-menu-label">{tab.label}</span>
             </button>
           );
         })}
@@ -59,50 +60,58 @@ export function QuizHubClient({ phrases }: Props) {
       </div>
 
       <style jsx>{`
-        .hub-toggle {
-          display: flex;
-          max-width: 640px;
-          margin: 1.5rem auto 0;
-          border: 1px solid var(--border, #e4e7ec);
-          border-radius: var(--radius, 12px);
-          overflow: hidden;
-          background: var(--surface, #ffffff);
+        /* toddler RegisterMenu 踏襲: モバイル=3カラムグリッド, gap-2 (0.5rem) */
+        .hub-menu {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0.5rem;
+          margin: 1.5rem 0 0;
         }
-        .hub-toggle-item {
-          flex: 1 1 0;
+        /* 各ボタン: 隙間を空けた個別の角丸カード, アイコン上・ラベル下の縦並び中央寄せ */
+        .hub-menu-item {
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 0.4rem;
-          padding: 0.7rem 0.5rem;
-          border: 0;
-          border-left: 1px solid var(--border, #e4e7ec);
-          background: transparent;
+          gap: 0.25rem;
+          padding: 0.75rem;
+          border: 1px solid var(--border, #e4e7ec);
+          border-radius: var(--radius, 12px);
+          background: var(--surface, #ffffff);
           color: var(--foreground, #1a2230);
-          font-size: 0.95rem;
+          font-size: 0.875rem;
           font-weight: 600;
           line-height: 1.2;
           text-align: center;
           text-decoration: none;
           white-space: nowrap;
           cursor: pointer;
-          transition: background 0.15s, color 0.15s;
+          transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
         }
-        .hub-toggle-item:first-child {
-          border-left: 0;
+        .hub-menu-item:hover {
+          border-color: color-mix(in srgb, var(--primary, #2563eb) 40%, transparent);
+          background: color-mix(in srgb, var(--primary, #2563eb) 10%, var(--surface, #ffffff));
         }
-        .hub-toggle-item:hover {
-          background: var(--primary-soft, #e8f0fe);
-        }
-        .hub-toggle-item.active {
+        .hub-menu-item.active {
+          border-color: var(--primary, #2563eb);
           background: var(--primary, #2563eb);
           color: #fff;
-          font-weight: 700;
+          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
         }
-        .hub-toggle-item :global(svg) {
-          width: 18px;
-          height: 18px;
+        .hub-menu-item :global(svg) {
+          width: 24px;
+          height: 24px;
           flex-shrink: 0;
+        }
+        /* PC: 中身幅で中央寄せ (toddler sm:inline-flex sm:gap-3) */
+        @media (min-width: 640px) {
+          .hub-menu {
+            display: inline-flex;
+            gap: 0.75rem;
+          }
+          .hub-menu-item {
+            padding: 0.75rem 1.25rem;
+          }
         }
       `}</style>
     </div>

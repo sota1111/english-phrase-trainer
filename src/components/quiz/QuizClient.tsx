@@ -97,54 +97,33 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
   const running = (mode === 'multiple' || mode === 'blank') && !completed;
   const total = questions.length;
 
-  // Single-screen composition (mirrors toddler AskPage):
-  //   title → persistent control card (mode selector) → output area below.
+  // Simplified composition: two mode buttons → output area below.
   return (
     <div className="quiz">
-      <header className="quiz-header">
-        <h1>{t('quiz.title')}</h1>
-      </header>
-
-      {/* Persistent control card — always visible, like AskPage's input form. */}
-      <div className="mode-panel">
-        <p className="q-label">{t('quiz.modeLabel')}</p>
-        <div className="mode-list">
-          <button
-            className={mode === 'multiple' ? 'mode-card active' : 'mode-card'}
-            onClick={startMultiple}
-            disabled={!canMultiple}
-            aria-pressed={mode === 'multiple'}
-          >
-            <span className="mode-icon" aria-hidden="true">A</span>
-            <span className="mode-text">
-              <span className="mode-name">{t('quiz.multiple')}</span>
-              <span className="mode-desc">{t('quiz.multipleDesc')}</span>
-            </span>
-            <span className="mode-arrow" aria-hidden="true">→</span>
-          </button>
-          <button
-            className={mode === 'blank' ? 'mode-card active' : 'mode-card'}
-            onClick={startBlank}
-            disabled={!canBlank}
-            aria-pressed={mode === 'blank'}
-          >
-            <span className="mode-icon" aria-hidden="true">_</span>
-            <span className="mode-text">
-              <span className="mode-name">{t('quiz.blank')}</span>
-              <span className="mode-desc">
-                {canBlank ? t('quiz.blankDesc') : t('quiz.blankUnavailable')}
-              </span>
-            </span>
-            <span className="mode-arrow" aria-hidden="true">→</span>
-          </button>
-        </div>
+      {/* Mode selection — two simple buttons. */}
+      <div className="mode-buttons">
+        <button
+          className={mode === 'multiple' ? 'mode-btn active' : 'mode-btn'}
+          onClick={startMultiple}
+          disabled={!canMultiple}
+          aria-pressed={mode === 'multiple'}
+        >
+          {t('quiz.multipleShort')}
+        </button>
+        <button
+          className={mode === 'blank' ? 'mode-btn active' : 'mode-btn'}
+          onClick={startBlank}
+          disabled={!canBlank}
+          aria-pressed={mode === 'blank'}
+        >
+          {t('quiz.blank')}
+        </button>
       </div>
 
-      {/* Output area — appears below the control card on the same screen. */}
+      {/* Output area — appears below the mode buttons on the same screen. */}
       <div className="quiz-output">
         {phrases.length === 0 ? (
           <div className="empty">
-            <div className="empty-emoji" aria-hidden="true">📝</div>
             <p className="empty-text">{t('quiz.empty')}</p>
           </div>
         ) : completed ? (
@@ -172,13 +151,7 @@ export function QuizClient({ phrases }: { phrases: QuizPhrase[] }) {
             record={record}
             t={t}
           />
-        ) : (
-          <div className="empty">
-            <div className="empty-emoji" aria-hidden="true">📝</div>
-            <p className="empty-text">{t('quiz.idleMain')}</p>
-            <p className="empty-sub">{t('quiz.idleSub')}</p>
-          </div>
-        )}
+        ) : null}
       </div>
 
       <QuizStyles />
@@ -373,13 +346,6 @@ function QuizStyles() {
         max-width: 640px;
         margin: 0 auto;
       }
-      .quiz-header {
-        margin-bottom: 1.5rem;
-      }
-      h1 {
-        margin: 0;
-        font-size: 1.5rem;
-      }
       .quiz-output {
         margin-top: 1.5rem;
       }
@@ -388,95 +354,39 @@ function QuizStyles() {
         padding: 3rem 1rem;
         color: var(--muted);
       }
-      .empty-emoji {
-        font-size: 2.5rem;
-        line-height: 1;
-        margin-bottom: 0.6rem;
-      }
       .empty-text {
         margin: 0;
         font-size: 0.95rem;
       }
-      .empty-sub {
-        margin: 0.3rem 0 0;
-        font-size: 0.82rem;
-        color: var(--muted-2, var(--muted));
-      }
-      .mode-panel {
-        padding: 1.75rem 1.5rem;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-      }
-      .mode-list {
+      .mode-buttons {
         display: grid;
-        gap: 0.65rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
       }
-      .mode-card {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        min-height: 72px;
-        padding: 0.9rem 1.1rem;
+      .mode-btn {
+        min-height: 56px;
+        padding: 0.85rem 1.1rem;
         background: var(--surface);
         border: 1.5px solid var(--border-strong);
         border-radius: var(--radius-sm);
         cursor: pointer;
-        text-align: left;
         color: var(--foreground);
-        transition: border-color 0.12s ease, background 0.12s ease;
+        font-size: 1.05rem;
+        font-weight: 700;
+        transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
       }
-      .mode-card:hover:not(:disabled) {
+      .mode-btn:hover:not(:disabled) {
         border-color: var(--primary);
         background: var(--primary-soft);
       }
-      .mode-card.active {
+      .mode-btn.active {
         border-color: var(--primary);
-        background: var(--primary-soft);
+        background: var(--primary);
+        color: #fff;
       }
-      .mode-card:disabled {
+      .mode-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-      }
-      .mode-icon {
-        flex: none;
-        display: grid;
-        place-items: center;
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: var(--primary-soft);
-        color: var(--primary-soft-fg);
-        font-size: 1.25rem;
-        font-weight: 800;
-        font-family: var(--font-serif-stack);
-      }
-      .mode-text {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-        flex: 1 1 auto;
-        min-width: 0;
-      }
-      .mode-name {
-        font-size: 1.1rem;
-        font-weight: 700;
-      }
-      .mode-desc {
-        font-size: 0.85rem;
-        color: var(--muted);
-      }
-      .mode-arrow {
-        flex: none;
-        color: var(--muted-2);
-        font-size: 1.2rem;
-        transition: transform 0.15s ease, color 0.15s ease;
-      }
-      .mode-card:hover:not(:disabled) .mode-arrow,
-      .mode-card.active .mode-arrow {
-        transform: translateX(3px);
-        color: var(--primary);
       }
       .progress-row {
         display: flex;

@@ -12,28 +12,21 @@ test.describe('Scenario e2e', () => {
     await authenticate(page, baseURL!);
   });
 
-  // S1: ホームの学習導線からクイズハブへ遷移できる。
-  test('home → quiz hub', async ({ page }) => {
+  // S1: ホームの学習導線から英作文ページへ遷移できる。
+  test('home → writing', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('nav.home-nav')).toBeVisible();
-    await page.locator('nav.home-nav a[href="/quiz"]').click();
-    await expect(page).toHaveURL(/\/quiz$/);
-    await expect(page.locator('.quiz-hub')).toBeVisible();
-    await expect(page.getByTestId('hub-tab-quiz')).toBeVisible();
-    await expect(page.getByTestId('hub-tab-writing')).toBeVisible();
+    await page.locator('nav.home-nav a[href="/writing"]').click();
+    await expect(page).toHaveURL(/\/writing$/);
+    await expect(page.locator('.writing')).toBeVisible();
   });
 
-  // S2: クイズハブのタブを切り替え、復習タブで /spaced-review へ遷移する。
-  test('quiz hub → switch to writing tab → review tab navigates to /spaced-review', async ({ page }) => {
-    await page.goto('/quiz');
-    // 既定はクイズパネル。
-    await expect(page.locator('.quiz')).toBeVisible();
-    // 英作文タブへ切替 → 英作文パネルが表示される。
-    await page.getByTestId('hub-tab-writing').click();
-    await expect(page.locator('.writing')).toBeVisible();
-    // 復習タブは /spaced-review への Link。
-    await page.getByTestId('hub-tab-review').click();
+  // S2: ホームの学習導線から復習ページへ遷移できる。
+  test('home → spaced-review', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('nav.home-nav a[href="/spaced-review"]').click();
     await expect(page).toHaveURL(/\/spaced-review/);
+    await expect(page.locator('h1')).toBeVisible();
   });
 
   // S3: ホームから分析画面へ遷移し、見出しが表示される。

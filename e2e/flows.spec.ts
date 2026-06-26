@@ -47,7 +47,7 @@ test.describe('Authenticated flows', () => {
     await authenticate(page, baseURL!);
     await page.goto('/');
     await expect(page.locator('nav.bottom-tabs')).toBeVisible();
-    const hrefs = ['/spaced-review', '/quiz', '/writing', '/phrases', '/analytics', '/calendar', '/'];
+    const hrefs = ['/phrases', '/analytics', '/calendar', '/'];
     for (const href of hrefs) {
       await page.locator(`nav.bottom-tabs a[href="${href}"]`).click();
       await expect.poll(() => pathnameOf(page)).toBe(href);

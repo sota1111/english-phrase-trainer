@@ -78,6 +78,12 @@ export function QuizHubClient({ phrases }: Props) {
           border: none;
           background: transparent;
           color: var(--muted, #667085);
+          /*
+            復習は <a>(Link)、クイズ/英作文は <button>。<button> は font-family を
+            継承しないため、明示しないと復習だけフォント/サイズが揃わない (SOT-1266)。
+            font-family を inherit して3セグメントの文字フォント・サイズを統一する。
+          */
+          font-family: inherit;
           font-size: 0.9rem;
           font-weight: 600;
           line-height: 1.2;

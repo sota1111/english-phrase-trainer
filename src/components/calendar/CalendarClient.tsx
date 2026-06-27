@@ -23,9 +23,9 @@ type Props = {
 
 function getDayColor(reviewCount: number): string {
   if (reviewCount === 0) return '#ebedf0';
-  if (reviewCount <= 5) return '#9be9a8';
-  if (reviewCount <= 10) return '#40c463';
-  return '#216e39';
+  if (reviewCount <= 5) return '#9ecbff';
+  if (reviewCount <= 10) return '#4493f8';
+  return '#0a3069';
 }
 
 export function CalendarClient({ initialData }: Props) {
